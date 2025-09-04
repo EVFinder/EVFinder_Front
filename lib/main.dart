@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
       // PermissionController.to.permissionCheck();
     });
     return GetMaterialApp(
+
       theme: ThemeData(
         fontFamily: 'neo',
       ),
