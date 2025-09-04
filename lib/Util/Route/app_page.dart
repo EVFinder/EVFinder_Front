@@ -8,5 +8,6 @@ class AppPages {
   static final pages = [
     GetPage(name: AppRoute.main, page: () => const MainView()),
     GetPage(name: AppRoute.login, page: () => const LoginView()),
+    // GetPage(name: AppRoute.signup, page: () => const SignupView()),
   ];
 }
