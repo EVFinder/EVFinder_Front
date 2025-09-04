@@ -1,20 +1,12 @@
-import 'package:evfinder_front/main.dart';
+import 'package:evfinder_front/View/login_view.dart';
+import 'package:evfinder_front/View/main_view.dart';
 import 'package:get/get.dart';
-import '../../View/viewtest.dart';
-import '../../Controller/controllertest.dart';
 
 part 'app_route.dart';
 
 class AppPages {
-  static const INITIAL = Routes.HOME;
-
-  static final routes = [
-    GetPage(
-      name: Routes.HOME,
-      page: () => MyApp(),
-      binding: BindingsBuilder(() {
-        // Get.lazyPut<HomeController>(() => HomeController());
-      }),
-    ),
+  static final pages = [
+    GetPage(name: AppRoute.main, page: () => const MainView()),
+    GetPage(name: AppRoute.login, page: () => const LoginView()),
   ];
 }
