@@ -1,27 +1,29 @@
 import 'package:evfinder_front/Controller/login_controller.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Controller/camera_controller.dart';
+import 'Controller/permission_controller.dart';
 import 'Util/Route/app_page.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final jwt = prefs.getString('jwt');
-  // await Firebase.initializeApp(); // Firebase 초기화
+  await Firebase.initializeApp(); // Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
-  // await FlutterNaverMap().init(
-  //   clientId: 'qe05hz13nm',
-  //   onAuthFailed: (ex) => switch (ex) {
-  //     NQuotaExceededException(:final message) => print(
-  //       "사용량 초과 (message: $message)",
-  //     ),
-  //     NUnauthorizedClientException() ||
-  //     NClientUnspecifiedException() ||
-  //     NAnotherAuthFailedException() => print("인증 실패: $ex"),
-  //   },
-  // );
+  await FlutterNaverMap().init(
+    clientId: 'qe05hz13nm',
+    onAuthFailed: (ex) => switch (ex) {
+      NQuotaExceededException(:final message) => print(
+        "사용량 초과 (message: $message)",
+      ),
+      NUnauthorizedClientException() ||
+      NClientUnspecifiedException() ||
+      NAnotherAuthFailedException() => print("인증 실패: $ex"),
+    },
+  );
 
   runApp(const MyApp());
 }
@@ -29,17 +31,20 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // Future<bool> checkAutoLogin() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final jwt = prefs.getString('jwt');
-  //   return jwt != null; // JWT가 있으면 자동 로그인
-  // }
+  Future<bool> checkAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+    return jwt != null; // JWT가 있으면 자동 로그인
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Get.put(PermissionController());
+    Get.put(PermissionController());
+    Get.put(CameraController());
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // PermissionController.to.permissionCheck();
+      var permissionController = Get.find<PermissionController>();
+      permissionController.permissionCheck();
+      // permissionController.dispose();
     });
     return GetMaterialApp(
       theme: ThemeData(
