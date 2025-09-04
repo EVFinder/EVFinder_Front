@@ -1,6 +1,7 @@
 part of 'app_page.dart';
 
-abstract class Routes {
-  static const HOME = '/main';
-  static const SPLASH = '/';
+class AppRoute {
+  static final main = MainView.route;
+  static final login = LoginView.route;
+  static final splash = '/';
 }
