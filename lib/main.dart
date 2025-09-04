@@ -1,20 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Util/Route/app_page.dart';
-import 'Constants/constantstest.dart';
 
-void main() {
-  runApp(MyApp());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final jwt = prefs.getString('jwt');
+  // await Firebase.initializeApp(); // Firebase 초기화
+  WidgetsFlutterBinding.ensureInitialized();
+  // await FlutterNaverMap().init(
+  //   clientId: 'qe05hz13nm',
+  //   onAuthFailed: (ex) => switch (ex) {
+  //     NQuotaExceededException(:final message) => print(
+  //       "사용량 초과 (message: $message)",
+  //     ),
+  //     NUnauthorizedClientException() ||
+  //     NClientUnspecifiedException() ||
+  //     NAnotherAuthFailedException() => print("인증 실패: $ex"),
+  //   },
+  // );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // Future<bool> checkAutoLogin() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final jwt = prefs.getString('jwt');
+  //   return jwt != null; // JWT가 있으면 자동 로그인
+  // }
+
   @override
   Widget build(BuildContext context) {
+    // Get.put(PermissionController());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      // PermissionController.to.permissionCheck();
+    });
     return GetMaterialApp(
-      // title: AppConstants.appName,
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
+      theme: ThemeData(
+        fontFamily: 'neo',
+      ),
       debugShowCheckedModeBanner: false,
+      initialBinding: BindingsBuilder(() {
+        // Get.put(AuthController());
+        // Get.lazyPut(() => ProfileController(), fenix: true);
+      }),
+      getPages: AppPages.pages,
+      initialRoute: AppRoute.login,
     );
   }
 }
+
