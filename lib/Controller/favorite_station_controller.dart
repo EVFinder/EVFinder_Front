@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Service/favorite_service.dart';
+
 class FavoriteStationController extends GetxController {
   final favoriteStations = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
