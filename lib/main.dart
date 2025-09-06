@@ -1,4 +1,7 @@
+import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Controller/login_controller.dart';
+import 'package:evfinder_front/Controller/main_controller.dart';
+import 'package:evfinder_front/Controller/map_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +62,9 @@ class MyApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
         Get.lazyPut(() => SignupController());
+        Get.lazyPut(() => MainController());
+        Get.lazyPut(() => MapController());
+        Get.lazyPut(() => FavoriteStationController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
