@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var permissionController = Get.find<PermissionController>();
       permissionController.permissionCheck();
-      permissionController.dispose();
+      // permissionController.dispose();
     });
     return GetMaterialApp(
 
