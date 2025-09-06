@@ -1,4 +1,5 @@
 import 'package:evfinder_front/Controller/login_controller.dart';
+import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
+        Get.lazyPut(() => SignupController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
