@@ -19,7 +19,7 @@ class LoginController extends GetxController {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("로그인 성공")),
     );
-    await Get.toNamed(AppRoute.main);
+    await Get.offAndToNamed(AppRoute.main);
   }
 
   @override
@@ -118,28 +118,30 @@ class LoginController extends GetxController {
 
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      final String? idToken = await userCredential.user?.getIdToken();
+      // final String? idToken = await userCredential.user?.getIdToken();
       final uid = userCredential.user?.uid;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('uid', uid!);
 
-      if (idToken == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')),
+      // if (idToken == null) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')),
+      //   );
+      //   return;
+      // }
+
+      final User? user = userCredential.user;
+      if( user != null) {
+        final response = await http.post(
+          Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': googleUser.email, 'password':  'GOOGLE_LOGIN_$uid',}), // 구글 로그인 시 비밀번호는 필요 없음
         );
-        return;
-      }
 
-      final response = await http.post(
-        Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'idToken': idToken}),
-      );
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-
-        if (decoded['success'] == true) {
+          // if (decoded['success'] == true) {
           final String jwt = decoded['jwt'];
 
           final prefs = await SharedPreferences.getInstance();
@@ -150,15 +152,16 @@ class LoginController extends GetxController {
           );
 
           success(context, jwt);
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text('로그인 실패: ${decoded['message']}')),
+          //   );
+          // }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('로그인 실패: ${decoded['message']}')),
+            const SnackBar(content: Text('서버 오류 발생')),
           );
         }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('서버 오류 발생')),
-        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -268,6 +271,6 @@ class LoginController extends GetxController {
   }
 
   void handleSignup() {
-    // Get.toNamed(AppRoute.signup);
+    Get.toNamed(AppRoute.signup);
   }
 }
