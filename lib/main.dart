@@ -7,11 +7,14 @@ import 'Controller/camera_controller.dart';
 import 'Controller/permission_controller.dart';
 import 'Util/Route/app_page.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'firebase_options.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Firebase 초기화
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ); // Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
