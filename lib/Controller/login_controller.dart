@@ -45,35 +45,37 @@ class LoginController extends GetxController {
     }
 
     try {
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      // final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      //   email: email,
+      //   password: password,
+      // );
 
-      final uid = userCredential.user?.uid;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('uid', uid!); //uid 저장
+      // final uid = userCredential.user?.uid;
+      // final prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('uid', uid!); //uid 저장
+      //
+      // final String? idToken = await userCredential.user?.getIdToken();
 
-      final String? idToken = await userCredential.user?.getIdToken();
-
-      if (idToken == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')),
-        );
-        return;
-      }
+      // if (idToken == null) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')),
+      //   );
+      //   return;
+      // }
 
       final response = await http.post(
         Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'idToken': idToken}),
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        if (decoded['success'] == true) {
+        // if (decoded['success'] == true) {
           final String jwt = decoded['jwt'];
+          final String uid = decoded['uid'];
+          final String email = decoded['email'];
 
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('jwt', jwt);
@@ -83,11 +85,11 @@ class LoginController extends GetxController {
           );
 
           success(context, jwt); // 구글 로그인과 동일하게 처리
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('로그인 실패: ${decoded['message']}')),
-          );
-        }
+        // } else {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(content: Text('로그인 실패: ${decoded['message']}')),
+        //   );
+        // }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('서버 오류가 발생했습니다.')),

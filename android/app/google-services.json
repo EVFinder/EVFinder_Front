@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "798822824658",
+    "project_id": "evfinder-4ff3d",
+    "storage_bucket": "evfinder-4ff3d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798822824658:android:318b718ab0ca2bcd18cb0b",
+        "android_client_info": {
+          "package_name": "com.example.evfinder_front"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "798822824658-eukc0nt9scg7jd75u0ofhfq0afqo79qf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.evfinder_front",
+            "certificate_hash": "952c0897fb2a8093f553076a5521df4507088bcc"
+          }
+        },
+        {
+          "client_id": "798822824658-qfebicb6gsqh75chuiv2ls14ldhbcvvb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.evfinder_front",
+            "certificate_hash": "b29124c194aca08c12548a05ce47ccdab5cf72fd"
+          }
+        },
+        {
+          "client_id": "798822824658-5cg1dfu4s36n0m0tahhf3e4h8b9ahqhq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2ma0KaWqvOdjq8FU9qanbXeNi2ocilwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "798822824658-5cg1dfu4s36n0m0tahhf3e4h8b9ahqhq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
