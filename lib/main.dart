@@ -2,6 +2,7 @@ import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Controller/login_controller.dart';
 import 'package:evfinder_front/Controller/main_controller.dart';
 import 'package:evfinder_front/Controller/map_controller.dart';
+import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var permissionController = Get.find<PermissionController>();
       permissionController.permissionCheck();
-      // permissionController.dispose();
+      permissionController.dispose();
     });
     return GetMaterialApp(
 
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => MainController());
         Get.lazyPut(() => MapController());
         Get.lazyPut(() => FavoriteStationController());
+        Get.lazyPut(() => SettingController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
