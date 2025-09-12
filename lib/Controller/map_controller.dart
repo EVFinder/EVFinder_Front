@@ -13,6 +13,7 @@ import '../../Service/favorite_service.dart';
 import '../Service/ev_charger_service.dart';
 import '../Service/location_service.dart';
 import '../Service/marker_service.dart';
+import '../View/Widget/charger_detail_card.dart';
 
 class MapController extends GetxController {
   late NaverMapController nMapController;
@@ -24,59 +25,89 @@ class MapController extends GetxController {
   final PermissionController locationController = PermissionController();
   RxBool isLocationLoaded = false.obs;
   Rx<Position?> userPosition = Rx<Position?>(null);
-  String addressname = '서울특별시 중구 세종대로 110';
-
+  RxDouble lat = 37.5665.obs;
+  RxDouble lon = 126.9780.obs;
 
   Future<void> initializeLocation() async {
     try {
       Position? position = await locationController.getCurrentLocation();
-
-        userPosition.value = position;
-        isLocationLoaded.value = true;
-
+      userPosition.value = position;
+      isLocationLoaded.value = true;
     } catch (e) {
       print('위치 가져오기 실패: $e');
-
-        isLocationLoaded.value = true; // 실패해도 지도는 보여주기
-
-
+      isLocationLoaded.value = true; // 실패해도 지도는 보여주기
     }
   }
 
-  // Future<void> fetchMyChargers(BuildContext context, dynamic result) async {
-  //   if (result != null && result is SearchChargers) {
-  //     // 새 리스트로 fetch
-  //     if (_markers.isNotEmpty) {
-  //       MarkerService.removeMarkers(_nMapController, _markers);
-  //     }
-  //     addressname = result.addressName;
-  //     await fetchChargers(addressname);
-  //     // 마커 새로 로딩
-  //     _loadMarkers(_chargers); // 이 부분 꼭 필요!
-  //     cameraController.moveCameraPosition(double.parse(result.y), double.parse(result.x), _nMapController);
-  //   } else {
-  //     if (isLocationLoaded && locationController.position != null) {
-  //       final addressResultName = LocationService.changeGPStoAddressName(locationController.position!.latitude, locationController.position!.longitude);
-  //       addressname = await addressResultName;
-  //     }
-  //     await fetchChargers(addressname);
-  //   }
-  // }
-  //
-  // Future<void> fetchChargers(String addressName) async {
-  //   final chargers = EvChargerService.fetchChargers(addressName); // ✅ 임시 query
-  //   _chargers = await chargers;
-  // }
+  Future<void> fetchMyChargers(BuildContext context, dynamic result) async {
+    if (result != null) {
+      // 기존 마커 제거
+      if (markers.isNotEmpty) {
+        MarkerService.removeMarkers(nMapController, markers);
+      }
 
-  // Future<void> _loadMarkers(List<EvCharger> chargers) async {
-  //   _markers = await MarkerService.generateMarkers(chargers, context, _nMapController);
-  //   for (var marker in _markers) {
-  //     try {
-  //       await _nMapController.addOverlay(marker);
-  //       await MarkerService.addMarkersToMap(_nMapController, _markers);
-  //     } catch (e) {
-  //       print("마커 추가 실패: ${marker.info.id}, 이유: $e");
-  //     }
-  //   }
-  // }
+      await fetchChargers(lat.value, lon.value);
+
+      // ✅ 이 부분이 빠져있었음!
+      await loadMarkers(context, chargers);
+
+      cameraController.moveCameraPosition(
+          double.parse(result.y),
+          double.parse(result.x),
+          nMapController
+      );
+    } else {
+      await fetchChargers(lat.value, lon.value);
+      await loadMarkers(context, chargers.value); // ✅ chargers -> chargers.value
+    }
+  }
+
+  Future<void> fetchChargers(double lat, double lon) async {
+    List<EvCharger> resultChargers = await EvChargerService.fetchChargers(lat, lon);
+    chargers.value = resultChargers;
+  }
+
+  Future<void> loadMarkers(BuildContext context, List<EvCharger> chargers) async {
+    try {
+      final newMarkers = await MarkerService.generateMarkers(
+          chargers,
+          nMapController,
+              (EvCharger charger) {
+            // 여기서 모달 띄우기
+            showChargerDetail(context, charger);
+          }
+      );
+      markers.value = newMarkers;
+      print(markers);
+      for (var marker in markers) {
+        try {
+          await nMapController.addOverlay(marker);
+        } catch (e) {
+          print("마커 추가 실패: ${marker.info.id}, 이유: $e");
+        }
+      }
+    } catch (e) {
+      print("마커 로딩 실패: $e");
+    }
+  }
+
+
+  void showChargerDetail(BuildContext context, EvCharger charger) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return ChargerDetailCard(
+              charger: charger,
+              isFavorite: false, // 또는 적절한 값
+              // uid: uid,
+            );
+          },
+        );
+      },
+    );
+  }
+
 }
