@@ -30,12 +30,16 @@ class MapView extends GetView<MapController> {
                 ),
               ),
               onMapReady: (mController) async {
-                if (controller.isMapReady.value == false) {
-                  // await controller.fetchMyChargers(context, null);
-                  controller.nMapController = mController;
-                  controller.isMapReady.value = true;
-                  // controller.loadMarkers(controller.chargers); // 서버에서 충전소 받아와서 마커 표시
-                }
+                controller.nMapController = mController;
+                await controller.fetchMyChargers(context, null);
+                controller.isMapReady.value = true;
+                // controller.loadMarkers(context, controller.chargers);
+                // if (controller.isMapReady.value == false) {
+                //   await controller.fetchMyChargers(context, null);
+                //   controller.nMapController = mController;
+                //   controller.isMapReady.value = true;
+                //   controller.loadMarkers(context, controller.chargers); // 서버에서 충전소 받아와서 마커 표시
+                // }
               },
             ),
             // Positioned(

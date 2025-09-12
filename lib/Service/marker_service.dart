@@ -8,56 +8,56 @@ import 'favorite_service.dart'; // 또는 상대경로 맞게 수정
 class MarkerService {
   static CameraController cameraController = CameraController();
   static Set<String> _addedMarkerIds = {}; // ID 추적용
-  static Future<List<NMarker>> generateMarkers(List<EvCharger> chargers, BuildContext context, NaverMapController nMapController)
-  async {
-    final prefs = await SharedPreferences.getInstance();
-    final uid = prefs.getString('uid') ?? '';
+  static Future<List<NMarker>> generateMarkers(List<EvCharger> chargers, NaverMapController nMapController, Function(EvCharger) onMarkerTab) async {
+    // final prefs = await SharedPreferences.getInstance();
+    // final uid = prefs.getString('uid') ?? '';
 
     return chargers.map((charger) {
       final marker = NMarker(
-        id: charger.statId,
-        position: NLatLng(charger.lat, charger.lng),
+        id: charger.id,
+        position: NLatLng(charger.lat, charger.lon),
         caption: NOverlayCaption(text: charger.name),
       );
 
       marker.setOnTapListener((NMarker marker) async {
-        cameraController.moveCameraPosition(charger.lat, charger.lng, nMapController);
+        cameraController.moveCameraPosition(charger.lat, charger.lon, nMapController);
 
-        final statIds = await FavoriteService.getFavoriteStatIds(uid);
+        // final statIds = await FavoriteService.getFavoriteStatIds(uid);
 
         // 디버깅용 출력
-        print("📌 charger.statId = ${charger.statId} (${charger.statId.runtimeType})");
-        print("📋 Favorite statIds = $statIds");
+        print("📌 charger.statId = ${charger.id} (${charger.id.runtimeType})");
+        // print("📋 Favorite statIds = $statIds");
 
-        final isFavorite = statIds.contains(charger.statId.toString());
+        // final isFavorite = statIds.contains(charger.id.toString());
+        onMarkerTab(charger);
 
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (context, setModalState) {
-                // bool _isFavorite = isFavorite;
-                return Text("sdf");
-                // return ChargerDetailCard(
-                //   charger: charger,
-                //   isFavorite: _isFavorite,
-                //   uid: uid,
-                //   onFavoriteToggle: () async {
-                //     if (_isFavorite) {
-                //       await FavoriteService.removeFavorite(uid, charger.statId);
-                //     } else {
-                //       await FavoriteService.addFavorite(uid, charger);
-                //     }
-                //     setModalState(() {
-                //       _isFavorite = !_isFavorite;
-                //     });
-                //   },
-                // );
-              },
-            );
-          },
-        );
+        // showModalBottomSheet(
+        //   context: context,
+        //   isScrollControlled: true,
+        //   builder: (context) {
+        //     return StatefulBuilder(
+        //       builder: (context, setModalState) {
+        //         // bool _isFavorite = isFavorite;
+        //         return Text("sdf");
+        //         // return ChargerDetailCard(
+        //         //   charger: charger,
+        //         //   isFavorite: _isFavorite,
+        //         //   uid: uid,
+        //         //   onFavoriteToggle: () async {
+        //         //     if (_isFavorite) {
+        //         //       await FavoriteService.removeFavorite(uid, charger.statId);
+        //         //     } else {
+        //         //       await FavoriteService.addFavorite(uid, charger);
+        //         //     }
+        //         //     setModalState(() {
+        //         //       _isFavorite = !_isFavorite;
+        //         //     });
+        //         //   },
+        //         // );
+        //       },
+        //     );
+        //   },
+        // );
       });
 
       return marker; // ❗❗ 여기 반드시 필요함
@@ -65,6 +65,7 @@ class MarkerService {
   }
 
   static Future<void> addMarkersToMap(NaverMapController controller, List<NMarker> markers) async {
+    print("마커 추가 시작");
     for (var marker in markers) {
       try {
         await controller.addOverlay(marker);

@@ -4,13 +4,13 @@ import '../Model/ev_charger.dart';
 import '../constants/api_constants.dart';
 
 class EvChargerService {
-  static Future<List<EvCharger>> fetchChargers(String query) async {
-    final url = Uri.parse('${ApiConstants.evApiBaseUrl}/findevc?query=$query');
+  static Future<List<EvCharger>> fetchChargers(double lat, double lon) async {
+    final url = Uri.parse('${ApiConstants.evApiBaseUrl}?lat=$lat&lon=$lon');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final decoded = json.decode(response.body);
-      final List chargers = decoded['chargers'];
+      // final decoded = json.decode(response.body);
+      final List chargers = json.decode(response.body);
       return chargers.map((e) => EvCharger.fromJson(e)).toList();
     } else {
       throw Exception('충전소 데이터를 불러오지 못했습니다.');
