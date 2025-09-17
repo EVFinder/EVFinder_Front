@@ -1,15 +1,21 @@
 import 'dart:ui';
 
-
 String getStatusLabel(int stat) {
   switch (stat) {
-    case 0: return '알수없음';
-    case 1: return '통신이상';
-    case 2: return '이용가능';
-    case 3: return '충전중';
-    case 4: return '운영중지';
-    case 5: return '점검중';
-    default: return '알수없음';
+    case 0:
+      return '알수없음';
+    case 1:
+      return '통신이상';
+    case 2:
+      return '이용가능';
+    case 3:
+      return '충전중';
+    case 4:
+      return '운영중지';
+    case 5:
+      return '점검중';
+    default:
+      return '알수없음';
   }
 }
 
