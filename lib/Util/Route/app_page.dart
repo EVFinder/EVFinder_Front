@@ -12,6 +12,7 @@ class AppPages {
     GetPage(name: AppRoute.main, page: () => const MainView()),
     GetPage(name: AppRoute.login, page: () => const LoginView()),
     GetPage(name: AppRoute.favorite, page: () => const FavoriteStationView()),
+    GetPage(name: AppRoute.profile, page: () => const ProfileView()),
     GetPage(name: AppRoute.signup, page: () => const SignupView()),
   ];
 }
