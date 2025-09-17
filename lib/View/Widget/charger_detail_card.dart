@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../Model/ev_charger.dart';
-
-import '../../Service/favorite_service.dart';
+import '../../Util/charger_status.dart';
+import '../../Util/charger_type.dart';
 
 class ChargerDetailCard extends StatefulWidget {
   final EvCharger charger;
@@ -23,14 +23,7 @@ class ChargerDetailCard extends StatefulWidget {
 }
 
 class _ChargerDetailCardState extends State<ChargerDetailCard> {
-  late bool _isFavorite;
   bool _isProcessing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFavorite = widget.isFavorite;
-  }
 
   void _toggleFavorite() async {
     if (_isProcessing) return;//중복 방지
@@ -43,9 +36,6 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
       //   await FavoriteService.addFavorite(widget.uid, widget.charger);
       // }
 
-      setState(() {
-        _isFavorite = !_isFavorite;
-      });
 
       // if (widget.onFavoriteToggle != null) {
       //   widget.onFavoriteToggle!();
@@ -60,8 +50,8 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
   @override
   Widget build(BuildContext context) {
     final charger = widget.charger;
-    final chargerTypeText = _convertChargerType(charger.evchargerDetail[0].type);
-    final chargerStateColor = _convertStatusColor(int.parse(charger.evchargerDetail[0].status));
+    final chargerTypeText = convertChargerType(charger.evchargerDetail[0].type);
+    final chargerStateColor = getStatusColor(int.parse(charger.evchargerDetail[0].status));
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -96,7 +86,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                   IconButton(
                     onPressed: _isProcessing ? null : _toggleFavorite, // 처리 중이면 비활성화
                     icon: Icon(
-                      _isFavorite ? Icons.star : Icons.star_border,
+                      widget.isFavorite ? Icons.star : Icons.star_border,
                       color: Colors.yellow,
                     ),
                   ),
@@ -135,7 +125,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text("충전가능", style: TextStyle(fontSize: 10, color: Colors.grey)),
-                        Text(_getAvailabilityText(int.parse(charger.evchargerDetail[0].status)), style: TextStyle(fontWeight: FontWeight.bold)),
+                        // Text(_getAvailabilityText(int.parse(charger.evchargerDetail[0].status)), style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],
@@ -147,39 +137,12 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
       ),
     );
   }
+  //
+  // String _getAvailabilityText(int stat) {
+  //   return stat == 2 ? '1/1' : '0/1';
+  // }
 
-  String _getAvailabilityText(int stat) {
-    return stat == 2 ? '1/1' : '0/1';
-  }
 
-  String _convertChargerType(String code) {
-    switch (code) {
-      case "01":
-        return "완속";
-      case "02":
-        return "급속";
-      case "03":
-        return "초급속";
-      case "06":
-        return "DC차데모";
-      case "07":
-        return "AC3상";
-      default:
-        return "기타";
-    }
-  }
 
-  Color _convertStatusColor(int stat) {
-    switch (stat) {
-      case 2:
-        return Colors.green;
-      case 3:
-        return Colors.orange;
-      case 4:
-      case 5:
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+
 }
