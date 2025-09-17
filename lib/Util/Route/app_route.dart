@@ -4,6 +4,7 @@ class AppRoute {
   static final main = MainView.route;
   static final login = LoginView.route;
   static final favorite = FavoriteStationView.route;
+  static final profile = ProfileView.route;
   // static final signup = SignupView.route;
   static final splash = '/';
 }
