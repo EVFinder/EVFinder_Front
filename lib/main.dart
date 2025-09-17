@@ -1,4 +1,5 @@
 import 'package:evfinder_front/Controller/login_controller.dart';
+import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,11 +8,14 @@ import 'Controller/camera_controller.dart';
 import 'Controller/permission_controller.dart';
 import 'Util/Route/app_page.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'firebase_options.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Firebase 초기화
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ); // Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
@@ -54,6 +58,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
+        Get.lazyPut(() => SignupController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
