@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../Util/status.dart';
+import '../../Util/charger_status.dart';
 
 class ListtileChargestarWidget extends StatefulWidget {
   const ListtileChargestarWidget({
