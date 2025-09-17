@@ -12,27 +12,27 @@ class FavoriteService {
   static Future<bool> addFavorite(String uid, EvCharger charger) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/add');
 
-    final body = {
-      "uid": uid,
-      "station": {
-        "statId": charger.statId,
-        "name": charger.name,
-        "addr": charger.addr,
-        "lat": charger.lat,
-        "lng": charger.lng,
-        "useTime": charger.useTime,
-        "output": charger.output,
-        "method": charger.method,
-        "chgerType": charger.chgerType,
-        "busiNm": charger.busiNm,
-        "stat": charger.stat,
-        "distance": charger.distance,
-        "timestamp": DateTime.now().toIso8601String(),
-      },
-    };
-    print('[DEBUG] 즐겨찾기 추가 요청: $body');
+    // final body = {
+    //   "uid": uid,
+    //   "station": {
+    //     "statId": charger.statId,
+    //     "name": charger.name,
+    //     "addr": charger.addr,
+    //     "lat": charger.lat,
+    //     "lng": charger.lng,
+    //     "useTime": charger.useTime,
+    //     "output": charger.output,
+    //     "method": charger.method,
+    //     "chgerType": charger.chgerType,
+    //     "busiNm": charger.busiNm,
+    //     "stat": charger.stat,
+    //     "distance": charger.distance,
+    //     "timestamp": DateTime.now().toIso8601String(),
+    //   },
+    // };
+    // print('[DEBUG] 즐겨찾기 추가 요청: $body');
 
-    final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode(body));
+    final response = await http.post(url, headers: {"Content-Type": "application/json"});
     print('[DEBUG] 응답 코드: ${response.statusCode}');
     print('[DEBUG] 응답 내용: ${response.body}');
     return response.statusCode == 200;
