@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Controller/camera_controller.dart';
 import 'Controller/permission_controller.dart';
+import 'Controller/profile_controller.dart';
 import 'Util/Route/app_page.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'firebase_options.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => SignupController());
         Get.lazyPut(() => MainController());
         Get.lazyPut(() => MapController());
+        Get.lazyPut(() => ProfileController());
         Get.lazyPut(() => FavoriteStationController());
         Get.lazyPut(() => SettingController());
         // Get.put(AuthController());
