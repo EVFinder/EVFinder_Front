@@ -8,5 +8,6 @@ class AppRoute {
   static final signup = SignupView.route;
   static final map = MapView.route;
   static final setting = SettingView.route;
+  static final password = ChangePasswordView.route;
   static final splash = '/';
 }
