@@ -50,13 +50,13 @@ class MainView extends GetView<MainController> {
                     icon: Icon(Icons.explore, size: 25),
                     color: controller.selectedIndex.value == 1 ? Colors.green : Colors.black12,
                   ),
-                  // IconButton(
-                  //   onPressed: () {
-                  //     controller.setView(2);
-                  //   },
-                  //   icon: Icon(Icons.person, size: 25),
-                  //   color: selectedIndex.value == 2 ? Colors.green : Colors.black12,
-                  // ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(2);
+                    },
+                    icon: Icon(Icons.person, size: 25),
+                    color: controller.selectedIndex.value == 2 ? Colors.green : Colors.black12,
+                  ),
                 ],
               ),
             ),
