@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../Controller/login_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../View/login_view.dart';
+import '../Controller/profile_controller.dart';
+import '../View/Widget/profile_card.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -41,7 +39,7 @@ class ProfileView extends GetView<ProfileController> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: ElevatedButton(
-                    onPressed: () => controller.handleLogout(context),
+                    onPressed: () => controller.handleLogout,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6B7280), // gray-500
                       minimumSize: const Size(double.infinity, 50),
@@ -58,7 +56,7 @@ class ProfileView extends GetView<ProfileController> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: ElevatedButton(
-                    onPressed: controller.handleDeleteAccount,
+                    onPressed: controller.deleteAccount,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEF4444), // red-500
                       minimumSize: const Size(double.infinity, 50),
