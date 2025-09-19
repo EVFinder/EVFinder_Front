@@ -4,6 +4,8 @@ import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
 import 'package:evfinder_front/View/map_view.dart';
 import 'package:evfinder_front/View/setting_view.dart';
+import 'package:evfinder_front/View/profile_view.dart';
+import 'package:evfinder_front/View/change_password.dart';
 import 'package:get/get.dart';
 import '../../View/signup_view.dart';
 
@@ -18,6 +20,7 @@ class AppPages {
     GetPage(name: AppRoute.signup, page: () => const SignupView()),
     GetPage(name: AppRoute.map, page: () => const MapView()),
     GetPage(name: AppRoute.setting, page: () => const SettingView()),
+    GetPage(name: AppRoute.password, page: () => const ChangePasswordView())
 
   ];
 }
