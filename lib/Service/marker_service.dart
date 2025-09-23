@@ -1,14 +1,17 @@
 import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/ev_charger.dart';
+import '../View/Widget/charger_detail_card.dart';
+import 'ev_charger_service.dart';
 import 'favorite_service.dart'; // 또는 상대경로 맞게 수정
 
 class MarkerService {
   static CameraController cameraController = CameraController();
   static Set<String> _addedMarkerIds = {}; // ID 추적용
-  static Future<List<NMarker>> generateMarkers(List<EvCharger> chargers, NaverMapController nMapController, Function(EvCharger) onMarkerTab) async {
+  static Future<List<NMarker>> generateMarkers(BuildContext context, List<EvCharger> chargers, NaverMapController nMapController, Function(EvCharger) onMarkerTab) async {
     // final prefs = await SharedPreferences.getInstance();
     // final uid = prefs.getString('uid') ?? '';
 
@@ -30,6 +33,8 @@ class MarkerService {
 
         // final isFavorite = statIds.contains(charger.id.toString());
         onMarkerTab(charger);
+
+
 
         // showModalBottomSheet(
         //   context: context,
@@ -91,4 +96,8 @@ class MarkerService {
     }
     markers.clear();
   }
+
+
 }
+
+
