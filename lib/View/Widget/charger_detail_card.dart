@@ -1,38 +1,50 @@
 import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Model/ev_charger_detail.dart';
+import 'package:evfinder_front/Service/favorite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/map_controller.dart';
 import '../../Model/ev_charger.dart';
 import '../../Util/charger_status.dart';
 
 class ChargerDetailCard extends GetView<MapController> {
-  const ChargerDetailCard({super.key, required this.charger, required this.isFavorite, required this.onFavoriteToggle});
+  const ChargerDetailCard({
+    super.key,
+    required this.charger,
+    // required this.isFavorite,
+  });
 
   final EvCharger charger;
-  final bool isFavorite;
-  final VoidCallback onFavoriteToggle;
+  // final bool isFavorite;
 
   @override
   Widget build(BuildContext context) {
+    final favoriteController = Get.find<FavoriteStationController>();
+
     // 확장 상태를 관리하는 RxBool
     final RxBool isExpanded = false.obs;
-    // final favoriteController = Get.find<FavoriteStationController>();
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Obx(
-        () => AnimatedContainer(
+      child: Obx(() {
+        final isFavorite = favoriteController.favoriteStations
+            .any((station) => station['id'] == charger.id);
+        return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           // 애니메이션 지속시간
           curve: Curves.easeInOut,
           // 애니메이션 커브
           height: isExpanded.value
               ? 200 +
-                    (charger.evchargerDetail.length * 70.0) // 확장된 높이 (각 아이템당 60px)
+                    (charger.evchargerDetail.length *
+                        70.0) // 확장된 높이 (각 아이템당 60px)
               : 200,
           // 기본 높이
           width: MediaQuery.of(context).size.width - 25,
-          decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(15)),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,7 +61,11 @@ class ChargerDetailCard extends GetView<MapController> {
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: Text(
                             charger.name,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -57,15 +73,27 @@ class ChargerDetailCard extends GetView<MapController> {
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: Text(
                             charger.addr,
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                     IconButton(
-                      onPressed: onFavoriteToggle,
-                      icon: Icon(isFavorite ? Icons.star : Icons.star_border, color: Colors.yellow),
+                      onPressed: () async {
+                        if (isFavorite) {
+                          await favoriteController.removeFavorite(charger.id);
+                        } else {
+                          await favoriteController.addFavorite(charger);
+                        }
+                      },
+                      icon: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color: Colors.yellow,
+                      ),
                     ),
                   ],
                 ),
@@ -74,7 +102,10 @@ class ChargerDetailCard extends GetView<MapController> {
 
               // 하단 상태
               Container(
-                decoration: BoxDecoration(color: const Color(0xFFF0F0F0), borderRadius: BorderRadius.circular(5)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F0F0),
+                  borderRadius: BorderRadius.circular(5),
+                ),
                 width: MediaQuery.of(context).size.width,
                 child: ListTile(
                   contentPadding: const EdgeInsets.only(left: 20, right: 16),
@@ -100,12 +131,27 @@ class ChargerDetailCard extends GetView<MapController> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text("${charger.evchargerDetail.where((detail) => detail.status == '2').length}", style: const TextStyle(fontSize: 20, color: Colors.green)),
+                              Text(
+                                "${charger.evchargerDetail.where((detail) => detail.status == '2').length}",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.green,
+                                ),
+                              ),
                               const Text("/"),
-                              Text("${charger.evchargerDetail.length}", style: const TextStyle(fontSize: 20, color: Colors.blue)),
+                              Text(
+                                "${charger.evchargerDetail.length}",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.blue,
+                                ),
+                              ),
                             ],
                           ),
-                          const Text("충전가능", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                          const Text(
+                            "충전가능",
+                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                          ),
                         ],
                       ),
                     ],
@@ -130,12 +176,30 @@ class ChargerDetailCard extends GetView<MapController> {
                         final detail = charger.evchargerDetail[index];
                         return ListTile(
                           dense: true,
-                          leading: CircleAvatar(radius: 6, backgroundColor: getStatusColor(int.parse(detail.status))),
-                          title: Text('충전기 ${index + 1}', style: const TextStyle(fontSize: 14)),
-                          subtitle: Text('${detail.type} | ${detail.powerType}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                          leading: CircleAvatar(
+                            radius: 6,
+                            backgroundColor: getStatusColor(
+                              int.parse(detail.status),
+                            ),
+                          ),
+                          title: Text(
+                            '충전기 ${index + 1}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          subtitle: Text(
+                            '${detail.type} | ${detail.powerType}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
                           trailing: Text(
                             getStatusLabel(int.parse(detail.status)),
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: getStatusColor(int.parse(detail.status))),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: getStatusColor(int.parse(detail.status)),
+                            ),
                           ),
                         );
                       },
@@ -145,8 +209,8 @@ class ChargerDetailCard extends GetView<MapController> {
               ],
             ],
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

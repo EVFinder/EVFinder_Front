@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Model/ev_charger.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,11 +69,23 @@ class FavoriteStationController extends GetxController {
     // final success = await FavoriteService.removeFavorite(uid.value, statId);
   }
 
-  Future<void> toggleFavorite(int index) async {
-    final statId = favoriteStations[index]['id'];
+  // Future<bool> refreshFavoriteStations(EvCharger charger) async {
+  //   final isFavorite = favoriteStations.any(
+  //         (station) => station['id'] == charger.id,
+  //   );
+  //   return isFavorite;
+  // }
+
+  Future<void> removeFavorite(String statId) async {
     final success = await FavoriteService.removeFavorite(uid.value, statId);
     if (success) {
-      favoriteStations.removeAt(index);
+      favoriteStations.removeWhere((station) => station['id'] == statId);
     }
+  }
+  Future<void> addFavorite(EvCharger evCharger) async {
+    await FavoriteService.addFavorite(uid.value, evCharger);
+    // if (success) {
+    //   favoriteStations.removeAt(index);
+    // }
   }
 }

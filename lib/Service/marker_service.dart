@@ -43,8 +43,7 @@ class MarkerService {
               builder: (context, setModalState) {
                 return ChargerDetailCard(
                   charger: charger,
-                  isFavorite: isFavorite, // 또는 적절한 값
-                  onFavoriteToggle: () {},
+                  // isFavorite: isFavorite, // 또는 적절한 값
                 );
               },
             );
