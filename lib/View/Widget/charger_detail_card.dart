@@ -3,8 +3,7 @@ import 'package:evfinder_front/Model/ev_charger_detail.dart';
 import 'package:evfinder_front/Service/favorite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../Controller/map_controller.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../Model/ev_charger.dart';
 import '../../Util/charger_status.dart';
 
