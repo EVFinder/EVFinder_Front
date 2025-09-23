@@ -1,10 +1,12 @@
 import 'package:evfinder_front/Controller/addCharge_controller.dart';
+import 'package:evfinder_front/Controller/charge_datail_controller.dart';
 import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Controller/login_controller.dart';
 import 'package:evfinder_front/Controller/main_controller.dart';
 import 'package:evfinder_front/Controller/map_controller.dart';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/Controller/reservManagement_controller.dart';
+import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/host_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
@@ -77,6 +79,8 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => AddChargeController());
         Get.lazyPut(() => ReservManagementController());
         Get.lazyPut(() => RegisterChargeController());
+        Get.lazyPut(() => ReservController());
+        Get.lazyPut(() => ChargeDatailController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),

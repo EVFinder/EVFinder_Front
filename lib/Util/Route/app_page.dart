@@ -1,12 +1,15 @@
 import 'dart:collection';
+import 'package:evfinder_front/Controller/charge_datail_controller.dart';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/View/add_charge_view.dart';
+import 'package:evfinder_front/View/charge_datail_view.dart';
 import 'package:evfinder_front/View/favortie_station_view.dart';
 import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
 import 'package:evfinder_front/View/map_view.dart';
 import 'package:evfinder_front/View/register_charge_view.dart';
 import 'package:evfinder_front/View/reserv_management_view.dart';
+import 'package:evfinder_front/View/reserv_view.dart';
 import 'package:evfinder_front/View/setting_view.dart';
 import 'package:evfinder_front/View/profile_view.dart';
 import 'package:evfinder_front/View/change_password.dart';
@@ -29,7 +32,9 @@ class AppPages {
     GetPage(name: AppRoute.host, page: () => const HostView()),
     GetPage(name: AppRoute.addcharge, page: () => const AddChargeView()),
     GetPage(name: AppRoute.management, page: () => const ReservManagementView()),
-    GetPage(name: AppRoute.register, page: () => const RegisterChargeView())
+    GetPage(name: AppRoute.register, page: () => const RegisterChargeView()),
+    GetPage(name: AppRoute.reserv, page: () => const ReservView()),
+    GetPage(name: AppRoute.detail, page: () => const ChargeDatailView())
 
   ];
 }

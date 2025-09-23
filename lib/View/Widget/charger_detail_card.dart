@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../Model/ev_charger.dart';
 import '../../Util/charger_status.dart';
 import '../../Util/charger_type.dart';
+import '../charge_datail_view.dart';
 
 class ChargerDetailCard extends StatefulWidget {
   final EvCharger charger;
@@ -55,7 +58,14 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
 
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Container(
+        child: GestureDetector(
+            onTap: () {
+              Get.back();
+              Future.microtask(() {
+                Get.to(() => const ChargeDatailView());
+              });
+            },
+              child: Container(
         height: 200,
         width: MediaQuery.of(context).size.width - 25,
         decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(15)),
@@ -135,6 +145,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
           ],
         ),
       ),
+        ),
     );
   }
   //
