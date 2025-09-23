@@ -7,6 +7,7 @@ import 'package:flutter_sliding_box/flutter_sliding_box.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/ev_charger.dart';
 import '../../Service/favorite_service.dart';
+import 'charger_detail_card.dart';
 import 'listtile_chargerinfo_widget.dart';
 
 class SlidingupPanelWidget extends StatelessWidget {
@@ -37,6 +38,22 @@ class SlidingupPanelWidget extends StatelessWidget {
               onTap: () async {
                 boxController.closeBox();
                 cameraController.moveCameraPosition(chargers[index].lat, chargers[index].lon, nMapController);
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return ChargerDetailCard(
+                          charger: chargers[index],
+                          isFavorite: false, // 또는 적절한 값
+                          onFavoriteToggle: () {}, // 필요시 콜백 함수 추가
+                          // uid: uid,
+                        );
+                      },
+                    );
+                  },
+                );
                 final statIds = await FavoriteService.getFavoriteStatIds('test_user');
                 final isFavorite = statIds.contains(chargers[index].id);
                 // showModalBottomSheet(
