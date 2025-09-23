@@ -10,6 +10,7 @@ class FavoriteStationView extends GetView<FavoriteStationController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.loadFavoriteStations();
     return Scaffold(
       appBar: AppBar(title: const Text('즐겨찾기 충전소')),
       body: Obx(() {
@@ -33,7 +34,7 @@ class FavoriteStationView extends GetView<FavoriteStationController> {
                   stationAddress: station['address'],
                   chargerStat: station['chargers']?.isNotEmpty == true ? int.parse(station['chargers'][0]['status']) : 0,
                   isFavorite: station['isFavorite'],
-                  onFavoriteToggle: () => controller.toggleFavorite(index),
+                  onFavoriteToggle: () => controller.removeFavorite(station['id']),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),
