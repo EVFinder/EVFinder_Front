@@ -1,15 +1,10 @@
+import 'package:evfinder_front/Model/ev_charger_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../Controller/map_controller.dart';
 import '../../Model/ev_charger.dart';
-import '../../Util/charger_status.dart';
-import '../../Util/charger_type.dart';
 
-class ChargerDetailCard extends StatefulWidget {
-  final EvCharger charger;
-  final bool isFavorite;
-  final VoidCallback? onFavoriteToggle;
-
-  // final String uid;
-
+class ChargerDetailCard extends GetView<MapController> {
   const ChargerDetailCard({
     super.key,
     required this.charger,
@@ -18,40 +13,15 @@ class ChargerDetailCard extends StatefulWidget {
     this.onFavoriteToggle,
   });
 
-  @override
-  State<ChargerDetailCard> createState() => _ChargerDetailCardState();
-}
-
-class _ChargerDetailCardState extends State<ChargerDetailCard> {
-  bool _isProcessing = false;
-
-  void _toggleFavorite() async {
-    if (_isProcessing) return;//중복 방지
-    _isProcessing = true;
-
-    try {
-      // if (_isFavorite) {
-      //   await FavoriteService.removeFavorite(widget.uid, widget.charger.id);
-      // } else {
-      //   await FavoriteService.addFavorite(widget.uid, widget.charger);
-      // }
-
-
-      // if (widget.onFavoriteToggle != null) {
-      //   widget.onFavoriteToggle!();
-      // }
-    } catch (e) {
-      print(" 즐겨찾기 처리 오류: $e");
-    } finally {
-      _isProcessing = false;
-    }
-  }
+  final EvCharger charger;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
-    final charger = widget.charger;
-    final chargerTypeText = convertChargerType(charger.evchargerDetail[0].type);
-    final chargerStateColor = getStatusColor(int.parse(charger.evchargerDetail[0].status));
+    // final charger = charger;
+    // final chargerTypeText = convertChargerType(charger.evchargerDetail[0].type);
+    // final chargerStateColor = getStatusColor(int.parse(charger.evchargerDetail[0].status));
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -71,7 +41,13 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(charger.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: Text(
+                          charger.name,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
                       const SizedBox(height: 5),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
@@ -84,11 +60,9 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                     ],
                   ),
                   IconButton(
-                    onPressed: _isProcessing ? null : _toggleFavorite, // 처리 중이면 비활성화
-                    icon: Icon(
-                      widget.isFavorite ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
-                    ),
+                    // onPressed: _isProcessing ? null : _toggleFavorite, // 처리 중이면 비활성화
+                    onPressed: () {}, // 처리 중이면 비활성화
+                    icon: Icon(isFavorite ? Icons.star : Icons.star_border, color: Colors.yellow),
                   ),
                 ],
               ),
@@ -107,23 +81,31 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                     Flexible(
                       child: Row(
                         children: [
-                          CircleAvatar(radius: 6, backgroundColor: chargerStateColor),
+                          // CircleAvatar(radius: 6, backgroundColor: chargerStateColor),
                           const SizedBox(width: 8),
-                          Flexible(child: Text(chargerTypeText, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          // Flexible(child: Text(chargerTypeText, style: const TextStyle(fontWeight: FontWeight.bold))),
                           const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              charger.evchargerDetail[0].powerType,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                          ),
+                          // Flexible(
+                          //   child: Text(
+                          //     charger.evchargerDetail[0].powerType,
+                          //     overflow: TextOverflow.ellipsis,
+                          //     style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("${charger.evchargerDetail.where((detail) => detail.status == '2').length}", style: TextStyle(fontSize: 20, color: Colors.green)),
+                            Text("/"),
+                            Text("${charger.evchargerDetail.length}", style: TextStyle(fontSize: 20, color: Colors.blue)),
+                          ],
+                        ),
                         Text("충전가능", style: TextStyle(fontSize: 10, color: Colors.grey)),
                         // Text(_getAvailabilityText(int.parse(charger.evchargerDetail[0].status)), style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
@@ -137,12 +119,4 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
       ),
     );
   }
-  //
-  // String _getAvailabilityText(int stat) {
-  //   return stat == 2 ? '1/1' : '0/1';
-  // }
-
-
-
-
 }

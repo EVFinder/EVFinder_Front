@@ -2,6 +2,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../Controller/map_controller.dart';
+import 'Widget/sliding_pannel_widget.dart';
 
 class MapView extends GetView<MapController> {
   const MapView({super.key});
@@ -54,8 +55,8 @@ class MapView extends GetView<MapController> {
             controller.isMapReady.value
                 ? Positioned(
                     bottom: 0,
-                    child: SizedBox.shrink(),
-                    // child: SlidingupPanelWidget(chargers: _chargers, nMapController: _nMapController, boxController: _boxController),
+                    // child: SizedBox.shrink(),
+                    child: SlidingupPanelWidget(chargers: controller.chargers, nMapController: controller.nMapController, boxController: controller.boxController),
                   )
                 : SizedBox.shrink(),
           ],
