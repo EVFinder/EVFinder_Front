@@ -83,9 +83,21 @@ class FavoriteStationController extends GetxController {
     }
   }
   Future<void> addFavorite(EvCharger evCharger) async {
-    await FavoriteService.addFavorite(uid.value, evCharger);
-    // if (success) {
-    //   favoriteStations.removeAt(index);
-    // }
+    final success = await FavoriteService.addFavorite(uid.value, evCharger);
+    if (success) {
+      // 중복 체크 후 추가
+      if (!favoriteStations.any((station) => station['id'] == evCharger.id)) {
+        favoriteStations.add({
+          "name": evCharger.name ?? '알 수 없음',
+          "address": evCharger.addr ?? '주소 없음',
+          "id": evCharger.id ?? '',
+          "lat": evCharger.lat ?? 0.0,
+          "lon": evCharger.lon ?? 0.0,
+          "chargers": evCharger.evchargerDetail ?? [], // 또는 evCharger.chargers
+          "isFavorite": true,
+        });
+      }
+    }
   }
+
 }

@@ -21,7 +21,6 @@ class ChargerDetailCard extends GetView<MapController> {
   @override
   Widget build(BuildContext context) {
     final favoriteController = Get.find<FavoriteStationController>();
-
     // 확장 상태를 관리하는 RxBool
     final RxBool isExpanded = false.obs;
     return Padding(
