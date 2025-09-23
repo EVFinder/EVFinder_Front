@@ -13,7 +13,7 @@ class MainView extends GetView<MainController> {
     // , ProfileView()
     return Obx(
       () => Scaffold(
-        appBar: controller.selectedIndex.value == 2
+        appBar: controller.selectedIndex.value == 3
             ? AppBar(
                 title: Text("EVFinder"),
                 actions: [
@@ -54,8 +54,15 @@ class MainView extends GetView<MainController> {
                     onPressed: () {
                       controller.setView(2);
                     },
-                    icon: Icon(Icons.person, size: 25),
+                    icon: Icon(Icons.manage_accounts, size: 25),
                     color: controller.selectedIndex.value == 2 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(3);
+                    },
+                    icon: Icon(Icons.person, size: 25),
+                    color: controller.selectedIndex.value == 3 ? Colors.green : Colors.black12,
                   ),
                 ],
               ),
