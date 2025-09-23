@@ -1,5 +1,6 @@
 import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:evfinder_front/Controller/permission_controller.dart';
+import 'package:evfinder_front/Model/ev_charger_detail.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,6 +22,7 @@ class MapController extends GetxController {
   late CameraController cameraController;
   RxList<NMarker> markers = <NMarker>[].obs;
   RxList<EvCharger> chargers = <EvCharger>[].obs;
+  RxList<EvCharger> focusCharger = <EvCharger>[].obs;
   RxBool isMapReady = false.obs;
   final PermissionController locationController = PermissionController();
   RxBool isLocationLoaded = false.obs;
@@ -45,38 +47,29 @@ class MapController extends GetxController {
       if (markers.isNotEmpty) {
         MarkerService.removeMarkers(nMapController, markers);
       }
-
       await fetchChargers(lat.value, lon.value);
-
       // ✅ 이 부분이 빠져있었음!
       await loadMarkers(context, chargers);
 
-      cameraController.moveCameraPosition(
-          double.parse(result.y),
-          double.parse(result.x),
-          nMapController
-      );
+      cameraController.moveCameraPosition(double.parse(result.y), double.parse(result.x), nMapController);
     } else {
       await fetchChargers(lat.value, lon.value);
-      await loadMarkers(context, chargers.value); // ✅ chargers -> chargers.value
+      await loadMarkers(context, chargers); // ✅ chargers -> chargers.value
     }
   }
 
   Future<void> fetchChargers(double lat, double lon) async {
-    List<EvCharger> resultChargers = await EvChargerService.fetchChargers(lat, lon);
+    List<EvCharger> resultChargers = await EvChargerService.fetchNearbyChargers(lat, lon);
     chargers.value = resultChargers;
   }
 
   Future<void> loadMarkers(BuildContext context, List<EvCharger> chargers) async {
     try {
-      final newMarkers = await MarkerService.generateMarkers(
-          chargers,
-          nMapController,
-              (EvCharger charger) {
-            // 여기서 모달 띄우기
-            showChargerDetail(context, charger);
-          }
-      );
+      final newMarkers = await MarkerService.generateMarkers(context, chargers, nMapController, (EvCharger charger) async {
+        await fetchOneBuildingCharger(charger.lat, charger.lon);
+        showChargerDetail(context, charger);
+        // 여기서 모달 띄우기
+      });
       markers.value = newMarkers;
       print(markers);
       for (var marker in markers) {
@@ -91,6 +84,11 @@ class MapController extends GetxController {
     }
   }
 
+  Future<void> fetchOneBuildingCharger(double lat, double lon) async {
+    List<EvCharger> resultChargers = await EvChargerService.fetchOneBuildingChargers(lat, lon);
+    focusCharger.clear();
+    focusCharger.value = resultChargers;
+  }
 
   void showChargerDetail(BuildContext context, EvCharger charger) {
     showModalBottomSheet(
@@ -100,8 +98,9 @@ class MapController extends GetxController {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return ChargerDetailCard(
-              charger: charger,
+              charger: focusCharger[0],
               isFavorite: false, // 또는 적절한 값
+              onFavoriteToggle: () {}, // 필요시 콜백 함수 추가
               // uid: uid,
             );
           },
@@ -109,5 +108,4 @@ class MapController extends GetxController {
       },
     );
   }
-
 }
