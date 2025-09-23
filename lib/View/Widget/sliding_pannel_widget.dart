@@ -17,6 +17,7 @@ class SlidingupPanelWidget extends StatelessWidget {
   final NaverMapController nMapController;
   final BoxController boxController;
   static CameraController cameraController = CameraController();
+
   @override
   Widget build(BuildContext context) {
     //슬라이딩 박스 위젯
@@ -47,7 +48,8 @@ class SlidingupPanelWidget extends StatelessWidget {
                         return ChargerDetailCard(
                           charger: chargers[index],
                           isFavorite: false, // 또는 적절한 값
-                          onFavoriteToggle: () {}, // 필요시 콜백 함수 추가
+                          onFavoriteToggle: () {},
+
                           // uid: uid,
                         );
                       },

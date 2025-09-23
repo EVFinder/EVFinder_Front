@@ -4,34 +4,31 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/ev_charger.dart';
 import '../constants/api_constants.dart';
 
 class FavoriteService {
   /// 즐겨찾기 추가
   static Future<bool> addFavorite(String uid, EvCharger charger) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/add');
-
-    // final body = {
-    //   "uid": uid,
-    //   "station": {
-    //     "statId": charger.statId,
-    //     "name": charger.name,
-    //     "addr": charger.addr,
-    //     "lat": charger.lat,
-    //     "lng": charger.lng,
-    //     "useTime": charger.useTime,
-    //     "output": charger.output,
-    //     "method": charger.method,
-    //     "chgerType": charger.chgerType,
-    //     "busiNm": charger.busiNm,
-    //     "stat": charger.stat,
-    //     "distance": charger.distance,
-    //     "timestamp": DateTime.now().toIso8601String(),
-    //   },
-    // };
-    // print('[DEBUG] 즐겨찾기 추가 요청: $body');
-
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/add/$uid');
+    final body = {
+      "id": charger.id,
+      "name": charger.name,
+      "address": charger.addr,
+      "lat": charger.lat,
+      "lon": charger.lon,
+      "chargers": charger.evchargerDetail
+          .map(
+            (detail) => {
+              "stationId": detail.stationId,
+              "chargerId": detail.chargerId,
+              "status": detail.status,
+              "isAvailable": detail.isAvailable, // 또는 적절한 필드명
+            },
+          )
+          .toList(),
+    };
     final response = await http.post(url, headers: {"Content-Type": "application/json"});
     print('[DEBUG] 응답 코드: ${response.statusCode}');
     print('[DEBUG] 응답 내용: ${response.body}');
@@ -40,26 +37,29 @@ class FavoriteService {
 
   /// 즐겨찾기 목록 조회
   static Future<List<Map<String, dynamic>>> fetchFavorites(String uid) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?uid=$uid');
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(json['favorites']);
+      final List<dynamic> json = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(json);
     } else {
       throw Exception('Failed to fetch favorites');
     }
   }
 
+
   static Future<bool> removeFavorite(String uid, String statId) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/remove?uid=$uid&statId=$statId');
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/delete/$uid/$statId');
     final response = await http.delete(url);
     return response.statusCode == 200;
   }
 
+
   // 임시값 (서울)
   static double userLat = 37.5665;
   static double userLng = 126.9780;
+
 
   static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({required String uid}) async {
     if (await Permission.location.isGranted) {
@@ -71,7 +71,7 @@ class FavoriteService {
 
     final url = Uri.parse(
       '${ApiConstants.favoriteApiBaseUrl}/global/listWithStat'
-          '?uid=$uid&lat=$userLat&lng=$userLng',
+      '?uid=$uid&lat=$userLat&lng=$userLng',
     );
 
     final response = await http.get(url);
@@ -116,15 +116,17 @@ class FavoriteService {
   }
 
   static Future<List<String>> getFavoriteStatIds(String uid) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?uid=$uid');
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list/$uid');
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> json = jsonDecode(response.body);
-        final List<dynamic> favorites = json['favorites'];
-        return favorites.map((e) => e['statId'].toString()).toList();
+        final List<dynamic> json = jsonDecode(response.body);
+        final favorites = List<Map<String, dynamic>>.from(json);
+        // final Map<String, dynamic> json = jsonDecode(response.body);
+        // final List<dynamic> favorites = json[json];
+        return favorites.map((e) => e['id'].toString()).toList();
       } else {
         print("서버 응답 에러: ${response.statusCode}");
         return []; // 실패 시에도 빈 리스트 반환

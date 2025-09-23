@@ -7,9 +7,7 @@ class ListtileChargestarWidget extends StatefulWidget {
     super.key,
     required this.stationName,
     required this.stationAddress,
-    required this.operatingHours,
     required this.chargerStat,
-    required this.distance,
     this.isFavorite = false,
     this.onFavoriteToggle,
     this.onTap,
@@ -17,9 +15,7 @@ class ListtileChargestarWidget extends StatefulWidget {
 
   final String stationName;
   final String stationAddress;
-  final String operatingHours;
   final int chargerStat; // 0: 불가능, 1: 가능
-  final String distance;
   final bool isFavorite;
   final VoidCallback? onFavoriteToggle;
   final VoidCallback? onTap;
@@ -173,14 +169,14 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            widget.distance,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF10B981),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          // Text(
+                          //   widget.distance,
+                          //   style: const TextStyle(
+                          //     fontSize: 12,
+                          //     color: Color(0xFF10B981),
+                          //     fontWeight: FontWeight.w600,
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -194,13 +190,13 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                             color: Color(0xFF6B7280),
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            widget.operatingHours,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
+                          // Text(
+                          //   widget.operatingHours,
+                          //   style: const TextStyle(
+                          //     fontSize: 13,
+                          //     color: Color(0xFF6B7280),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
