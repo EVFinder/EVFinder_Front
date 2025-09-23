@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Model/ev_charger.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,7 @@ class FavoriteStationController extends GetxController {
   final uid = ''.obs;
 
   @override
-  void onInit(){
+  void onInit() {
     super.onInit();
     _loadUidAndFavorites();
   }
@@ -20,31 +21,71 @@ class FavoriteStationController extends GetxController {
     await loadFavoriteStations();
   }
 
-  Future<void> loadFavoriteStations() async{
+  // Future<void> loadFavoriteStations() async{
+  //   isLoading.value = true;
+  //
+  //   try {
+  //     final rawFavorites = await FavoriteService.fetchFavoritesWithStat(uid: uid.value);
+  //     favoriteStations.assignAll(rawFavorites.map((e) => {
+  //       "name": e['name']?.toString() ?? '알 수 없음',
+  //       "addr": e['addr']?.toString() ?? '주소 없음',
+  //       "useTime": e['useTime']?.toString() ?? '',
+  //       "stat": e['stat'] ?? 0,
+  //       "statId": e['statId'],
+  //       "distance": e['distance'] != null
+  //           ? "${double.parse(e['distance'].toString()).toStringAsFixed(1)} km"
+  //           : '',
+  //       "isFavorite": true,
+  //     }));
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  Future<void> loadFavoriteStations() async {
     isLoading.value = true;
 
     try {
-      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(uid: uid.value);
-      favoriteStations.assignAll(rawFavorites.map((e) => {
-        "name": e['name']?.toString() ?? '알 수 없음',
-        "addr": e['addr']?.toString() ?? '주소 없음',
-        "useTime": e['useTime']?.toString() ?? '',
-        "stat": e['stat'] ?? 0,
-        "statId": e['statId'],
-        "distance": e['distance'] != null
-            ? "${double.parse(e['distance'].toString()).toStringAsFixed(1)} km"
-            : '',
-        "isFavorite": true,
-      }));
+      final rawFavorites = await FavoriteService.fetchFavorites(uid.value);
+      favoriteStations.assignAll(
+        rawFavorites.map(
+          (e) => {
+            "name": e['name']?.toString() ?? '알 수 없음',
+            "address": e['address']?.toString() ?? '주소 없음',
+            "id": e['id']?.toString() ?? '',
+            "lat": e['lat'] ?? 0.0,
+            "lon": e['lon'] ?? 0.0,
+            "chargers": e['chargers'] ?? [],
+            "isFavorite": true,
+          },
+        ),
+      );
     } finally {
       isLoading.value = false;
     }
   }
-  Future<void> toggleFavorite(int index) async {
-    final statId = favoriteStations[index]['statId'];
+
+  Future<void> refreshFavoriteStations() async {
+    // final success = await FavoriteService.removeFavorite(uid.value, statId);
+  }
+
+  // Future<bool> refreshFavoriteStations(EvCharger charger) async {
+  //   final isFavorite = favoriteStations.any(
+  //         (station) => station['id'] == charger.id,
+  //   );
+  //   return isFavorite;
+  // }
+
+  Future<void> removeFavorite(String statId) async {
     final success = await FavoriteService.removeFavorite(uid.value, statId);
-    if(success){
-      favoriteStations.removeAt(index);
+    if (success) {
+      favoriteStations.removeWhere((station) => station['id'] == statId);
     }
+  }
+  Future<void> addFavorite(EvCharger evCharger) async {
+    await FavoriteService.addFavorite(uid.value, evCharger);
+    // if (success) {
+    //   favoriteStations.removeAt(index);
+    // }
   }
 }
