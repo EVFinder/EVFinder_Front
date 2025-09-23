@@ -63,11 +63,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
+        Get.put(FavoriteStationController());
         Get.lazyPut(() => SignupController());
         Get.lazyPut(() => MainController());
         Get.lazyPut(() => MapController());
         Get.lazyPut(() => ProfileController());
-        Get.lazyPut(() => FavoriteStationController());
         Get.lazyPut(() => SettingController());
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);

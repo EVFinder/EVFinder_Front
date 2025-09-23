@@ -29,7 +29,7 @@ class FavoriteService {
           )
           .toList(),
     };
-    final response = await http.post(url, headers: {"Content-Type": "application/json"});
+    final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode(body));
     print('[DEBUG] 응답 코드: ${response.statusCode}');
     print('[DEBUG] 응답 내용: ${response.body}');
     return response.statusCode == 200;
