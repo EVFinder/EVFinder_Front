@@ -22,7 +22,6 @@ class MapController extends GetxController {
   late CameraController cameraController;
   RxList<NMarker> markers = <NMarker>[].obs;
   RxList<EvCharger> chargers = <EvCharger>[].obs;
-  RxList<EvCharger> focusCharger = <EvCharger>[].obs;
   RxBool isMapReady = false.obs;
   final PermissionController locationController = PermissionController();
   RxBool isLocationLoaded = false.obs;
@@ -65,11 +64,7 @@ class MapController extends GetxController {
 
   Future<void> loadMarkers(BuildContext context, List<EvCharger> chargers) async {
     try {
-      final newMarkers = await MarkerService.generateMarkers(context, chargers, nMapController, (EvCharger charger) async {
-        await fetchOneBuildingCharger(charger.lat, charger.lon);
-        showChargerDetail(context, charger);
-        // 여기서 모달 띄우기
-      });
+      final newMarkers = await MarkerService.generateMarkers(context, chargers, nMapController);
       markers.value = newMarkers;
       print(markers);
       for (var marker in markers) {
@@ -82,30 +77,5 @@ class MapController extends GetxController {
     } catch (e) {
       print("마커 로딩 실패: $e");
     }
-  }
-
-  Future<void> fetchOneBuildingCharger(double lat, double lon) async {
-    List<EvCharger> resultChargers = await EvChargerService.fetchOneBuildingChargers(lat, lon);
-    focusCharger.clear();
-    focusCharger.value = resultChargers;
-  }
-
-  void showChargerDetail(BuildContext context, EvCharger charger) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return ChargerDetailCard(
-              charger: focusCharger[0],
-              isFavorite: false, // 또는 적절한 값
-              onFavoriteToggle: () {}, // 필요시 콜백 함수 추가
-              // uid: uid,
-            );
-          },
-        );
-      },
-    );
   }
 }
