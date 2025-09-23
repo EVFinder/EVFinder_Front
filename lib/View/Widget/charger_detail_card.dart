@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Model/ev_charger_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,17 +7,17 @@ import '../../Model/ev_charger.dart';
 import '../../Util/charger_status.dart';
 
 class ChargerDetailCard extends GetView<MapController> {
-  const ChargerDetailCard({super.key, required this.charger, required this.isFavorite, this.onFavoriteToggle});
+  const ChargerDetailCard({super.key, required this.charger, required this.isFavorite, required this.onFavoriteToggle});
 
   final EvCharger charger;
   final bool isFavorite;
-  final VoidCallback? onFavoriteToggle;
+  final VoidCallback onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
     // 확장 상태를 관리하는 RxBool
     final RxBool isExpanded = false.obs;
-
+    // final favoriteController = Get.find<FavoriteStationController>();
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Obx(
@@ -63,7 +64,7 @@ class ChargerDetailCard extends GetView<MapController> {
                       ],
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: onFavoriteToggle,
                       icon: Icon(isFavorite ? Icons.star : Icons.star_border, color: Colors.yellow),
                     ),
                   ],

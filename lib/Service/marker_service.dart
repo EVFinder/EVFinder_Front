@@ -11,9 +11,11 @@ import 'favorite_service.dart'; // 또는 상대경로 맞게 수정
 class MarkerService {
   static CameraController cameraController = CameraController();
   static Set<String> _addedMarkerIds = {}; // ID 추적용
-  static Future<List<NMarker>> generateMarkers(BuildContext context, List<EvCharger> chargers, NaverMapController nMapController, Function(EvCharger) onMarkerTab) async {
-    // final prefs = await SharedPreferences.getInstance();
-    // final uid = prefs.getString('uid') ?? '';
+  static RxList<EvCharger> focusCharger = <EvCharger>[].obs;
+
+  static Future<List<NMarker>> generateMarkers(BuildContext context, List<EvCharger> chargers, NaverMapController nMapController) async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('uid') ?? '';
 
     return chargers.map((charger) {
       final marker = NMarker(
@@ -25,16 +27,29 @@ class MarkerService {
       marker.setOnTapListener((NMarker marker) async {
         cameraController.moveCameraPosition(charger.lat, charger.lon, nMapController);
 
-        // final statIds = await FavoriteService.getFavoriteStatIds(uid);
+        final statIds = await FavoriteService.getFavoriteStatIds(uid);
 
         // 디버깅용 출력
         print("📌 charger.statId = ${charger.id} (${charger.id.runtimeType})");
         // print("📋 Favorite statIds = $statIds");
 
-        // final isFavorite = statIds.contains(charger.id.toString());
-        onMarkerTab(charger);
-
-
+        final isFavorite = statIds.contains(charger.id.toString());
+        await fetchOneBuildingCharger(charger.lat, charger.lon);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                return ChargerDetailCard(
+                  charger: charger,
+                  isFavorite: isFavorite, // 또는 적절한 값
+                  onFavoriteToggle: () {},
+                );
+              },
+            );
+          },
+        );
 
         // showModalBottomSheet(
         //   context: context,
@@ -97,7 +112,27 @@ class MarkerService {
     markers.clear();
   }
 
+  static Future<void> fetchOneBuildingCharger(double lat, double lon) async {
+    List<EvCharger> resultChargers = await EvChargerService.fetchOneBuildingChargers(lat, lon);
+    focusCharger.clear();
+    focusCharger.value = resultChargers;
+  }
 
+  // void showChargerDetail(BuildContext context, EvCharger charger, bool isFavorite) async {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setModalState) {
+  //           return ChargerDetailCard(
+  //             charger: focusCharger[0],
+  //             isFavorite: isFavorite, // 또는 적절한 값
+  //             // uid: uid,
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 }
-
-
