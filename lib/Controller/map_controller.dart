@@ -25,10 +25,20 @@ class MapController extends GetxController {
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    print('PermissionController 초기화됨');
+    // 초기화 시 실행할 코드들
+    initializeLocation();
+  }
+
   Future<void> initializeLocation() async {
     try {
       Position? position = await locationController.getCurrentLocation();
       userPosition.value = position;
+      lat.value = position!.latitude;
+      lon.value = position.longitude;
       isLocationLoaded.value = true;
     } catch (e) {
       print('위치 가져오기 실패: $e');
