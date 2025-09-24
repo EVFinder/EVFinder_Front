@@ -27,13 +27,13 @@ class MarkerService {
       marker.setOnTapListener((NMarker marker) async {
         cameraController.moveCameraPosition(charger.lat, charger.lon, nMapController);
 
-        final statIds = await FavoriteService.getFavoriteStatIds(uid);
-
-        // 디버깅용 출력
-        print("📌 charger.statId = ${charger.id} (${charger.id.runtimeType})");
-        // print("📋 Favorite statIds = $statIds");
-
-        final isFavorite = statIds.contains(charger.id.toString());
+        // final statIds = await FavoriteService.getFavoriteStatIds(uid);
+        //
+        // // 디버깅용 출력
+        // print("📌 charger.statId = ${charger.id} (${charger.id.runtimeType})");
+        // // print("📋 Favorite statIds = $statIds");
+        //
+        // final isFavorite = statIds.contains(charger.id.toString());
         await fetchOneBuildingCharger(charger.lat, charger.lon);
         showModalBottomSheet(
           context: context,
