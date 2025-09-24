@@ -9,6 +9,7 @@ class AddChargeView extends GetView<AddChargeController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.loadHostCharge();
     return Scaffold(
       appBar: AppBar(
         title: const Text("내 충전소"),
@@ -34,17 +35,32 @@ class AddChargeView extends GetView<AddChargeController> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        children: const [
-          AddChargeCard(
-              stationName: '공유 충전소',
-              stationAddress: '충주',
-              operatingHours: '14:00-16:00',
-              chargerStat: 1,
-              distance: '200m')
-        ],
-      )
+      body: Obx(() {
+        if(controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if(controller.hostchargeStation.isEmpty) {
+          return const Center(child: Text("등록한 충전소가 없습니다."));
+        }
+        return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ListView.separated(
+                itemCount: controller.hostchargeStation.length,
+                itemBuilder: (context, index) {
+                  final station = controller.hostchargeStation[index];
+                  return AddChargeCard(
+                      stationName: station['stationName'],
+                      stationAddress: station['address'],
+                      chargerStat: station['status'],
+                      onTap: () => Get.toNamed('/detail', arguments: station),
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              ),
+            ),
+        );
+      })
     );
   }
 }
