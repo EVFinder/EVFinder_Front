@@ -34,10 +34,10 @@ class ChargerDetailCard extends GetView<MapController> {
           curve: Curves.easeInOut,
           // 애니메이션 커브
           height: isExpanded.value
-              ? 200 +
+              ? 250 +
                     (charger.evchargerDetail.length *
                         70.0) // 확장된 높이 (각 아이템당 60px)
-              : 200,
+              : 250,
           // 기본 높이
           width: MediaQuery.of(context).size.width - 25,
           decoration: BoxDecoration(

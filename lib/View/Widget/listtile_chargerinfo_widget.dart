@@ -1,8 +1,8 @@
-
-
 import 'package:evfinder_front/Util/charger_status.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class ListtileChargerinfoWidget extends StatefulWidget {
   const ListtileChargerinfoWidget({
@@ -49,7 +49,6 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
       //     ),
       //   );
       // },
-
       child: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
         child: SizedBox(
@@ -66,7 +65,14 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(widget.name, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(
+                        width: Get.size.width * 0.6,
+                        child: Text(
+                          widget.name,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                       // SizedBox(width: 10),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
@@ -78,14 +84,14 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
               ),
               widget.isStatChip
                   ? Chip(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // 더 크게 할수록 더 둥글어짐
-                ),
-                visualDensity: VisualDensity.compact,
-                labelPadding: EdgeInsets.all(2.0),
-                label: Text(getStatusLabel(widget.stat), style: TextStyle(color: Colors.white, fontSize: 10)),
-                backgroundColor: getStatusColor(widget.stat),
-              )
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30), // 더 크게 할수록 더 둥글어짐
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      labelPadding: EdgeInsets.all(2.0),
+                      label: Text(getStatusLabel(widget.stat), style: TextStyle(color: Colors.white, fontSize: 10)),
+                      backgroundColor: getStatusColor(widget.stat),
+                    )
                   : SizedBox.shrink(),
               widget.isCancelIconExist ? IconButton(onPressed: () {}, icon: Icon(Icons.close)) : SizedBox.shrink(),
             ],
@@ -99,6 +105,7 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
     );
   }
 }
+
 //
 // /// 충전기 타입 코드 → 텍스트
 // String _convertChargerType(String code) {
