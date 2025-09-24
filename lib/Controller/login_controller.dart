@@ -67,11 +67,17 @@ class LoginController extends GetxController {
 
         // if (decoded['success'] == true) {
         final String jwt = decoded['jwt'];
-        final String uid = decoded['uid'];
-        final String email = decoded['email'];
+        // final String uid = decoded['uid'];
+        // final String email = decoded['email'];
+        // final String userName = decoded['userName'];
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt', jwt);
+        // await prefs.setString('uid', uid); //uid 저장
+        // await prefs.setString('email', email);
+        // await prefs.setString('name', userName);
+
+
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 

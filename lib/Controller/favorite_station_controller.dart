@@ -49,7 +49,8 @@ class FavoriteStationController extends GetxController {
       final rawFavorites = await FavoriteService.fetchFavorites(uid.value);
       favoriteStations.assignAll(
         rawFavorites.map(
-          (e) => {
+              (e) =>
+          {
             "name": e['name']?.toString() ?? '알 수 없음',
             "address": e['address']?.toString() ?? '주소 없음',
             "id": e['id']?.toString() ?? '',
@@ -82,6 +83,7 @@ class FavoriteStationController extends GetxController {
       favoriteStations.removeWhere((station) => station['id'] == statId);
     }
   }
+
   Future<void> addFavorite(EvCharger evCharger) async {
     final success = await FavoriteService.addFavorite(uid.value, evCharger);
     if (success) {
@@ -99,5 +101,4 @@ class FavoriteStationController extends GetxController {
       }
     }
   }
-
 }
