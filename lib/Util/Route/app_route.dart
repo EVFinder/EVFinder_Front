@@ -15,5 +15,6 @@ class AppRoute {
   static final register = RegisterChargeView.route;
   static final reserv = ReservView.route;
   static final detail = ChargeDatailView.route;
+  static final bnbcharge = BnbStationView.route;
   static final splash = '/';
 }

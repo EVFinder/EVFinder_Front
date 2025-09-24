@@ -1,3 +1,4 @@
+import 'package:evfinder_front/View/bnb_station_view.dart';
 import 'package:evfinder_front/View/reserv_management_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,15 +17,15 @@ class HostView extends GetView<HostController> {
       appBar: AppBar(
         bottom: TabBar(
             tabs: <Widget>[
-              Tab(icon: Icon(Icons.add_location_alt), text: '충전소 등록'),
-              Tab(icon: Icon(Icons.calendar_month), text: '예약 관리',)
+              Tab(icon: Icon(Icons.ev_station), text: '충전소 목록',),
+              Tab(icon: Icon(Icons.add_location_alt), text: '충전소 등록')
         ],
         ),
       ),
     body: const TabBarView(
     children: [
-     AddChargeView(),
-     ReservManagementView(),
+      BnbStationView(),
+      AddChargeView(),
     ],
     ),
     ),
