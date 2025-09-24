@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Service/favorite_service.dart';
+import '../Model/search_chargers.dart';
 import '../Service/ev_charger_service.dart';
 import '../Service/location_service.dart';
 import '../Service/marker_service.dart';
@@ -19,11 +20,13 @@ import '../View/Widget/charger_detail_card.dart';
 class MapController extends GetxController {
   late NaverMapController nMapController;
   final BoxController boxController = BoxController();
-  late CameraController cameraController;
+
+  // late CameraController cameraController;
   RxList<NMarker> markers = <NMarker>[].obs;
   RxList<EvCharger> chargers = <EvCharger>[].obs;
   RxBool isMapReady = false.obs;
   final PermissionController locationController = PermissionController();
+  final CameraController cameraController = CameraController();
   RxBool isLocationLoaded = false.obs;
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
@@ -40,20 +43,20 @@ class MapController extends GetxController {
     }
   }
 
-  Future<void> fetchMyChargers(BuildContext context, dynamic result) async {
+  Future<void> fetchMyChargers(BuildContext context, SearchChargers? result) async {
     if (result != null) {
       // 기존 마커 제거
       if (markers.isNotEmpty) {
         MarkerService.removeMarkers(nMapController, markers);
       }
-      await fetchChargers(lat.value, lon.value);
+      await fetchChargers(double.parse(result.y), double.parse(result.x));
       // ✅ 이 부분이 빠져있었음!
       await loadMarkers(context, chargers);
 
       cameraController.moveCameraPosition(double.parse(result.y), double.parse(result.x), nMapController);
     } else {
       await fetchChargers(lat.value, lon.value);
-      await loadMarkers(context, chargers); // ✅ chargers -> chargers.value
+      await loadMarkers(context, chargers);
     }
   }
 
