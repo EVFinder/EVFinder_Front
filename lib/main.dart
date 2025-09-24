@@ -70,17 +70,17 @@ class MyApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
         Get.put(FavoriteStationController());
-        Get.lazyPut(() => SignupController());
-        Get.lazyPut(() => MainController());
-        Get.lazyPut(() => MapController());
-        Get.lazyPut(() => ProfileController());
-        Get.lazyPut(() => SettingController());
-        Get.lazyPut(() => HostController());
-        Get.lazyPut(() => AddChargeController());
-        Get.lazyPut(() => ReservManagementController());
-        Get.lazyPut(() => RegisterChargeController());
-        Get.lazyPut(() => ReservController());
-        Get.lazyPut(() => ChargeDatailController());
+        Get.lazyPut(() => SignupController(), fenix: true);
+        Get.lazyPut(() => MainController(), fenix: true);
+        Get.lazyPut(() => MapController(), fenix: true);
+        Get.lazyPut(() => ProfileController(), fenix: true);
+        Get.lazyPut(() => SettingController(), fenix: true);
+        Get.lazyPut(() => HostController(), fenix: true);
+        Get.lazyPut(() => AddChargeController(), fenix: true);
+        Get.lazyPut(() => ReservManagementController(), fenix: true);
+        Get.lazyPut(() => RegisterChargeController(), fenix: true);
+        Get.lazyPut(() => ReservController(), fenix: true);
+        Get.lazyPut(() => ChargeDatailController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
