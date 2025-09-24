@@ -1,8 +1,10 @@
+import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class PermissionController extends GetxController{
+
+class PermissionController {
+  var mapController = CameraController();
   Position? position;
 
   Future<bool> permission() async {
