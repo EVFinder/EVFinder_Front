@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddChargeController extends GetxController {
-  final hostchargeStation = <Map<String, dynamic>>[.obs;
+  final hostchargeStation = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
   final uid = ''.obs;
 
@@ -27,8 +27,8 @@ class AddChargeController extends GetxController {
  Future<void> loadHostCharge() async {
     isLoading.value = true;
 
-    try {
-      final ra
-    }
+    // try {
+    //   final ra
+    // }
  }
 }
