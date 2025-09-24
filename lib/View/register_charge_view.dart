@@ -1,7 +1,7 @@
-import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/register_charge_controller.dart';
+import 'package:kpostal/kpostal.dart';
 
 class RegisterChargeView extends GetView<RegisterChargeController> {
   const RegisterChargeView({super.key});
@@ -40,10 +40,11 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
 
                     // 호스트 이름
                     TextFormField(
+                      controller: controller.hostnameController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '호스트 이름'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -53,12 +54,15 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                         hintText: "예: 홍길동",
                       ),
                     ),
+                    const SizedBox(height: 12),
+
                     // 연락처
                     TextFormField(
+                      controller: controller.phoneController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '연락처'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -68,13 +72,15 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                         hintText: "예: 010-1234-5678",
                       ),
                     ),
+                    const SizedBox(height: 12),
 
                     // 충전소 이름
                     TextFormField(
+                      controller: controller.chargeNameContrller,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '충전소 이름'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -84,27 +90,80 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                         hintText: "예: 프리미엄 충전소",
                       ),
                     ),
+                    const SizedBox(height: 16),
 
-                    TextFormField(
-                      decoration: InputDecoration(
-                        label: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
-                            children: [
-                              TextSpan(text: '주소'),
-                              TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
-                            ],
+                    // 주소 섹션: 버튼 -> 주소 -> 상세주소
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 주소 찾기 버튼
+                        TextButton(
+                          onPressed: () {
+                            controller.openPostcode();
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color(0xFF0F172A),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            shape: const StadiumBorder(),
+                          ),
+                          child: const Text(
+                            '주소 찾기',
+                            style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
-                        hintText: "예: 서울특별시 학동로 123-45",
-                      ),
-                    ),
+                        const SizedBox(height: 8),
 
+                        // 주소
+                        TextFormField(
+                          controller: controller.addrController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            label: RichText(
+                              text: const TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(text: '주소'),
+                                  TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
+                                ],
+                              ),
+                            ),
+                            hintText: "예: 서울특별시 강남구 학동로 123-45",
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // 상세주소
+                        TextFormField(
+                          controller: controller.detailaddrController,
+                          decoration: InputDecoration(
+                            labelText: "상세 주소",
+                            hintText: "예: 지하1층, B5동 주차장",
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // 충전기 타입
                     TextFormField(
+                      controller: controller.chargeTypeController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '충전기 타입'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -114,29 +173,33 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                         hintText: "예: 완속",
                       ),
                     ),
+                    const SizedBox(height: 12),
 
-                    // 운영 시간 (시작~종료)
+                    // 운영 상태
                     TextFormField(
+                      controller: controller.statController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
-                              TextSpan(text: '운영 시간'),
+                              TextSpan(text: '운영 상태'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
                             ],
                           ),
                         ),
-                        hintText: "예: 09:00-22:00",
+                        hintText: "예: 사용 가능",
                       ),
                     ),
+                    const SizedBox(height: 12),
 
                     // 파워 타입
                     TextFormField(
+                      controller: controller.powerController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '파워 타입'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -146,13 +209,15 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                         hintText: "예: 50kW",
                       ),
                     ),
+                    const SizedBox(height: 12),
 
                     // 가격
                     TextFormField(
+                      controller: controller.priceContoller,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
+                            style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(text: '가격'),
                               TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
@@ -168,7 +233,7 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          //등록 구현해야 함
+                          controller.register(context);
                         },
                         child: const Text("등록"),
                       ),
