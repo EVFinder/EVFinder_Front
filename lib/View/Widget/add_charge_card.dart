@@ -3,31 +3,28 @@ import 'package:flutter/material.dart';
 class AddChargeCard extends StatelessWidget{
   const AddChargeCard({
     super.key,
-    required this.stationName,
-    required this.stationAddress,
-    required this.operatingHours,
+    required this.stationName, //충전소 이름
+    required this.stationAddress, //주소
     required this.chargerStat,
-    required this.distance,
     this.onTap,
   });
 
   final String stationName;
   final String stationAddress;
-  final String operatingHours;
-  final int chargerStat; // 0: 불가능, 1: 가능
-  final String distance;
+  final String chargerStat; // 0: 불가능, 1: 가능
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
 
-    final statusLabel = chargerStat == 1 ? '가능' : '불가';
-    final statusColor = chargerStat == 1
+    final statusColor = chargerStat == 'available'
         ? const Color(0xFF10B981)
         : const Color(0xFFEF4444);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: GestureDetector(
+        onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -89,7 +86,7 @@ class AddChargeCard extends StatelessWidget{
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          statusLabel,
+                          chargerStat,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -120,44 +117,16 @@ class AddChargeCard extends StatelessWidget{
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        distance,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF10B981),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
-
-                  // 운영시간
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 14,
-                        color: Color(0xFF6B7280),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        operatingHours,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+      )
     );
   }
-
 }

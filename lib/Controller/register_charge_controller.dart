@@ -66,7 +66,7 @@ class RegisterChargeController extends GetxController {
       final response = await http.post(
         Uri.parse('${ApiConstants.chargerbnbApiUrl}/${uid}'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'address': address, 'lat': 37,'lon': 24, 'hostName':hostname,'hostContact':hostContact,'stationName':stationName,'chargerType': chargerType,'power': power, 'pricePerHour':pricePerHour,'status':status})
+        body: jsonEncode({'address': address, 'lat': 37.5,'lon': 127.8, 'hostName':hostname,'hostContact':hostContact,'stationName':stationName,'chargerType': chargerType,'power': power, 'pricePerHour':pricePerHour,'status':status})
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
