@@ -1,7 +1,10 @@
+import 'package:evfinder_front/View/search_charger_view.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../Controller/map_controller.dart';
+import '../Model/search_chargers.dart';
+import 'Widget/search_appbar_widget.dart';
 import 'Widget/sliding_pannel_widget.dart';
 
 class MapView extends GetView<MapController> {
@@ -34,31 +37,36 @@ class MapView extends GetView<MapController> {
                 controller.nMapController = mController;
                 await controller.fetchMyChargers(context, null);
                 controller.isMapReady.value = true;
-                // controller.loadMarkers(context, controller.chargers);
-                // if (controller.isMapReady.value == false) {
-                //   await controller.fetchMyChargers(context, null);
-                //   controller.nMapController = mController;
-                //   controller.isMapReady.value = true;
-                //   controller.loadMarkers(context, controller.chargers); // 서버에서 충전소 받아와서 마커 표시
-                // }
               },
             ),
-            // Positioned(
-            //   top: -20,
-            //   child: SearchAppbarWidget(
-            //     onTap: () async {
-            //       final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView()));
-            //       await fetchMyChargers(context, result);
-            //     },
-            //   ),
-            // ),
-            controller.isMapReady.value
-                ? Positioned(
+            Positioned(
+              top: -20,
+              child: SearchAppbarWidget(
+                onTap: () async {
+                  controller.boxController.closeBox();
+                  final SearchChargers result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView()));
+                  await controller.fetchMyChargers(context, result);
+                  // controller.boxController.closeBox();
+                },
+              ),
+            ),
+            Obx(() {
+              return controller.isMapReady.value
+                  ? GetBuilder<MapController>(
+                builder: (controller) {
+                  return Positioned(
                     bottom: 0,
-                    // child: SizedBox.shrink(),
-                    child: SlidingupPanelWidget(chargers: controller.chargers, nMapController: controller.nMapController, boxController: controller.boxController),
-                  )
-                : SizedBox.shrink(),
+                    child: SlidingupPanelWidget(
+                        chargers: controller.chargers,
+                        nMapController: controller.nMapController,
+                        boxController: controller.boxController
+                    ),
+                  );
+                },
+              )
+                  : SizedBox.shrink();
+            }),
+
           ],
         ),
       ),

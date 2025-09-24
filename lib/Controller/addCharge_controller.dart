@@ -29,6 +29,7 @@ class AddChargeController extends GetxController {
 
   Future<void> loadHostCharge() async {
     isLoading.value = true;
+
     try {
       final rawHostCharge = await fetchHostCharge(uid.value);
       hostchargeStation.assignAll(
