@@ -1,6 +1,8 @@
 import 'package:evfinder_front/Util/charger_status.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class ListtileChargerinfoWidget extends StatefulWidget {
   const ListtileChargerinfoWidget({
@@ -64,7 +66,7 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 250,
+                        width: Get.size.width * 0.6,
                         child: Text(
                           widget.name,
                           style: TextStyle(fontWeight: FontWeight.w700),
