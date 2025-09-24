@@ -12,6 +12,7 @@ class SignupController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final nameController = TextEditingController();
   final loginController = LoginController();
   final RxBool isLoading = false.obs;
 
@@ -79,12 +80,13 @@ class SignupController extends GetxController {
   Future<void> signup(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text;
+    final name = nameController.text;
 
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.authApiBaseUrl}/signup'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'email': email, 'password': password, 'userName': name}),
       );
 
       if (response.statusCode == 200) {
