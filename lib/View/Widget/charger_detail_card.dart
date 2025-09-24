@@ -4,6 +4,7 @@ import 'package:evfinder_front/Service/favorite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import '../../Controller/map_controller.dart';
 import '../../Model/ev_charger.dart';
 import '../../Util/charger_status.dart';
 
