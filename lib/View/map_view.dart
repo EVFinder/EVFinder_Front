@@ -28,10 +28,7 @@ class MapView extends GetView<MapController> {
               options: NaverMapViewOptions(
                 initialCameraPosition: NCameraPosition(
                   target: controller.userPosition.value != null
-                      ? NLatLng(
-                      controller.userPosition.value!.latitude,
-                      controller.userPosition.value!.longitude
-                  )
+                      ? NLatLng(controller.userPosition.value!.latitude, controller.userPosition.value!.longitude)
                       : const NLatLng(37.5665, 126.9780),
                   zoom: 15,
                 ),
@@ -46,18 +43,30 @@ class MapView extends GetView<MapController> {
               top: -20,
               child: SearchAppbarWidget(
                 onTap: () async {
+                  controller.boxController.closeBox();
                   final SearchChargers result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView()));
                   await controller.fetchMyChargers(context, result);
+                  // controller.boxController.closeBox();
                 },
               ),
             ),
-            controller.isMapReady.value
-                ? Positioned(
+            Obx(() {
+              return controller.isMapReady.value
+                  ? GetBuilder<MapController>(
+                builder: (controller) {
+                  return Positioned(
                     bottom: 0,
-                    // child: SizedBox.shrink(),
-                    child: SlidingupPanelWidget(chargers: controller.chargers, nMapController: controller.nMapController, boxController: controller.boxController),
-                  )
-                : SizedBox.shrink(),
+                    child: SlidingupPanelWidget(
+                        chargers: controller.chargers,
+                        nMapController: controller.nMapController,
+                        boxController: controller.boxController
+                    ),
+                  );
+                },
+              )
+                  : SizedBox.shrink();
+            }),
+
           ],
         ),
       ),
