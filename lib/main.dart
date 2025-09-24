@@ -7,6 +7,7 @@ import 'package:evfinder_front/Controller/map_controller.dart';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/Controller/reservManagement_controller.dart';
 import 'package:evfinder_front/Controller/reserv_controller.dart';
+import 'package:evfinder_front/Controller/search_charger_controller.dart';
 import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/host_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
@@ -21,22 +22,15 @@ import 'Util/Route/app_page.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'firebase_options.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ); // Firebase 초기화
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); // Firebase 초기화
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
     onAuthFailed: (ex) => switch (ex) {
-      NQuotaExceededException(:final message) => print(
-        "사용량 초과 (message: $message)",
-      ),
-      NUnauthorizedClientException() ||
-      NClientUnspecifiedException() ||
-      NAnotherAuthFailedException() => print("인증 실패: $ex"),
+      NQuotaExceededException(:final message) => print("사용량 초과 (message: $message)"),
+      NUnauthorizedClientException() || NClientUnspecifiedException() || NAnotherAuthFailedException() => print("인증 실패: $ex"),
     },
   );
 
@@ -62,10 +56,7 @@ class MyApp extends StatelessWidget {
       // permissionController.dispose();
     });
     return GetMaterialApp(
-
-      theme: ThemeData(
-        fontFamily: 'neo',
-      ),
+      theme: ThemeData(fontFamily: 'neo'),
       debugShowCheckedModeBanner: false,
       initialBinding: BindingsBuilder(() {
         Get.put(LoginController());
@@ -81,6 +72,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => RegisterChargeController(), fenix: true);
         Get.lazyPut(() => ReservController(), fenix: true);
         Get.lazyPut(() => ChargeDatailController(), fenix: true);
+        Get.lazyPut(() => SearchChargerController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
@@ -89,4 +81,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
