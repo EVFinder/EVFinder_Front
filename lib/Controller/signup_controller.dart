@@ -96,6 +96,7 @@ class SignupController extends GetxController {
         final String jwt = decoded['jwt'];
         final String uid = decoded['uid'];
         final String email = decoded['email'];
+        final String name = decoded['userName'];
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('회원가입 성공')));
 
