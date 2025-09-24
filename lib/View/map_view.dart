@@ -83,6 +83,29 @@ class MapView extends GetView<MapController> {
               await controller.fetchMyChargers(context, null);
               controller.isMapReady.value = true;
             },
+            // 카메라 이동이 완료되었을 때
+            onCameraChange: (NCameraUpdateReason reason, bool animated) {
+              // 카메라 이동 중
+              print('카메라 이동 중: $reason');
+            },
+            onCameraIdle: () async {
+              // 카메라 이동이 완료되었을 때 중심점 좌표 가져오기
+              if (controller.isMapReady.value) {
+                final cameraPosition = await controller.nMapController.getCameraPosition();
+                final centerLat = cameraPosition.target.latitude;
+                final centerLng = cameraPosition.target.longitude;
+
+                print('지도 중심점: $centerLat, $centerLng');
+
+                // 컨트롤러에 저장
+                controller.updateMapCenter(context ,centerLat, centerLng);
+              }
+            },
+            // 지도 클릭 시
+            // onMapTapped: (NPoint point, NLatLng latLng) {
+            //   print('지도 클릭 위치: ${latLng.latitude}, ${latLng.longitude}');
+            //   controller.onMapTapped(latLng.latitude, latLng.longitude);
+            // },
           ),
           Positioned(
             top: -20,
