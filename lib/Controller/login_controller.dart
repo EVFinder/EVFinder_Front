@@ -64,18 +64,19 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
+        print(decoded);
 
         // if (decoded['success'] == true) {
         final String jwt = decoded['jwt'];
-        // final String uid = decoded['uid'];
-        // final String email = decoded['email'];
-        // final String userName = decoded['userName'];
+        final String uid = decoded['uid'];
+        final String email = decoded['email'];
+        final String userName = decoded['userName'];
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt', jwt);
-        // await prefs.setString('uid', uid); //uid 저장
-        // await prefs.setString('email', email);
-        // await prefs.setString('name', userName);
+        await prefs.setString('uid', uid); //uid 저장
+        await prefs.setString('email', email);
+        await prefs.setString('name', userName);
 
 
 
