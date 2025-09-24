@@ -1,21 +1,14 @@
 import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:evfinder_front/Controller/permission_controller.dart';
-import 'package:evfinder_front/Model/ev_charger_detail.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../Model/ev_charger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../Service/favorite_service.dart';
 import '../Model/search_chargers.dart';
 import '../Service/ev_charger_service.dart';
-import '../Service/location_service.dart';
 import '../Service/marker_service.dart';
-import '../View/Widget/charger_detail_card.dart';
 
 class MapController extends GetxController {
   late NaverMapController nMapController;
@@ -63,6 +56,8 @@ class MapController extends GetxController {
   Future<void> fetchChargers(double lat, double lon) async {
     List<EvCharger> resultChargers = await EvChargerService.fetchNearbyChargers(lat, lon);
     chargers.value = resultChargers;
+    chargers.refresh();
+    update();
   }
 
   Future<void> loadMarkers(BuildContext context, List<EvCharger> chargers) async {

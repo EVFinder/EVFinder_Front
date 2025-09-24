@@ -184,11 +184,11 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                       // 운영시간
                       Row(
                         children: [
-                          const Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: Color(0xFF6B7280),
-                          ),
+                          // const Icon(
+                          //   Icons.access_time,
+                          //   size: 14,
+                          //   color: Color(0xFF6B7280),
+                          // ),
                           const SizedBox(width: 4),
                           // Text(
                           //   widget.operatingHours,
