@@ -24,6 +24,7 @@ class MapController extends GetxController {
   final PermissionController locationController = PermissionController();
   final CameraController cameraController = CameraController();
   RxBool isLocationLoaded = false.obs;
+  RxBool cameraMoved = false.obs;
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
@@ -42,10 +43,11 @@ class MapController extends GetxController {
       userPosition.value = position;
       lat.value = position!.latitude;
       lon.value = position.longitude;
-      isLocationLoaded.value = true;
     } catch (e) {
       print('위치 가져오기 실패: $e');
-      isLocationLoaded.value = true; // 실패해도 지도는 보여주기
+    } finally {
+      isLocationLoaded.value = true;
+      cameraMoved.value = false;
     }
   }
 
@@ -75,6 +77,8 @@ class MapController extends GetxController {
       await loadMarkers(context, chargers);
     } catch (e) {
       print('fetchMyChargers 실패: $e');
+    } finally {
+      cameraMoved.value = false;
     }
   }
 
@@ -204,13 +208,12 @@ class MapController extends GetxController {
   // 🔥 지도 중심점 업데이트 (디바운싱 추가)
   Timer? _searchTimer;
 
-  void updateMapCenter(BuildContext context, double lat, double lng) async{
+  void updateMapCenter(BuildContext context, double lat, double lng) async {
     mapCenterLat.value = lat;
     mapCenterLng.value = lng;
     // final prefs = await SharedPreferences.getInstance();
     // prefs.setDouble('lat', lat);
     // prefs.setDouble('lon', lng);
-
 
     // 기존 타이머 취소
     _searchTimer?.cancel();
@@ -238,6 +241,17 @@ class MapController extends GetxController {
   Future<NLatLng> getCurrentMapCenter() async {
     final cameraPosition = await nMapController.getCameraPosition();
     return cameraPosition.target;
+  }
+
+  void cameraMoveCompleted(BuildContext context) async {
+    final cameraPosition = await nMapController.getCameraPosition();
+    final centerLat = cameraPosition.target.latitude;
+    final centerLng = cameraPosition.target.longitude;
+
+    print('지도 중심점: $centerLat, $centerLng');
+
+    // 컨트롤러에 저장
+    updateMapCenter(context, centerLat, centerLng);
   }
 
   @override
