@@ -4,6 +4,7 @@ import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:evfinder_front/Controller/permission_controller.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/ev_charger.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -203,9 +204,13 @@ class MapController extends GetxController {
   // 🔥 지도 중심점 업데이트 (디바운싱 추가)
   Timer? _searchTimer;
 
-  void updateMapCenter(BuildContext context, double lat, double lng) {
+  void updateMapCenter(BuildContext context, double lat, double lng) async{
     mapCenterLat.value = lat;
     mapCenterLng.value = lng;
+    // final prefs = await SharedPreferences.getInstance();
+    // prefs.setDouble('lat', lat);
+    // prefs.setDouble('lon', lng);
+
 
     // 기존 타이머 취소
     _searchTimer?.cancel();

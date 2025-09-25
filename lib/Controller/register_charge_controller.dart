@@ -19,6 +19,9 @@ class RegisterChargeController extends GetxController {
   final powerController = TextEditingController();
   final priceContoller = TextEditingController();
 
+  final Rx<double?> lat = Rx<double?>(null);
+  final Rx<double?> lon = Rx<double?>(null);
+
   String? uid;
   @override
   void onInit() {
@@ -48,6 +51,9 @@ class RegisterChargeController extends GetxController {
         addrController.text = result.roadAddress.isNotEmpty
             ? result.roadAddress
             : result.address;
+        lat.value = result.latitude;
+        lon.value = result.longitude;
+
       },
     ));
   }
@@ -66,7 +72,17 @@ class RegisterChargeController extends GetxController {
       final response = await http.post(
         Uri.parse('${ApiConstants.chargerbnbApiUrl}/${uid}'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'address': address, 'lat': 37.5,'lon': 127.8, 'hostName':hostname,'hostContact':hostContact,'stationName':stationName,'chargerType': chargerType,'power': power, 'pricePerHour':pricePerHour,'status':status})
+        body: jsonEncode({
+          'address': address,
+          'lat': lat.value,
+          'lon': lon.value,
+          'hostName':hostname,
+          'hostContact':hostContact,
+          'stationName':stationName,
+          'chargerType': chargerType,
+          'power': power,
+          'pricePerHour':pricePerHour,
+          'status':status})
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -12,11 +12,7 @@ class BnbStationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUidAndCahrge();
-  }
-
-  Future<void> _loadUidAndCahrge() async {
-    await loadBnbCharge();
+    loadBnbCharge();
   }
 
   @override
@@ -24,10 +20,10 @@ class BnbStationController extends GetxController {
     super.dispose();
   }
 
-  Future<void> loadBnbCharge() async {
+  Future<void> loadBnbCharge({double? lat, double? lon}) async {
     isLoading.value = true;
     try {
-      final rawHostCharge = await fetchHostCharge();
+      final rawHostCharge = await fetchHostCharge(lat: lat, lon: lon);
       bnbchargeStation.assignAll(
         rawHostCharge.map(
               (e) =>
@@ -51,9 +47,19 @@ class BnbStationController extends GetxController {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> fetchHostCharge() async {
-    final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/all');
+  static Future<List<Map<String, dynamic>>> fetchHostCharge({double? lat, double? lon}) async {
+    var urlString = '${ApiConstants.chargerbnbApiUrl}/all';
+
+    if(lat != null && lon != null) {
+      urlString += '?lat=$lat&lon=$lon&radiusKm=5';
+    }
+
+    final url = Uri.parse(urlString);
+    print("URL: $url");
     final response = await http.get(url);
+
+    print("서버 응답 코드: ${response.statusCode}");
+    print("서버 응답 내용: ${utf8.decode(response.bodyBytes)}");
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -62,4 +68,5 @@ class BnbStationController extends GetxController {
       throw Exception('Failed to fetch hostCharge');
     }
   }
+
 }
