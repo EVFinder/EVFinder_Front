@@ -58,8 +58,8 @@ class SlidingupPanelWidget extends StatelessWidget {
                     );
                   },
                 );
-                final statIds = await FavoriteService.getFavoriteStatIds('test_user');
-                final isFavorite = statIds.contains(chargers[index].id);
+                // final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+                // final isFavorite = statIds.contains(chargers[index].id);
                 // showModalBottomSheet(
                 //   context: context,
                 //   builder: (_) => ChargerDetailCard(charger: widget.chargers[index], isFavorite: isFavorite, uid: _uid),
