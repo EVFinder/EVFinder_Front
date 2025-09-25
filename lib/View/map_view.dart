@@ -56,27 +56,20 @@ class MapView extends GetView<MapController> {
           NaverMap(
             options: NaverMapViewOptions(
               initialCameraPosition: NCameraPosition(
-                target: controller.userPosition.value != null
-                    ? NLatLng(controller.userPosition.value!.latitude, controller.userPosition.value!.longitude)
-                    : const NLatLng(37.5665, 126.9780),
-                zoom: 15,
+                // 🔥 메모리에 저장된 카메라 위치 사용
+                target: NLatLng(controller.currentCameraLat.value, controller.currentCameraLng.value),
+                zoom: controller.currentZoom.value,
               ),
             ),
             onMapReady: (mController) async {
-              controller.nMapController = mController;
-              await controller.fetchMyChargers(context, null);
-              controller.isMapReady.value = true;
+              await controller.onMapReady(context, mController);
             },
             // 카메라 이동이 완료되었을 때
             onCameraChange: (NCameraUpdateReason reason, bool animated) {
-              // 카메라 이동 중
               print('카메라 이동 중: $reason');
             },
             onCameraIdle: () async {
-              // 카메라 이동이 완료되었을 때 중심점 좌표 가져오기
-              if (controller.isMapReady.value) {
-                controller.cameraMoved.value = true;
-              }
+              controller.onCameraIdle();
             },
             // 지도 클릭 시
             // onMapTapped: (NPoint point, NLatLng latLng) {
@@ -86,14 +79,19 @@ class MapView extends GetView<MapController> {
           ),
           controller.cameraMoved.value
               ? Positioned(
-                  bottom: Get.size.height * 0.05,
-                  right: Get.size.width * 0.05,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      controller.cameraMoveCompleted(context);
-                    },
-                    backgroundColor: const Color(0xFF10B981),
-                    child: const Icon(Icons.refresh),
+                  top: Get.size.height * 0.12,
+                  right: Get.size.width * 0.2,
+                  child: SizedBox(
+                    width: Get.size.width * 0.6,
+                    height: Get.size.width * 0.12,
+                    child: FloatingActionButton.extended(
+                      onPressed: () {
+                        controller.refreshCurrentLocation(context);
+                      },
+                      backgroundColor: Colors.white,
+                      label: Text("현재 위치에서 충전소 새로고침"),
+                      icon: Icon(Icons.refresh_outlined),
+                    ),
                   ),
                 )
               : SizedBox.shrink(),
