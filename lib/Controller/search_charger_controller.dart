@@ -9,16 +9,38 @@ import '../Service/ev_charger_service.dart';
 import 'package:flutter/material.dart';
 import 'map_controller.dart';
 
+enum SearchType {
+  map,
+  bnb,
+}
+
 class SearchChargerController {
   TextEditingController tController = TextEditingController();
-  RxList<SearchChargers> searchResult = <SearchChargers>[].obs;
+  RxList<SearchChargers> searchResult = <SearchChargers>[].obs; //list 하나 더 추가
+  RxList<SearchChargers> bnbSearchResult = <SearchChargers>[].obs;
   List<EvCharger> chargers = [];
   RxBool isSearched = false.obs;
+
+  var currentSearchType = SearchType.map.obs;
+
+  void setSearchType(SearchType type) {
+    currentSearchType.value = type;
+    activeList.clear();
+    tController.clear();
+  }
+
+  RxList<SearchChargers> get activeList {
+    if(currentSearchType.value == SearchType.bnb) {
+      return bnbSearchResult;
+    } else{
+      return searchResult;
+    }
+  }
 
   Future<void> searchList(String query) async {
     final result = await SearchByKeywordService.searchUseKeyword(query);
     // print();
-    searchResult.value = result;
+    activeList.value = result;
   }
 
   Future<void> fetchChargers(double lat, double lon) async {

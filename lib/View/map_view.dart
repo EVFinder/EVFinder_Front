@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/search_charger_controller.dart';
 import 'package:evfinder_front/View/search_charger_view.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
@@ -114,7 +115,7 @@ class MapView extends GetView<MapController> {
                 controller.boxController.closeBox();
                 final SearchChargers result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SearchChargerView()),
+                  MaterialPageRoute(builder: (_) => SearchChargerView(searchType: SearchType.map)),
                 );
                 await controller.fetchMyChargers(context, result);
               },
