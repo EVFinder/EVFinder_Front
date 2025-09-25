@@ -49,8 +49,7 @@ class FavoriteStationController extends GetxController {
       final rawFavorites = await FavoriteService.fetchFavorites(uid.value);
       favoriteStations.assignAll(
         rawFavorites.map(
-              (e) =>
-          {
+          (e) => {
             "name": e['name']?.toString() ?? '알 수 없음',
             "address": e['address']?.toString() ?? '주소 없음',
             "id": e['id']?.toString() ?? '',
@@ -67,15 +66,26 @@ class FavoriteStationController extends GetxController {
   }
 
   Future<void> refreshFavoriteStations() async {
-    // final success = await FavoriteService.removeFavorite(uid.value, statId);
+    isLoading.value = true;
+    try {
+      final rawFavorites = await FavoriteService.fetchFavoriteStatus(uid.value);
+      favoriteStations.assignAll(
+        rawFavorites.map(
+          (e) => {
+            "name": e['name']?.toString() ?? '알 수 없음',
+            "address": e['address']?.toString() ?? '주소 없음',
+            "id": e['id']?.toString() ?? '',
+            "lat": e['lat'] ?? 0.0,
+            "lon": e['lon'] ?? 0.0,
+            "chargers": e['chargers'] ?? [],
+            "isFavorite": true,
+          },
+        ),
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
-
-  // Future<bool> refreshFavoriteStations(EvCharger charger) async {
-  //   final isFavorite = favoriteStations.any(
-  //         (station) => station['id'] == charger.id,
-  //   );
-  //   return isFavorite;
-  // }
 
   Future<void> removeFavorite(String statId) async {
     final success = await FavoriteService.removeFavorite(uid.value, statId);
