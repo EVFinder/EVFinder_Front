@@ -1,8 +1,15 @@
 import 'package:evfinder_front/Controller/bnb_station_controller.dart';
+import 'package:evfinder_front/Controller/search_charger_controller.dart';
 import 'package:evfinder_front/View/Widget/bnb_charge_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+// ↓ 필요 시 경로 조정
+import 'package:evfinder_front/View/search_charger_view.dart';
+import 'package:evfinder_front/Model/ev_charger.dart';
+import 'package:evfinder_front/View/Widget/search_appbar_widget.dart';
+
+import '../Model/search_chargers.dart';
 
 class BnbStationView extends GetView<BnbStationController> {
   const BnbStationView({super.key});
@@ -10,40 +17,60 @@ class BnbStationView extends GetView<BnbStationController> {
 
   @override
   Widget build(BuildContext context) {
-    controller.loadBnbCharge();
     return Scaffold(
         appBar: AppBar(
           title: const Text("공유 충전소 목록"),
         ),
-        body: Obx(() {
-          if(controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if(controller.bnbchargeStation.isEmpty) {
-            return const Center(child: Text("공유 충전소가 없습니다."));
-          }
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: ListView.separated(
-                itemCount: controller.bnbchargeStation.length,
-                itemBuilder: (context, index) {
-                  final station = controller.bnbchargeStation[index];
-                  return BnbChargeCard(
-                    stationName: station['stationName'],
-                    stationAddress: station['address'],
-                    chargerStat: station['status'],
-                    chargerType: station['chargerType'],
-                    pricePerHour: station['pricePerHour'],
-                    power: station['power'],
-                    onTap: () => Get.toNamed('/detail', arguments: station),
-                  );
-                },
-                separatorBuilder: (context, index) => const Divider(),
-              ),
+        // 1. Column을 사용하여 위젯들을 세로로 배치합니다.
+        body: Column(
+          children: [
+            // 2. 검색 위젯을 항상 상단에 표시합니다.
+            SearchAppbarWidget(
+              onTap: () async {
+                final result = await Get.to(
+                        () => const SearchChargerView(searchType: SearchType.bnb)
+                );
+                if(result != null && result is SearchChargers) {
+                  final lat = double.parse(result.y);
+                  final lon = double.parse(result.x);
+
+                  controller.loadBnbCharge(lat: lat, lon: lon);
+                }
+              },
             ),
-          );
-        })
-    );
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (controller.bnbchargeStation.isEmpty) {
+                  return const Center(child: Text("공유 충전소가 없습니다."));
+                }
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListView.separated(
+                      itemCount: controller.bnbchargeStation.length,
+                      itemBuilder: (context, index) {
+                        final station = controller.bnbchargeStation[index];
+                        return BnbChargeCard(
+                          stationName: station['stationName'],
+                          stationAddress: station['address'],
+                          chargerStat: station['status'],
+                          chargerType: station['chargerType'],
+                          pricePerHour: station['pricePerHour'],
+                          power: station['power'],
+                          onTap: () =>
+                              Get.toNamed('/detail', arguments: station),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ],
+        ));
   }
-}
+  }
