@@ -25,19 +25,26 @@ class FavoriteStationView extends GetView<FavoriteStationController> {
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ListView.separated(
-              itemCount: controller.favoriteStations.length,
-              itemBuilder: (context, index) {
-                final station = controller.favoriteStations[index];
-                return ListtileChargestarWidget(
-                  stationName: station['name'],
-                  stationAddress: station['address'],
-                  chargerStat: station['chargers']?.isNotEmpty == true ? int.parse(station['chargers'][0]['status']) : 0,
-                  isFavorite: station['isFavorite'],
-                  onFavoriteToggle: () => controller.removeFavorite(station['id']),
-                );
-              },
-              separatorBuilder: (context, index) => const Divider(),
+            child: RefreshIndicator(
+              onRefresh: controller.refreshFavoriteStations,
+              edgeOffset: 10,
+              displacement: 100,
+              // color: Colors.blue,
+              // backgroundColor: Colors.blue,
+              child: ListView.separated(
+                itemCount: controller.favoriteStations.length,
+                itemBuilder: (context, index) {
+                  final station = controller.favoriteStations[index];
+                  return ListtileChargestarWidget(
+                    stationName: station['name'],
+                    stationAddress: station['address'],
+                    chargerStat: station['chargers']?.isNotEmpty == true ? int.parse(station['chargers'][0]['status']) : 0,
+                    isFavorite: station['isFavorite'],
+                    onFavoriteToggle: () => controller.removeFavorite(station['id']),
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              ),
             ),
           ),
         );
