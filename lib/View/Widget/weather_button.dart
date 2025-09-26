@@ -60,7 +60,7 @@ class WeatherButton extends StatelessWidget {
                         if (weather == "Thunderstorm") Image.asset('assets/icon/weather/weather_thunderstorm.png', color: Colors.yellow, width: 30, height: 30),
                         if (weather == "Rain" || weather == "Drizzle") Image.asset('assets/icon/weather/weather_rain.png', color: Colors.blue, width: 30, height: 30),
                         if (weather == "Snow") Image.asset('assets/icon/weather/weather_snow.png', color: Colors.blue, width: 30, height: 30),
-                        if (weather == "Clear") Image.asset('assets/icon/weather/weather_clear.png', color: Colors.yellow, width: 30, height: 30),
+                        if (weather == "Clear") Image.asset('assets/icon/weather/weather_clear.png', color: Colors.lightBlueAccent, width: 30, height: 30),
                         if (weather == "Clouds") Image.asset('assets/icon/weather/weather_cloud.png', color: Colors.grey, width: 30, height: 30),
                         if (weather == "Atmosphere") Image.asset('assets/icon/weather/weather_atmosphere.png', color: Colors.grey, width: 30, height: 30),
                       ],
