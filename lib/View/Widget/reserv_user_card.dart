@@ -10,6 +10,8 @@ class ReservUserCard extends StatelessWidget {
     this.statusColor = const Color(0xFF7C3AED), // 보라색 칩
     required this.dateText,        // 예: 01월 25일
     required this.timeText,        // 예: 14:00
+    this.onCancel,
+    this.onUpdate
   });
 
   final String stationName;
@@ -19,6 +21,8 @@ class ReservUserCard extends StatelessWidget {
   final Color statusColor;
   final String dateText;
   final String timeText;
+  final VoidCallback? onCancel;
+  final VoidCallback? onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +118,14 @@ class ReservUserCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: null,
-                    child: const Text('충전소 보기'),
+                    onPressed: onUpdate,
+                    child: const Text('예약 수정'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: null,
+                    onPressed: onCancel,
                     child: const Text('취소'),
                   ),
                 ),
