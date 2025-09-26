@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/profile_controller.dart';
@@ -47,6 +48,7 @@ class ProfileView extends GetView<ProfileController> {
 
                         final startTimeString = reservation['startTime'];
                         final endTimeString = reservation['endTime'];
+                        final String reserveId = reservation['id'];
 
                         if (startTimeString != null && endTimeString != null) {
                           // 1. ISO 8601 형식의 문자열을 DateTime 객체로 파싱
@@ -62,8 +64,21 @@ class ProfileView extends GetView<ProfileController> {
 
                           timeText = '$startTimePart-$endTimePart';
                         }
-
-                        return ReservUserCard(stationName: '공유 충전소', address: '서울 학동로 123-45', rating: 4.8, statusText: '예약 확정', dateText: dateText, timeText: timeText);
+                        return ReservUserCard(
+                            stationName: reservation['stationName'],
+                            address: reservation['address'],
+                            rating: 4.8,
+                            statusText: '예약 확정',
+                            dateText: dateText,
+                            timeText: timeText,
+                            onCancel: () {
+                              controller.confirmDeleteReverse(reserveId);
+                            },
+                          onUpdate: () {
+                              print("수정 전달 데이터 $reservation");
+                              Get.toNamed("/reserv", arguments : {'type': ReserveType.update, 'reservation': reservation});
+                          },
+                        );
                       }).toList(),
                     );
                   }),
