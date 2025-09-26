@@ -13,7 +13,7 @@ class MainView extends GetView<MainController> {
     // , ProfileView()
     return Obx(
       () => Scaffold(
-        appBar: controller.selectedIndex.value == 3
+        appBar: controller.selectedIndex.value == 4
             ? AppBar(
                 title: Text("EVFinder"),
                 actions: [
@@ -32,7 +32,7 @@ class MainView extends GetView<MainController> {
           child: Container(
             height: 10,
             child: Padding(
-              padding: const EdgeInsets.only(right: 30, left: 30),
+              padding: const EdgeInsets.only(right: 20, left: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -40,29 +40,36 @@ class MainView extends GetView<MainController> {
                     onPressed: () {
                       controller.setView(0);
                     },
-                    icon: Icon(Icons.star, size: 25),
+                    icon: Icon(Icons.groups, size: 25),
                     color: controller.selectedIndex.value == 0 ? Colors.green : Colors.black12,
                   ),
                   IconButton(
                     onPressed: () {
                       controller.setView(1);
                     },
-                    icon: Icon(Icons.explore, size: 25),
+                    icon: Icon(Icons.star, size: 25),
                     color: controller.selectedIndex.value == 1 ? Colors.green : Colors.black12,
                   ),
                   IconButton(
                     onPressed: () {
                       controller.setView(2);
                     },
-                    icon: Icon(Icons.manage_accounts, size: 25),
+                    icon: Icon(Icons.explore, size: 25),
                     color: controller.selectedIndex.value == 2 ? Colors.green : Colors.black12,
                   ),
                   IconButton(
                     onPressed: () {
                       controller.setView(3);
                     },
-                    icon: Icon(Icons.person, size: 25),
+                    icon: Icon(Icons.manage_accounts, size: 25),
                     color: controller.selectedIndex.value == 3 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(4);
+                    },
+                    icon: Icon(Icons.person, size: 25),
+                    color: controller.selectedIndex.value == 4 ? Colors.green : Colors.black12,
                   ),
                 ],
               ),
