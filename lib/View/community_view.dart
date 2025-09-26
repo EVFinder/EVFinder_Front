@@ -9,6 +9,8 @@ class CommunityView extends GetView<CommunityController> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Community"));
+    return Scaffold(
+        appBar: AppBar(title: Text("커뮤니티"),),
+        body: Center(child: Text("community")));
   }
 }
