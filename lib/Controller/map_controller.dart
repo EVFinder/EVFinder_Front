@@ -26,7 +26,8 @@ class MapController extends GetxController {
   RxBool cameraMoved = false.obs;
   RxBool isInitialLoad = true.obs;
   RxBool isUserGesture = false.obs; // 🔥x<We 사용자 제스처 여부
-  Rx<Weather> weather = Weather(main: "clear", description: "Clear Sky", temperature: 23.0, feelsLike: 23.0, humidity: 23).obs;
+  Rx<Weather> weather = Weather(main: "Clear", description: "Clear Sky", temperature: 23.0, feelsLike: 23.0, humidity: 23).obs;
+  RxString address = ''.obs;
 
   final PermissionController locationController = PermissionController();
   final CameraController cameraController = CameraController();
@@ -120,7 +121,6 @@ class MapController extends GetxController {
         // 🔥 검색 결과로 이동시 카메라 위치 업데이트
         currentCameraLat.value = targetLat;
         currentCameraLng.value = targetLon;
-
 
         cameraController.moveCameraPosition(targetLat, targetLon, nMapController);
         cameraMoved.value = false;
@@ -235,7 +235,14 @@ class MapController extends GetxController {
 
   Future<Weather> fetchWeather(double lat, double lon) async {
     Weather weather = await WeatherService.fetchWeather(lat, lon);
+    address.value = await coorToAddr(lat, lon);
     return weather;
+  }
+
+  Future<String> coorToAddr(double lat, double lon) async {
+    String address = await WeatherService.chageCoorToAddr(lat, lon);
+
+    return address;
   }
 
   @override

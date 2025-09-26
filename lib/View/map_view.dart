@@ -104,7 +104,7 @@ class MapView extends GetView<MapController> {
             child: WeatherButton(
               weather: controller.weather.value.main,
               // weather: "Clear", // 수정해야함 (테스트용)
-              address: '충북 충주시 대학로 50', // 수정해야함 (주소 API 필요)
+              address: controller.address.value,
               temperature: controller.weather.value.temperature,
               humidity: controller.weather.value.humidity,
             ),
