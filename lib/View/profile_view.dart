@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../Controller/profile_controller.dart';
 import '../View/Widget/profile_card.dart';
 import 'package:evfinder_front/View/Widget/reserv_user_card.dart';
+import 'package:intl/intl.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -23,16 +24,58 @@ class ProfileView extends GetView<ProfileController> {
               padding: const EdgeInsets.only(bottom: 16),
               child: Column(
                 children: [
-                  // ✅ 예약 카드 추가 위치
-                  const ReservUserCard(
-                    stationName: '공유 충전소',
-                    address: '서울 학동로 123-45',
-                    rating: 4.8,
-                    statusText: '예약 확정',
-                    dateText: '2025-09-18',
-                    timeText: '14:00',
-                    durationText: '2시간',
-                  ),
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.reserveStation.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Center(child: Text('예약 내역이 없습니다.')),
+                      );
+                    }
+                    return Column(
+                      children: controller.reserveStation.map((reservation) {
+
+                        String dateText = '-';
+                        String timeText = '-';
+
+                        final startTimeString = reservation['startTime'];
+                        final endTimeString = reservation['endTime'];
+
+                        if (startTimeString != null && endTimeString != null) {
+                          // 1. ISO 8601 형식의 문자열을 DateTime 객체로 파싱
+                          final startTime = DateTime.parse(startTimeString);
+                          final endTime = DateTime.parse(endTimeString);
+
+                          // 년-월-일 형식
+                          dateText = DateFormat('yyyy-MM-dd').format(startTime);
+
+                          // 시간:분:초 형식
+                          final startTimePart = DateFormat('HH시mm분ss초').format(startTime);
+                          final endTimePart = DateFormat('HH시mm분ss초').format(endTime);
+
+                          timeText = '$startTimePart-$endTimePart';
+                        }
+
+                        return ReservUserCard(
+                          stationName: '공유 충전소',
+                          address: '서울 학동로 123-45',
+                          rating: 4.8,
+                          statusText: '예약 확정',
+                          dateText: dateText,
+                          timeText: timeText,
+                        );
+                      }).toList(),
+                    );
+                  }),
+                  // stationName: reservation['stationName'],
+                  // address: reservation['address'],
+                  // rating: (reservation['rating'] as num).toDouble(),
+                  // statusText: reservation['statusText'],
+                  // dateText: reservation['dateText'],
+                  // timeText: reservation['timeText'],
+                  // durationText: reservation['durationText'],
 
                   const SizedBox(height: 15),
 

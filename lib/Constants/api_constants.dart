@@ -1,6 +1,6 @@
 class ApiConstants {
   //본인 서버 주소 사용
-  static const String ip = '100.100.102.243'; // IP 만 바꿔주면 됨
+  static const String ip = '192.168.0.123'; // IP 만 바꿔주면 됨
   static const String baseUrl = 'http://$ip:8080';
 
   static const String authApiBaseUrl = 'http://$ip:8080/auth';

@@ -10,7 +10,6 @@ class ReservUserCard extends StatelessWidget {
     this.statusColor = const Color(0xFF7C3AED), // 보라색 칩
     required this.dateText,        // 예: 01월 25일
     required this.timeText,        // 예: 14:00
-    required this.durationText,    // 예: (2시간)
   });
 
   final String stationName;
@@ -20,7 +19,6 @@ class ReservUserCard extends StatelessWidget {
   final Color statusColor;
   final String dateText;
   final String timeText;
-  final String durationText;
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +102,6 @@ class ReservUserCard extends StatelessWidget {
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            durationText,
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-                          ),
                         ],
                       ),
                     ],
