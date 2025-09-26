@@ -37,7 +37,7 @@ class RegisterChargeController extends GetxController {
   Future<void> _loadUid() async {
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid'); // 로그인 시 setString('uid', uid)로 저장했던 값
-    userName = prefs.getString('userName');
+    userName = prefs.getString('name');
   }
 
   @override

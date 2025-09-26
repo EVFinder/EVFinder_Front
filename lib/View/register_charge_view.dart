@@ -227,6 +227,7 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                       child: ElevatedButton(
                         onPressed: () {
                           controller.register(context);
+                          Get.toNamed("/host");
                         },
                         child: const Text("등록"),
                       ),
