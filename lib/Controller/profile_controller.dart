@@ -19,10 +19,17 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUidAndreserv();
+    loadUidAndreserv();
   }
 
-  Future<void> _loadUidAndreserv() async {
+  // 화면이 다시 보일 때마다 데이터 새로고침
+  @override
+  void onReady() {
+    super.onReady();
+    loadreservCharge(); // 추가: 화면이 준비될 때마다 예약 데이터 다시 로드
+  }
+
+  Future<void> loadUidAndreserv() async {
     final prefs = await SharedPreferences.getInstance();
     uid.value = prefs.getString('uid') ?? '';
     await loadreservCharge();
@@ -35,15 +42,15 @@ class ProfileController extends GetxController {
       final rawReservCharge = await fetchReservCharge(uid.value);
       reserveStation.assignAll(
         rawReservCharge.map(
-            (e) => {
-                "shareId": e['shareId']?.toString() ?? '알 수 없음',
-                "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음',
-                "userName": e['userName']?.toString() ?? '알 수 없음',
-                "userPNumber": e['userPNumber']?.toString() ?? '알 수 없음',
-                "startTime": e['startTime']?.toString() ?? '알 수 없음',
-                "endTime": e['endTime']?.toString() ?? '알 수 없음',
-                "createdAt": e['createdAt']?.toString() ?? '알 수 없음',
-            },
+              (e) => {
+            "shareId": e['shareId']?.toString() ?? '알 수 없음',
+            "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음',
+            "userName": e['userName']?.toString() ?? '알 수 없음',
+            "userPNumber": e['userPNumber']?.toString() ?? '알 수 없음',
+            "startTime": e['startTime']?.toString() ?? '알 수 없음',
+            "endTime": e['endTime']?.toString() ?? '알 수 없음',
+            "createdAt": e['createdAt']?.toString() ?? '알 수 없음',
+          },
         ),
       );
     } finally {
@@ -110,14 +117,14 @@ class ProfileController extends GetxController {
 
       if(response.statusCode != 200) {
         Get.snackbar('', '서버 오류 (${response.statusCode})',
-        snackPosition: SnackPosition.BOTTOM);
+            snackPosition: SnackPosition.BOTTOM);
         return;
       }
 
       final decoded = jsonDecode(response.body);
       if (decoded['success']) {
         Get.snackbar('', '비밀번호 변경 완료',
-        snackPosition: SnackPosition.BOTTOM);
+            snackPosition: SnackPosition.BOTTOM);
         Get.back();
       } else {
         Get.snackbar('', '실패: ${decoded['message']}', snackPosition: SnackPosition.BOTTOM);
