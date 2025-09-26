@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/charge_detail_controller.dart';
 import 'package:evfinder_front/View/Widget/host_card.dart';
 import 'package:evfinder_front/View/Widget/review_card.dart';
 import 'package:evfinder_front/View/reserv_view.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-class ChargeDetailView extends StatelessWidget {
+class ChargeDetailView extends GetView<ChargeDetailController> {
   const ChargeDetailView({super.key});
 
   static String route = "/detail";
@@ -19,7 +20,62 @@ class ChargeDetailView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text(station['stationName'], style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 기존 타이틀은 Expanded로 감싸서 긴 이름도 잘리지 않게 처리
+            Expanded(
+              child: Text(
+                station['stationName'],
+                style: const TextStyle(fontWeight: FontWeight.w700),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // isHost가 true일 때만 버튼을 보여줍니다.
+            if (isHost)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text('충전소 상태 변경'),
+                        content: const Text('충전소의 상태를 선택해주세요.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              controller.statChange(station['id'], "available");
+                              Get.toNamed("/main");
+                            },
+                            child: const Text('사용 가능'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              controller.statChange(station['id'], "unavailable");
+                              Get.toNamed("/main");
+                            },
+                            child: const Text('불가능'),
+                          ),
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('취소', style: TextStyle(color: Colors.grey)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade50,
+                      foregroundColor: Colors.blue.shade800,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      textStyle:
+                      const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: const Text('상태 변경'),
+                ),
+              ),
+          ],
+        ),
       ),
 
       // 하단 고정 CTA
@@ -29,21 +85,22 @@ class ChargeDetailView extends StatelessWidget {
           child: SizedBox(
             height: 52,
             width: double.infinity,
-            child: !isHost
+            child: isHost
                 ? ElevatedButton(
-                    onPressed: () {
-                      print("전달 데이터 : $station");
-                      Get.toNamed('/reserv', arguments: station);
-                    },
-                    // {
-                    //   Future.microtask(() {
-                    //     Get.to(() => const ReservView());
-                    //   });
-                    // },
-                    style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                    child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-                  )
-                : SizedBox.shrink(),
+              onPressed: () {
+                print("호스트 전달 데이터; $station");
+                Get.toNamed('/management', arguments: station);
+              },
+              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+              child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            )
+                : ElevatedButton(
+              onPressed: () {
+                Get.toNamed('/reserv', arguments: station);
+              },
+              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+              child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            ),
           ),
         ),
       ),
