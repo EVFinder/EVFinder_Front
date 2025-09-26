@@ -31,10 +31,14 @@ class ChargeDatailView extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Future.microtask(() {
-                  Get.to(() => const ReservView());
-                });
+                print("전달 데이터 : $station");
+                Get.toNamed('/reserv', arguments: station);
               },
+              // {
+              //   Future.microtask(() {
+              //     Get.to(() => const ReservView());
+              //   });
+              // },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),

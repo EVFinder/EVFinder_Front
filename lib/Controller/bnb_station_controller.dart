@@ -39,6 +39,7 @@ class BnbStationController extends GetxController {
             "power": e['power']?.toString() ?? '알 수 없음',
             "pricePerHour": e['pricePerHour'] ?? 0.0,
             "status": e['status']?.toString() ?? '알 수 없음',
+            "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음,'
           },
         ),
       );
@@ -51,7 +52,7 @@ class BnbStationController extends GetxController {
     var urlString = '${ApiConstants.chargerbnbApiUrl}/all';
 
     if(lat != null && lon != null) {
-      urlString += '?lat=$lat&lon=$lon&radiusKm=5';
+      urlString += '?lat=$lat&lon=$lon&radiusKm=100';
     }
 
     final url = Uri.parse(urlString);
