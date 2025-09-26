@@ -43,11 +43,12 @@ class ProfileController extends GetxController {
       reserveStation.assignAll(
         rawReservCharge.map(
               (e) => {
-            "id": e['id']?.toString() ?? '알 수 없음',
+            "id": e['id']?.toString() ?? '알 수 없음', //reserveid
             "shareId": e['shareId']?.toString() ?? '알 수 없음',
-            "reserveId": e['reserveId']?.toString() ?? '알 수 없음',
+            "address": e['address']?.toString() ?? '알 수 없음',
             "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음',
             "userName": e['userName']?.toString() ?? '알 수 없음',
+            "stationName": e['stationName']?.toString() ?? '알 수 없음',
             "userPNumber": e['userPNumber']?.toString() ?? '알 수 없음',
             "startTime": e['startTime']?.toString() ?? '알 수 없음',
             "endTime": e['endTime']?.toString() ?? '알 수 없음',
@@ -75,15 +76,42 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Future <void> deleteReserv() async{
-  //   try {
-  //     isLoading.value = true;
-  //
-  //     final response = await http.delete(
-  //       Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}'),
-  //     );
-  //   }
-  // }
+  Future <void> deleteReserv(String reserveId) async{
+    if (reserveId == null || reserveId.isEmpty || reserveId == '알 수 없음') {
+      Get.snackbar('', '예약 정보가 올바르지 않습니다.', snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
+      final response = await http.delete(url);
+
+      if(response.statusCode == 200) {
+        Get.snackbar('', '예약 취소가 완료되었습니다.', snackPosition: SnackPosition.BOTTOM);
+        loadreservCharge();
+      } else {
+        Get.snackbar('', '예약 취소를 실패하었습니다.', snackPosition: SnackPosition.BOTTOM);
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void confirmDeleteReverse(String reserveId) {
+    Get.defaultDialog(
+      title: '예약 취소',
+      middleText: '정말로 취소하시겠어요? 이 작업은 되돌릴 수 없습니다.',
+      textCancel: '돌아가기',
+      textConfirm: '예약 취소',
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        Get.back();
+        deleteReserv(reserveId);
+      },
+    );
+  }
+
   void handleChangePassword() {
     Get.to(() => const ChangePasswordView());
   }

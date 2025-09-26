@@ -131,7 +131,7 @@ class ReservView extends GetView<ReservController> {
                       child: ElevatedButton(
                         onPressed: () {
                             controller.reserv(context);
-                            Get.toNamed("/host");
+                            Get.toNamed("/main");
                         },
                         child: const Text("예약"),
                       ),
