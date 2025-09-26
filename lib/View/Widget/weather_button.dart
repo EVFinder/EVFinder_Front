@@ -18,8 +18,8 @@ class WeatherButton extends StatelessWidget {
       return AnimatedContainer(
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        width: isExpanded.value ? Get.size.width * 0.5 : Get.size.width * 0.14,
-        height: isExpanded.value ? Get.size.height * 0.08 : Get.size.height * 0.06,
+        width: isExpanded.value ? Get.size.width * 0.5 : Get.size.width * 0.16,
+        height: isExpanded.value ? Get.size.height * 0.08 : Get.size.height * 0.07,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
@@ -57,11 +57,12 @@ class WeatherButton extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (weather == "Thunderstorm") Image.asset('assets/icon/weather/weather_thunderstorm.png', color: Colors.yellow, width: 24, height: 24),
-                        if (weather == "Rain" || weather == "Drizzle") Image.asset('assets/icon/weather/weather_rain.png', color: Colors.blue, width: 24, height: 24),
-                        if (weather == "Snow") Image.asset('assets/icon/weather/weather_snow.png', color: Colors.blue, width: 24, height: 24),
-                        if (weather == "Clear") Image.asset('assets/icon/weather/weather_clear.png', color: Colors.yellow, width: 24, height: 24),
-                        if (weather == "Clouds") Image.asset('assets/icon/weather/weather_cloud.png', color: Colors.grey, width: 24, height: 24),
+                        if (weather == "Thunderstorm") Image.asset('assets/icon/weather/weather_thunderstorm.png', color: Colors.yellow, width: 30, height: 30),
+                        if (weather == "Rain" || weather == "Drizzle") Image.asset('assets/icon/weather/weather_rain.png', color: Colors.blue, width: 30, height: 30),
+                        if (weather == "Snow") Image.asset('assets/icon/weather/weather_snow.png', color: Colors.blue, width: 30, height: 30),
+                        if (weather == "Clear") Image.asset('assets/icon/weather/weather_clear.png', color: Colors.yellow, width: 30, height: 30),
+                        if (weather == "Clouds") Image.asset('assets/icon/weather/weather_cloud.png', color: Colors.grey, width: 30, height: 30),
+                        if (weather == "Atmosphere") Image.asset('assets/icon/weather/weather_atmosphere.png', color: Colors.grey, width: 30, height: 30),
                       ],
                     ),
                     if (showContent.value) ...[
