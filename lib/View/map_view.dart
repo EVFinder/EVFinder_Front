@@ -38,25 +38,11 @@ class MapView extends GetView<MapController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-            ),
+            CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)),
             SizedBox(height: 20),
-            Text(
-              '현재 위치를 확인하고 있습니다...',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text('현재 위치를 확인하고 있습니다...', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             SizedBox(height: 8),
-            Text(
-              '잠시만 기다려주세요',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
+            Text('잠시만 기다려주세요', style: TextStyle(fontSize: 14, color: Colors.grey)),
           ],
         ),
       ),
@@ -65,16 +51,13 @@ class MapView extends GetView<MapController> {
 
   Widget _buildMapScreen(BuildContext context) {
     return Obx(
-          () => Stack(
+      () => Stack(
         children: [
           NaverMap(
             options: NaverMapViewOptions(
               initialCameraPosition: NCameraPosition(
                 target: controller.userPosition.value != null
-                    ? NLatLng(
-                  controller.userPosition.value!.latitude,
-                  controller.userPosition.value!.longitude,
-                )
+                    ? NLatLng(controller.userPosition.value!.latitude, controller.userPosition.value!.longitude)
                     : const NLatLng(37.5665, 126.9780),
                 zoom: 15,
               ),
@@ -92,14 +75,7 @@ class MapView extends GetView<MapController> {
             onCameraIdle: () async {
               // 카메라 이동이 완료되었을 때 중심점 좌표 가져오기
               if (controller.isMapReady.value) {
-                final cameraPosition = await controller.nMapController.getCameraPosition();
-                final centerLat = cameraPosition.target.latitude;
-                final centerLng = cameraPosition.target.longitude;
-
-                print('지도 중심점: $centerLat, $centerLng');
-
-                // 컨트롤러에 저장
-                controller.updateMapCenter(context ,centerLat, centerLng);
+                controller.cameraMoved.value = true;
               }
             },
             // 지도 클릭 시
@@ -108,15 +84,25 @@ class MapView extends GetView<MapController> {
             //   controller.onMapTapped(latLng.latitude, latLng.longitude);
             // },
           ),
+          controller.cameraMoved.value
+              ? Positioned(
+                  bottom: Get.size.height * 0.05,
+                  right: Get.size.width * 0.05,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      controller.cameraMoveCompleted(context);
+                    },
+                    backgroundColor: const Color(0xFF10B981),
+                    child: const Icon(Icons.refresh),
+                  ),
+                )
+              : SizedBox.shrink(),
           Positioned(
             top: -20,
             child: SearchAppbarWidget(
               onTap: () async {
                 controller.boxController.closeBox();
-                final SearchChargers result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => SearchChargerView(searchType: SearchType.map)),
-                );
+                final SearchChargers result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView(searchType: SearchType.map)));
                 await controller.fetchMyChargers(context, result);
               },
             ),
@@ -124,17 +110,13 @@ class MapView extends GetView<MapController> {
           Obx(() {
             return controller.isMapReady.value
                 ? GetBuilder<MapController>(
-              builder: (controller) {
-                return Positioned(
-                  bottom: 0,
-                  child: SlidingupPanelWidget(
-                    chargers: controller.chargers,
-                    nMapController: controller.nMapController,
-                    boxController: controller.boxController,
-                  ),
-                );
-              },
-            )
+                    builder: (controller) {
+                      return Positioned(
+                        bottom: 0,
+                        child: SlidingupPanelWidget(chargers: controller.chargers, nMapController: controller.nMapController, boxController: controller.boxController),
+                      );
+                    },
+                  )
                 : const SizedBox.shrink();
           }),
         ],
