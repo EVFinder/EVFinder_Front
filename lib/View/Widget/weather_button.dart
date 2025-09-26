@@ -18,7 +18,7 @@ class WeatherButton extends StatelessWidget {
       return AnimatedContainer(
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        width: isExpanded.value ? Get.size.width * 0.6 : Get.size.width * 0.16,
+        width: isExpanded.value ? Get.size.width * 0.8 : Get.size.width * 0.16,
         height: isExpanded.value ? Get.size.height * 0.08 : Get.size.height * 0.07,
         decoration: BoxDecoration(
           color: Colors.white,
