@@ -7,10 +7,16 @@ import 'package:intl/intl.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
+
   static String route = "/profile";
 
   @override
   Widget build(BuildContext context) {
+    // 화면이 빌드될 때마다 예약 데이터 새로고침
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadreservCharge();
+    });
+
     return SafeArea(
       child: Column(
         children: [
@@ -36,7 +42,6 @@ class ProfileView extends GetView<ProfileController> {
                     }
                     return Column(
                       children: controller.reserveStation.map((reservation) {
-
                         String dateText = '-';
                         String timeText = '-';
 
@@ -58,24 +63,10 @@ class ProfileView extends GetView<ProfileController> {
                           timeText = '$startTimePart-$endTimePart';
                         }
 
-                        return ReservUserCard(
-                          stationName: '공유 충전소',
-                          address: '서울 학동로 123-45',
-                          rating: 4.8,
-                          statusText: '예약 확정',
-                          dateText: dateText,
-                          timeText: timeText,
-                        );
+                        return ReservUserCard(stationName: '공유 충전소', address: '서울 학동로 123-45', rating: 4.8, statusText: '예약 확정', dateText: dateText, timeText: timeText);
                       }).toList(),
                     );
                   }),
-                  // stationName: reservation['stationName'],
-                  // address: reservation['address'],
-                  // rating: (reservation['rating'] as num).toDouble(),
-                  // statusText: reservation['statusText'],
-                  // dateText: reservation['dateText'],
-                  // timeText: reservation['timeText'],
-                  // durationText: reservation['durationText'],
 
                   const SizedBox(height: 15),
 
@@ -90,39 +81,35 @@ class ProfileView extends GetView<ProfileController> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                       ),
-                      child: const Text('비밀번호 변경',
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                      child: const Text('비밀번호 변경', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: ElevatedButton(
-                      // ⛔️ () => controller.handleLogout 는 실행 안 됨
-                      onPressed: controller.handleLogout, // ✅ 함수 참조로 전달
+                      onPressed: controller.handleLogout,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF6B7280),
                         minimumSize: const Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                       ),
-                      child: const Text('로그아웃',
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                      child: const Text('로그아웃', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: ElevatedButton(
-                      onPressed: controller.deleteAccount,
+                      onPressed: controller.confirmDeleteAccount,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFEF4444),
                         minimumSize: const Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                       ),
-                      child: const Text('회원 탈퇴',
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                      child: const Text('회원 탈퇴', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 20),
