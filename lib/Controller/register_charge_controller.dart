@@ -11,7 +11,6 @@ import '../Constants/api_constants.dart';
 class RegisterChargeController extends GetxController {
   final addrController = TextEditingController();
   final detailaddrController = TextEditingController();
-  final hostnameController = TextEditingController();
   final phoneController = TextEditingController();
   final chargeNameContrller = TextEditingController();
   final chargeTypeController = TextEditingController();
@@ -29,6 +28,7 @@ class RegisterChargeController extends GetxController {
   };
 
   String? uid;
+  String? userName;
   @override
   void onInit() {
     super.onInit();
@@ -37,13 +37,13 @@ class RegisterChargeController extends GetxController {
   Future<void> _loadUid() async {
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid'); // 로그인 시 setString('uid', uid)로 저장했던 값
+    userName = prefs.getString('name');
   }
 
   @override
   void dispose() {
     addrController.dispose();
     detailaddrController.dispose();
-    hostnameController.dispose();
     phoneController.dispose();
     chargeNameContrller.dispose();
     chargeTypeController.dispose();
@@ -66,7 +66,6 @@ class RegisterChargeController extends GetxController {
 
   Future <void> register(BuildContext context) async {
     final address = '${addrController.text.trim()} ${detailaddrController.text.trim()}'.trim();
-    final hostname = hostnameController.text;
     final hostContact = phoneController.text;
     final stationName = chargeNameContrller.text;
     final chargerType = chargeTypeController.text;
@@ -82,7 +81,7 @@ class RegisterChargeController extends GetxController {
           'address': address,
           'lat': lat.value,
           'lon': lon.value,
-          'hostName':hostname,
+          'hostName':userName,
           'hostContact':hostContact,
           'stationName':stationName,
           'chargerType': chargerType,

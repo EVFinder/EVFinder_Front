@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class ReservHostCard extends StatelessWidget {
   const ReservHostCard({
     super.key,
-    required this.stationName,
     required this.statusText,      // 예: 예약 확정
     this.statusColor = const Color(0xFF7C3AED), // 보라색 칩
     required this.userName,        // 예: 홍길동
@@ -12,7 +11,6 @@ class ReservHostCard extends StatelessWidget {
     required this.timeText,        // 예: 14:00
   });
 
-  final String stationName;
   final String statusText;
   final Color statusColor;
   final String userName;
@@ -31,12 +29,6 @@ class ReservHostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              stationName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 6),
-
             Row(
               children: [
                 Container(
@@ -75,19 +67,6 @@ class ReservHostCard extends StatelessWidget {
                           Text(dateText),
                           Text(timeText),
                       const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.center,
-                        child: OutlinedButton(
-                          onPressed: null, // 예약 취소 구현해야 됨
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF111827),
-                            side: const BorderSide(color: Color(0xFFE5E7EB)),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text('취소'),
-                        )
-                      )
                     ],
                   ),
                 ),

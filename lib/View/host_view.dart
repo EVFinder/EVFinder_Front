@@ -7,7 +7,7 @@ import '../View/add_charge_view.dart';
 
 class HostView extends GetView<HostController> {
   const HostView({super.key});
-  static String route = "/share";
+  static String route = "/host";
 
   @override
   Widget build(BuildContext context) {
