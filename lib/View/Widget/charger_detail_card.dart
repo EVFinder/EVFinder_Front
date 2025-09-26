@@ -145,6 +145,7 @@ class ChargerDetailCard extends GetView<MapController> {
                                   // 네비게이션 시작
                                   await navigationController.startNavigation(charger.lat, charger.lon);
 
+
                                   Get.back(); // 로딩 다이얼로그 닫기
 
                                   // 성공 메시지

@@ -239,7 +239,7 @@ class NavigationController extends GetxController {
     NLatLng destination = navigationData.value!.fullRoute!.last;
 
     // 현재 위치에서 목적지까지 새 경로 계산
-    await startNavigation(destination.latitude, destination.longitude);
+    // await startNavigation(destination.latitude, destination.longitude);
   }
 
   // 음성 안내 (TTS 구현 필요)
