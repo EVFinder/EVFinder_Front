@@ -11,7 +11,7 @@ class ReservView extends GetView<ReservController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("새 충전소 등록"),
+        title: const Text("충전소 예약"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -38,22 +38,6 @@ class ReservView extends GetView<ReservController> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 호스트 이름
-                    TextFormField(
-                      controller: controller.nameController,
-                      decoration: InputDecoration(
-                        label: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
-                            children: [
-                              TextSpan(text: '예약자 이름'),
-                              TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
-                            ],
-                          ),
-                        ),
-                        hintText: "예: 홍길동",
-                      ),
-                    ),
                     // 연락처
                     TextFormField(
                       controller: controller.contactController,
