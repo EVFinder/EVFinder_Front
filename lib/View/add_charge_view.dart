@@ -53,7 +53,7 @@ class AddChargeView extends GetView<AddChargeController> {
                       stationName: station['stationName'],
                       stationAddress: station['address'],
                       chargerStat: station['status'],
-                      onTap: () => Get.toNamed('/detail', arguments: station),
+                        onTap: () => Get.toNamed('/detail', arguments: {'station': station, 'isHost': true}),
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(),
