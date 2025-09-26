@@ -115,7 +115,7 @@ class ReservUserCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: null,
-                    child: const Text('충전소 보기'),
+                    child: const Text('예약 수정'),
                   ),
                 ),
                 const SizedBox(width: 8),

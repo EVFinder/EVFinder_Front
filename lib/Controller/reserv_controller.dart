@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReservController extends GetxController {
-  final nameController = TextEditingController();
   final contactController = TextEditingController();
   final startController = TextEditingController();
   final endController = TextEditingController();
@@ -15,10 +14,11 @@ class ReservController extends GetxController {
   String? uid;
   String? shareId;
   String? ownerUid;
+  String? userName;
   @override
   void onInit() {
     super.onInit();
-    _loadUid();
+    _loadUidandUsername();
 
     final arguments = Get.arguments as Map<String, dynamic>?;
     if(arguments != null) {
@@ -29,18 +29,17 @@ class ReservController extends GetxController {
   @override
   void dispose() {
     super.dispose();
-    nameController.dispose();
     contactController.dispose();
     startController.dispose();
     endController.dispose();
   }
-  Future<void> _loadUid() async {
+  Future<void> _loadUidandUsername() async {
     final prefs = await SharedPreferences.getInstance();
-    uid = prefs.getString('uid'); // 로그인 시 setString('uid', uid)로 저장했던 값
+    uid = prefs.getString('uid');
+    userName = prefs.getString('userName');
   }
 
   Future <void> reserv(BuildContext context) async {
-    final userName = nameController.text;
     final userPNumber = contactController.text;
     final startTime = startController.text;
     final endTime = endController.text;

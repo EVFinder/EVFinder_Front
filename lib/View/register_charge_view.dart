@@ -38,24 +38,6 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 호스트 이름
-                    TextFormField(
-                      controller: controller.hostnameController,
-                      decoration: InputDecoration(
-                        label: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black),
-                            children: [
-                              TextSpan(text: '호스트 이름'),
-                              TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
-                            ],
-                          ),
-                        ),
-                        hintText: "예: 홍길동",
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
                     // 연락처
                     TextFormField(
                       controller: controller.phoneController,
