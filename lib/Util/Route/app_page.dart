@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'package:evfinder_front/Controller/charge_datail_controller.dart';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/View/add_charge_view.dart';
 import 'package:evfinder_front/View/bnb_station_view.dart';

@@ -1,6 +1,5 @@
 import 'package:evfinder_front/Controller/addCharge_controller.dart';
 import 'package:evfinder_front/Controller/bnb_station_controller.dart';
-import 'package:evfinder_front/Controller/charge_datail_controller.dart';
 import 'package:evfinder_front/Controller/favorite_station_controller.dart';
 import 'package:evfinder_front/Controller/login_controller.dart';
 import 'package:evfinder_front/Controller/main_controller.dart';
