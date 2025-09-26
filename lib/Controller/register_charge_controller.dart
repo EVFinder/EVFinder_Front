@@ -22,6 +22,12 @@ class RegisterChargeController extends GetxController {
   final Rx<double?> lat = Rx<double?>(null);
   final Rx<double?> lon = Rx<double?>(null);
 
+  final selectedStat = Rxn<String>();
+  final Map<String, String> statOptions = {
+    'available': '사용 가능',
+    'unavailable': '불가능',
+  };
+
   String? uid;
   @override
   void onInit() {
@@ -66,7 +72,7 @@ class RegisterChargeController extends GetxController {
     final chargerType = chargeTypeController.text;
     final power = powerController.text;
     final pricePerHour = priceContoller.text;
-    final status = statController.text;
+    final status = selectedStat.value;
 
     try {
       final response = await http.post(
