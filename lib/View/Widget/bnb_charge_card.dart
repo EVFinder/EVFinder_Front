@@ -17,13 +17,13 @@ class BnbChargeCard extends StatelessWidget{
   final String chargerStat; // 0: 불가능, 1: 가능
   final String chargerType;
   final String power;
-  final String pricePerHour;
+  final int pricePerHour;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
 
-    final statusColor = chargerStat == '사용 가능'
+    final statusColor = chargerStat == 'available'
         ? const Color(0xFF10B981)
         : const Color(0xFFEF4444);
 
@@ -130,7 +130,7 @@ class BnbChargeCard extends StatelessWidget{
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.1),
+                              color: Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -138,7 +138,7 @@ class BnbChargeCard extends StatelessWidget{
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: statusColor,
+                                color: Color(0xFF1E3A8A),
                               ),
                             ),
                           ),
@@ -148,14 +148,14 @@ class BnbChargeCard extends StatelessWidget{
                       Row(
                         children: [
                           const Icon(
-                            Icons.location_on_outlined,
+                            Icons.paid,
                             size: 14,
                             color: Color(0xFF6B7280),
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              pricePerHour,
+                              "가격: " + pricePerHour.toString(),
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Color(0xFF6B7280),
@@ -170,7 +170,7 @@ class BnbChargeCard extends StatelessWidget{
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.1),
+                              color: Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -178,7 +178,7 @@ class BnbChargeCard extends StatelessWidget{
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: statusColor,
+                                color: Color(0xFF1E3A8A),
                               ),
                             ),
                           ),

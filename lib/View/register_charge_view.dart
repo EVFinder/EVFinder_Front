@@ -176,8 +176,18 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                     const SizedBox(height: 12),
 
                     // 운영 상태
-                    TextFormField(
-                      controller: controller.statController,
+                    Obx(() => DropdownButtonFormField<String>(
+                      value: controller.selectedStat.value,
+                      items: controller.statOptions.keys.map((String key) {
+                        return DropdownMenuItem<String>(
+                          value: key,
+                          child: Text(controller.statOptions[key]!),
+                        );
+                      }).toList(),
+
+                      onChanged: (String? newValue) {
+                        controller.selectedStat.value = newValue;
+                      },
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
@@ -188,9 +198,10 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                             ],
                           ),
                         ),
-                        hintText: "예: 사용 가능",
+                        hintText: "선택하세요",
+                        border: OutlineInputBorder(), // 테두리를 추가하면 더 보기 좋습니다.
                       ),
-                    ),
+                    )),
                     const SizedBox(height: 12),
 
                     // 파워 타입
