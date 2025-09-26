@@ -18,4 +18,17 @@ class WeatherService {
       throw Exception('검색 결과를 불러오지 못했습니다.');
     }
   }
+
+  static Future<String> chageCoorToAddr(double lat, double lon) async {
+    final url = Uri.parse('${ApiConstants.coorToAddr}x=$lon&y=$lat');
+    final response = await http.get(url);
+    // print(response.statusCode);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> decoded = json.decode(response.body);
+      return decoded['addressName'];
+    } else {
+      throw Exception('검색 결과를 불러오지 못했습니다.');
+    }
+  }
 }
