@@ -36,7 +36,7 @@ class ReservController extends GetxController {
   Future<void> _loadUidandUsername() async {
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
-    userName = prefs.getString('userName');
+    userName = prefs.getString('name');
   }
 
   Future <void> reserv(BuildContext context) async {

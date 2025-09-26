@@ -43,7 +43,9 @@ class ProfileController extends GetxController {
       reserveStation.assignAll(
         rawReservCharge.map(
               (e) => {
+            "id": e['id']?.toString() ?? '알 수 없음',
             "shareId": e['shareId']?.toString() ?? '알 수 없음',
+            "reserveId": e['reserveId']?.toString() ?? '알 수 없음',
             "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음',
             "userName": e['userName']?.toString() ?? '알 수 없음',
             "userPNumber": e['userPNumber']?.toString() ?? '알 수 없음',
@@ -73,6 +75,15 @@ class ProfileController extends GetxController {
     }
   }
 
+  // Future <void> deleteReserv() async{
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     final response = await http.delete(
+  //       Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}'),
+  //     );
+  //   }
+  // }
   void handleChangePassword() {
     Get.to(() => const ChangePasswordView());
   }
