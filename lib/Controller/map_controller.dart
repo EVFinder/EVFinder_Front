@@ -23,6 +23,8 @@ class MapController extends GetxController {
   RxBool isLocationLoaded = false.obs;
   RxBool cameraMoved = false.obs;
   RxBool isInitialLoad = true.obs;
+  RxBool isUserGesture = false.obs; // 🔥 추가: 사용자 제스처 여부
+
 
   final PermissionController locationController = PermissionController();
   final CameraController cameraController = CameraController();
@@ -78,10 +80,11 @@ class MapController extends GetxController {
 
   // 카메라 이동 완료 처리
   void onCameraIdle() async {
-    if (isMapReady.value && !isInitialLoad.value) {
+    // 🔥 사용자 제스처로 움직였을 때만 버튼 표시
+    if (isMapReady.value && !isInitialLoad.value && isUserGesture.value) {
       cameraMoved.value = true;
 
-      // 🔥 현재 카메라 위치 업데이트 (메모리에만)
+      // 현재 카메라 위치 업데이트 (메모리에만)
       try {
         final cameraPosition = await nMapController.getCameraPosition();
         currentCameraLat.value = cameraPosition.target.latitude;
@@ -93,7 +96,11 @@ class MapController extends GetxController {
         print('카메라 위치 업데이트 실패: $e');
       }
     }
+
+    // 🔥 제스처 플래그 초기화
+    isUserGesture.value = false;
   }
+
 
   // 버튼 표시 여부 계산
   bool get shouldShowRefreshButton =>
