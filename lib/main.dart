@@ -12,6 +12,7 @@ import 'package:evfinder_front/Controller/search_charger_controller.dart';
 import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/host_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
+import 'package:evfinder_front/View/Navigation/navigation_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => SignupController(), fenix: true);
         Get.lazyPut(() => MainController(), fenix: true);
         Get.lazyPut(() => MapController(), fenix: true);
+        Get.lazyPut(() => NavigationController(), fenix: true);
         Get.lazyPut(() => ProfileController(), fenix: true);
         Get.lazyPut(() => SettingController(), fenix: true);
         Get.lazyPut(() => HostController(), fenix: true);
