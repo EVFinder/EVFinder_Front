@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:evfinder_front/Controller/camera_controller.dart';
 import 'package:evfinder_front/Controller/permission_controller.dart';
+import 'package:evfinder_front/Service/weather_service.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
 import '../Model/search_chargers.dart';
+import '../Model/weather.dart';
 import '../Service/ev_charger_service.dart';
 import '../Service/marker_service.dart';
 
@@ -23,8 +25,8 @@ class MapController extends GetxController {
   RxBool isLocationLoaded = false.obs;
   RxBool cameraMoved = false.obs;
   RxBool isInitialLoad = true.obs;
-  RxBool isUserGesture = false.obs; // 🔥 추가: 사용자 제스처 여부
-
+  RxBool isUserGesture = false.obs; // 🔥x<We 사용자 제스처 여부
+  Rx<Weather> weather = Weather(main: "clear", description: "Clear Sky", temperature: 23.0, feelsLike: 23.0, humidity: 23).obs;
 
   final PermissionController locationController = PermissionController();
   final CameraController cameraController = CameraController();
@@ -101,10 +103,8 @@ class MapController extends GetxController {
     isUserGesture.value = false;
   }
 
-
   // 버튼 표시 여부 계산
-  bool get shouldShowRefreshButton =>
-      isMapReady.value && cameraMoved.value && !isInitialLoad.value;
+  bool get shouldShowRefreshButton => isMapReady.value && cameraMoved.value && !isInitialLoad.value;
 
   // fetchMyChargers 메서드
   Future<void> fetchMyChargers(BuildContext? context, SearchChargers? result) async {
@@ -121,6 +121,7 @@ class MapController extends GetxController {
         currentCameraLat.value = targetLat;
         currentCameraLng.value = targetLon;
 
+
         cameraController.moveCameraPosition(targetLat, targetLon, nMapController);
         cameraMoved.value = false;
       } else {
@@ -129,6 +130,7 @@ class MapController extends GetxController {
         targetLon = currentCameraLng.value;
       }
 
+      weather.value = await fetchWeather(targetLat, targetLon);
       await fetchChargers(targetLat, targetLon);
 
       if (context != null) {
@@ -153,22 +155,10 @@ class MapController extends GetxController {
       currentCameraLng.value = cameraPosition.target.longitude;
       currentZoom.value = cameraPosition.zoom;
 
-      Get.snackbar(
-          '새로고침 완료',
-          '현재 위치 기준으로 충전소를 새로 검색했습니다.',
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.green.withOpacity(0.8),
-          colorText: Colors.white
-      );
+      Get.snackbar('새로고침 완료', '현재 위치 기준으로 충전소를 새로 검색했습니다.', duration: Duration(seconds: 2), backgroundColor: Colors.green.withOpacity(0.8), colorText: Colors.white);
     } catch (e) {
       print('새로고침 실패: $e');
-      Get.snackbar(
-          '새로고침 실패',
-          '충전소 검색 중 오류가 발생했습니다.',
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.red.withOpacity(0.8),
-          colorText: Colors.white
-      );
+      Get.snackbar('새로고침 실패', '충전소 검색 중 오류가 발생했습니다.', duration: Duration(seconds: 2), backgroundColor: Colors.red.withOpacity(0.8), colorText: Colors.white);
     }
   }
 
@@ -241,6 +231,11 @@ class MapController extends GetxController {
   Future<NLatLng> getCurrentMapCenter() async {
     final cameraPosition = await nMapController.getCameraPosition();
     return cameraPosition.target;
+  }
+
+  Future<Weather> fetchWeather(double lat, double lon) async {
+    Weather weather = await WeatherService.fetchWeather(lat, lon);
+    return weather;
   }
 
   @override
