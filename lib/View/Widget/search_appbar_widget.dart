@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class SearchAppbarWidget extends StatelessWidget {
-  const SearchAppbarWidget({super.key, required this.onTap});
+  const SearchAppbarWidget({super.key, required this.onTap, required this.topPadding});
 
   final VoidCallback onTap;
+  final double topPadding;
 
   @override
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
+      padding: EdgeInsets.fromLTRB(16, topPadding, 16, 16),
       child: GestureDetector(
         onTap: onTap,
         child: Container(

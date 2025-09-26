@@ -1,4 +1,6 @@
 import 'package:evfinder_front/Controller/search_charger_controller.dart';
+import 'package:evfinder_front/Service/weather_service.dart';
+import 'package:evfinder_front/View/Widget/weather_button.dart';
 import 'package:evfinder_front/View/search_charger_view.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
@@ -67,6 +69,14 @@ class MapView extends GetView<MapController> {
             // 카메라 이동이 완료되었을 때
             onCameraChange: (NCameraUpdateReason reason, bool animated) {
               print('카메라 이동 중: $reason');
+
+              // 🔥 사용자 제스처(드래그, 핀치 줌 등)인지 확인
+              if (reason == NCameraUpdateReason.gesture) {
+                controller.isUserGesture.value = true;
+              } else {
+                // 프로그래밍적 이동(검색, 위치 이동 등)
+                controller.isUserGesture.value = false;
+              }
             },
             onCameraIdle: () async {
               controller.onCameraIdle();
@@ -76,6 +86,28 @@ class MapView extends GetView<MapController> {
             //   print('지도 클릭 위치: ${latLng.latitude}, ${latLng.longitude}');
             //   controller.onMapTapped(latLng.latitude, latLng.longitude);
             // },
+          ),
+          // Positioned(
+          //   bottom: Get.size.height * 0.05,
+          //   right: Get.size.width * 0.1,
+          //   child: FloatingActionButton(
+          //     onPressed: () {
+          //       WeatherService.searchUseKeyword(controller.currentCameraLat.value, controller.currentCameraLng.value);
+          //     },
+          //     backgroundColor: Colors.white,
+          //     child: Image.asset('assets/icon/weather/weather_icon_basic_24px.png', color: Colors.blue),
+          //   ),
+          // ),
+          Positioned(
+            bottom: Get.size.height * 0.05,
+            right: Get.size.width * 0.05,
+            child: WeatherButton(
+              weather: controller.weather.value.main,
+              // weather: "Clear", // 수정해야함 (테스트용)
+              address: '충북 충주시 대학로 50', // 수정해야함 (주소 API 필요)
+              temperature: controller.weather.value.temperature,
+              humidity: controller.weather.value.humidity,
+            ),
           ),
           controller.cameraMoved.value
               ? Positioned(
@@ -98,6 +130,7 @@ class MapView extends GetView<MapController> {
           Positioned(
             top: -20,
             child: SearchAppbarWidget(
+              topPadding: 60,
               onTap: () async {
                 controller.boxController.closeBox();
                 final SearchChargers result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView(searchType: SearchType.map)));

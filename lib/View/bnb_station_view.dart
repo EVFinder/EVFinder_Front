@@ -25,6 +25,7 @@ class BnbStationView extends GetView<BnbStationController> {
         children: [
           // 2. 검색 위젯을 항상 상단에 표시합니다.
           SearchAppbarWidget(
+            topPadding: 0,
             onTap: () async {
               final result = await Get.to(() => const SearchChargerView(searchType: SearchType.bnb));
               if (result != null && result is SearchChargers) {
