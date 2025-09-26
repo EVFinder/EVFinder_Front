@@ -20,7 +20,7 @@ class WeatherService {
   }
 
   static Future<String> chageCoorToAddr(double lat, double lon) async {
-    final url = Uri.parse('${ApiConstants.coorToAddr}x=$lon&y=$lat');
+    final url = Uri.parse('${ApiConstants.coorToAddr}?x=$lon&y=$lat');
     final response = await http.get(url);
     // print(response.statusCode);
 
