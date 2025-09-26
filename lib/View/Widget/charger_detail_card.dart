@@ -67,22 +67,22 @@ class ChargerDetailCard extends GetView<MapController> {
                             ),
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Get.toNamed('/detail/new'); //충전소 등록 페이지로 이동해야 함
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: const Color(0xFF0F172A),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
-                            shape: const StadiumBorder(),
-                          ),
-                          child: const Text(
-                            '상세 보기',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        // TextButton(
+                        //   onPressed: () {
+                        //     Get.toNamed('/detail/new'); //충전소 등록 페이지로 이동해야 함
+                        //   },
+                        //   style: TextButton.styleFrom(
+                        //     foregroundColor: Colors.white,
+                        //     backgroundColor: const Color(0xFF0F172A),
+                        //     padding: const EdgeInsets.symmetric(
+                        //         horizontal: 14, vertical: 8),
+                        //     shape: const StadiumBorder(),
+                        //   ),
+                        //   child: const Text(
+                        //     '상세 보기',
+                        //     style: TextStyle(fontWeight: FontWeight.w600),
+                        //   ),
+                        // ),
                         const SizedBox(height: 5),
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.75,
