@@ -15,6 +15,7 @@ class HostView extends GetView<HostController> {
       length: 2,
       child: Scaffold(
       appBar: AppBar(
+        toolbarHeight: 0,
         bottom: TabBar(
             tabs: <Widget>[
               Tab(icon: Icon(Icons.ev_station), text: '충전소 목록',),

@@ -106,6 +106,7 @@ class MapView extends GetView<MapController> {
           Positioned(
             top: -20,
             child: SearchAppbarWidget(
+              topPadding: 60,
               onTap: () async {
                 controller.boxController.closeBox();
                 final SearchChargers result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView(searchType: SearchType.map)));
