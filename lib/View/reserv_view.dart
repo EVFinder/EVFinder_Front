@@ -40,6 +40,7 @@ class ReservView extends GetView<ReservController> {
 
                     // 호스트 이름
                     TextFormField(
+                      controller: controller.nameController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
@@ -55,6 +56,7 @@ class ReservView extends GetView<ReservController> {
                     ),
                     // 연락처
                     TextFormField(
+                      controller: controller.contactController,
                       decoration: InputDecoration(
                         label: RichText(
                           text: const TextSpan(
@@ -71,41 +73,80 @@ class ReservView extends GetView<ReservController> {
 
                     // 시작 시간
                     TextFormField(
+                      controller: controller.startController,
+                      readOnly: true, // 사용자가 직접 입력하는 것을 막습니다.
                       decoration: InputDecoration(
-                        label: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
-                            children: [
-                              TextSpan(text: '시작 시간'),
-                              TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
-                            ],
-                          ),
-                        ),
-                        hintText: "예: 09:00",
+                        hintText: "시작 시간을 선택하세요",
                       ),
+                      onTap: () async {
+                        // 1. 날짜 선택기 실행
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2101),
+                        );
+
+                        if (pickedDate != null) {
+                          final TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                          );
+
+                          if (pickedTime != null) {
+                            final dateTime = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                            controller.startController.text = dateTime.toUtc().toIso8601String();
+                          }
+                        }
+                      },
                     ),
 
-                    // 사용 시간
                     TextFormField(
+                      controller: controller.endController,
+                      readOnly: true, // 사용자가 직접 입력하는 것을 막습니다.
                       decoration: InputDecoration(
-                        label: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black), // 기본 라벨 스타일
-                            children: [
-                              TextSpan(text: '사용 시간'),
-                              TextSpan(text: ' *', style: TextStyle(color: Color(0xFFEF4444))),
-                            ],
-                          ),
-                        ),
-                        hintText: "예: 2시간",
+                        hintText: "종료 시간을 선택하세요",
                       ),
+                      onTap: () async {
+                        // 1. 날짜 선택기 실행
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2101),
+                        );
+
+                        if (pickedDate != null) {
+                          final TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                          );
+
+                          if (pickedTime != null) {
+                            final dateTime = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                            controller.endController.text = dateTime.toUtc().toIso8601String();
+                          }
+                        }
+                      },
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          //등록 구현해야 함
+                            controller.reserv(context);
                         },
                         child: const Text("예약"),
                       ),
