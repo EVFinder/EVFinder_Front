@@ -1,4 +1,6 @@
 import 'package:evfinder_front/Controller/search_charger_controller.dart';
+import 'package:evfinder_front/Service/weather_service.dart';
+import 'package:evfinder_front/View/Widget/weather_button.dart';
 import 'package:evfinder_front/View/search_charger_view.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
@@ -84,6 +86,28 @@ class MapView extends GetView<MapController> {
             //   print('지도 클릭 위치: ${latLng.latitude}, ${latLng.longitude}');
             //   controller.onMapTapped(latLng.latitude, latLng.longitude);
             // },
+          ),
+          // Positioned(
+          //   bottom: Get.size.height * 0.05,
+          //   right: Get.size.width * 0.1,
+          //   child: FloatingActionButton(
+          //     onPressed: () {
+          //       WeatherService.searchUseKeyword(controller.currentCameraLat.value, controller.currentCameraLng.value);
+          //     },
+          //     backgroundColor: Colors.white,
+          //     child: Image.asset('assets/icon/weather/weather_icon_basic_24px.png', color: Colors.blue),
+          //   ),
+          // ),
+          Positioned(
+            bottom: Get.size.height * 0.05,
+            right: Get.size.width * 0.05,
+            child: WeatherButton(
+              // weather: controller.weather.value.main,
+              weather: "Thunderstorm",
+              address: '충북 충주시 대학로 50', // 수정해야함 (주소 API 필요)
+              temperature: controller.weather.value.temperature,
+              humidity: controller.weather.value.humidity,
+            ),
           ),
           controller.cameraMoved.value
               ? Positioned(
