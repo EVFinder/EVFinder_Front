@@ -67,6 +67,14 @@ class MapView extends GetView<MapController> {
             // 카메라 이동이 완료되었을 때
             onCameraChange: (NCameraUpdateReason reason, bool animated) {
               print('카메라 이동 중: $reason');
+
+              // 🔥 사용자 제스처(드래그, 핀치 줌 등)인지 확인
+              if (reason == NCameraUpdateReason.gesture) {
+                controller.isUserGesture.value = true;
+              } else {
+                // 프로그래밍적 이동(검색, 위치 이동 등)
+                controller.isUserGesture.value = false;
+              }
             },
             onCameraIdle: () async {
               controller.onCameraIdle();
