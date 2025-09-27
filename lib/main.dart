@@ -83,6 +83,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => ReservUserController(), fenix: true);
         Get.lazyPut(() => ReviewWriteController(), fenix: true);
         Get.lazyPut(() => ReviewDetailController(), fenix: true);
+        Get.lazyPut(() => CommunityController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
