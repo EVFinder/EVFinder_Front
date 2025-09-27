@@ -43,9 +43,9 @@ class AppPages {
     GetPage(name: AppRoute.reserv, page: () => const ReservView()),
     GetPage(name: AppRoute.detail, page: () => const ChargeDetailView()),
     GetPage(name: AppRoute.bnbcharge, page: () => const BnbStationView()),
-    GetPage(name: AppRoute.community, page: () => const CommunityView()),
+    GetPage(name: AppRoute.community, page: () => CommunityView()),
     GetPage(name: AppRoute.reviewWrite, page: () => const ReviewWriteView()),
-    GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView())
+    GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView()),
     GetPage(name: AppRoute.community, page: () => CommunityView()),
     GetPage(name: AppRoute.addpost, page: () => AddPostView()),
     GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
