@@ -10,6 +10,7 @@ import 'package:evfinder_front/View/favortie_station_view.dart';
 import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
 import 'package:evfinder_front/View/map_view.dart';
+import 'package:evfinder_front/View/post_detail_view.dart';
 import 'package:evfinder_front/View/register_charge_view.dart';
 import 'package:evfinder_front/View/reserv_management_view.dart';
 import 'package:evfinder_front/View/reserv_user_view.dart';
@@ -42,11 +43,12 @@ class AppPages {
     GetPage(name: AppRoute.reserv, page: () => const ReservView()),
     GetPage(name: AppRoute.detail, page: () => const ChargeDetailView()),
     GetPage(name: AppRoute.bnbcharge, page: () => const BnbStationView()),
-    GetPage(name: AppRoute.community, page: () => const CommunityView()),
+    GetPage(name: AppRoute.community, page: () => CommunityView()),
     GetPage(name: AppRoute.reviewWrite, page: () => const ReviewWriteView()),
-    GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView())
+    GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView()),
     GetPage(name: AppRoute.community, page: () => CommunityView()),
-    GetPage(name: AppRoute.community, page: () => CommunityView()),
-    GetPage(name: AppRoute.reservUser, page: () => const ReservUserView())
+    GetPage(name: AppRoute.addpost, page: () => AddPostView()),
+    GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
+    GetPage(name: AppRoute.postdetail, page: () => const PostDetailView()),
   ];
 }
