@@ -13,6 +13,7 @@ import 'package:evfinder_front/View/register_charge_view.dart';
 import 'package:evfinder_front/View/reserv_management_view.dart';
 import 'package:evfinder_front/View/reserv_user_view.dart';
 import 'package:evfinder_front/View/reserv_view.dart';
+import 'package:evfinder_front/View/review_detail_view.dart';
 import 'package:evfinder_front/View/setting_view.dart';
 import 'package:evfinder_front/View/profile_view.dart';
 import 'package:evfinder_front/View/change_password.dart';
@@ -42,6 +43,7 @@ class AppPages {
     GetPage(name: AppRoute.bnbcharge, page: () => const BnbStationView()),
     GetPage(name: AppRoute.community, page: () => const CommunityView()),
     GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
-    GetPage(name: AppRoute.reviewWrite, page: () => const ReviewWriteView())
+    GetPage(name: AppRoute.reviewWrite, page: () => const ReviewWriteView()),
+    GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView())
   ];
 }
