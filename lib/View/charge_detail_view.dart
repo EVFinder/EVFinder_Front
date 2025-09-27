@@ -5,6 +5,7 @@ import 'package:evfinder_front/View/reserv_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 
 class ChargeDetailView extends GetView<ChargeDetailController> {
   const ChargeDetailView({super.key});
@@ -88,7 +89,6 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
             child: isHost
                 ? ElevatedButton(
               onPressed: () {
-                print("호스트 전달 데이터; $station");
                 Get.toNamed('/management', arguments: station);
               },
               style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
@@ -148,18 +148,130 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
             const SizedBox(height: 16),
 
             // 리뷰
-            _SectionCard(
-              title: '리뷰 (3)',
-              child: ReviewCard(userName: '길동홍', rating: 3, content: '조음', createdAt: '2021-08-23'),
-            ),
+            // _SectionCard(
+            //   title: '리뷰 (3)',
+            //   child: ReviewCard(userName: '길동홍', rating: 3, content: '조음', createdAt: '2021-08-23'),
+            //
+            // ),
 
-            const SizedBox(height: 80), // 스크롤 하단 여백
+            Obx(() => _SectionCard(
+            title: '리뷰 (${controller.bnbReview.length})',
+              child: Column(
+                children: [
+                  if (controller.isLoading.value)
+                    const Center(child: CircularProgressIndicator())
+                  else if (controller.bnbReview.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20.0),
+                      child: Center(child: Text('작성된 리뷰가 없습니다.')),
+                    ),
+
+                  ...controller.bnbReview.map((review) {
+
+                    final String reviewAuthorUid = review['uid']?.toString() ?? '';
+
+
+                    final bool isMine = controller.uid.value == reviewAuthorUid;
+                    final String reviewId = review['reviewId'] as String;
+                    final String create = review['createdAt'] as String;
+                    String dateText = '-';
+
+                    try {
+                      final createDate = DateTime.parse(create);
+                      dateText = DateFormat('yyyy-MM-dd').format(createDate);
+                    } catch (e) {
+                      print("날짜 파싱 에러: $create, 오류: $e");
+                      dateText = create;
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: ReviewCard(
+                        userName: review['userName'] as String,
+                        rating: review['rating'] as int,
+                        content: review['content'] as String,
+                        createdAt: dateText,
+                        isMine: isMine,
+                        onDelete: () {
+                          Get.dialog(
+                              AlertDialog(
+                                  title: const Text('리뷰 삭제'),
+                                  content: const Text('정말로 이 리뷰를 삭제하시겠습니까?'),
+                                  actions: [
+                                  TextButton(
+                                    onPressed: () => Get.back(),
+                                    child: const Text('취소'),
+                                  ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Get.back();
+                                        controller.deleteReview(reviewId);
+                                      },
+                                      child: const Text('삭제', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
+                              ),
+                          );
+                        },
+                        onEdit: () {
+                          Get.toNamed("/reviewWrite", arguments: {'review': review});
+                        },
+                      ),
+                    );
+                  }).toList(),
+
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Get.toNamed("/reviewWrite", arguments: {'station': station});
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF374151),
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('리뷰 작성'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Get.toNamed("reviewDetail", arguments: station);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF374151),
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('더 보기'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+                  ),
           ],
         ),
       ),
     );
   }
 }
+
 
 class _Pill extends StatelessWidget {
   const _Pill({required this.text});
