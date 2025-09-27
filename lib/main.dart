@@ -10,6 +10,7 @@ import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/Controller/reservManagement_controller.dart';
 import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:evfinder_front/Controller/reserv_user_controller.dart';
+import 'package:evfinder_front/Controller/review_write_controller.dart';
 import 'package:evfinder_front/Controller/search_charger_controller.dart';
 import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/host_controller.dart';
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => CommunityController(), fenix: true);
         Get.lazyPut(() => ChargeDetailController(), fenix: true);
         Get.lazyPut(() => ReservUserController(), fenix: true);
+        Get.lazyPut(() => ReviewWriteController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
