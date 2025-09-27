@@ -8,7 +8,7 @@ class CommunityPost {
   final int likes;
   final String createdAt;
   final String updatedAt;
-  final bool isOwner;
+  final bool owner;
 
   CommunityPost({
     required this.postId,
@@ -20,7 +20,7 @@ class CommunityPost {
     required this.likes,
     required this.createdAt,
     required this.updatedAt,
-    required this.isOwner,
+    required this.owner,
   });
 
   factory CommunityPost.fromJson(Map<String, dynamic> json) {
@@ -34,7 +34,7 @@ class CommunityPost {
       likes: json['likes'] ?? 0,
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
-      isOwner: json['isOwner'] ?? false,
+      owner: json['owner'] ?? false,
     );
   }
 }
