@@ -41,4 +41,41 @@ class PostService {
       throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
     }
   }
+
+  static Future<List<CommunityPost>> fetchMyPost() async {
+    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/my/posts');
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+    print('[DEBUG] Fetch My Post 응답 코드: ${response.statusCode}');
+    print('[DEBUG] Fetch My Post 응답 내용: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((e) => CommunityPost.fromJson(e)).toList();
+    } else {
+      throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
+    }
+  }
+
+  static Future<bool> addPost(String cId, String title, String content) async {
+    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts');
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    final body = {"title": title, "content": content};
+
+    final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'}, body: json.encode(body));
+
+    print('[DEBUG] Fetch Add Post 응답 코드: ${response.statusCode}');
+    print('[DEBUG] Fetch Add Post 응답 내용: ${response.body}');
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
+    }
+  }
 }

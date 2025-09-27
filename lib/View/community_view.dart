@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/community_controller.dart';
+import '../Util/Route/app_page.dart';
 import 'Widget/Community/add_category_dialog_widget.dart';
+import 'Widget/Community/my_post_tile.dart';
 import 'Widget/Community/post_card_widget.dart';
 import 'Widget/community_stat_item.dart';
 
@@ -29,9 +31,9 @@ class CommunityView extends GetView<CommunityController> {
         ],
         bottom: TabBar(
           controller: controller.tabController,
-          labelColor: Theme.of(context).primaryColor,
+          labelColor: Color(0xFF078714),
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Theme.of(context).primaryColor,
+          indicatorColor: Color(0xFF078714),
           tabs: [
             Tab(icon: Icon(Icons.home_outlined), text: '홈'),
             Tab(icon: Icon(Icons.group_outlined), text: '내 게시글'),
@@ -39,7 +41,7 @@ class CommunityView extends GetView<CommunityController> {
         ),
       ),
       body: FutureBuilder(
-        future: controller.initializeCategories(),
+        future: controller.initialize(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -67,7 +69,7 @@ class CommunityView extends GetView<CommunityController> {
                 ),
               ),
             // 게시글 추가 버튼
-            FloatingActionButton(heroTag: "addPost", onPressed: () => _showCreateOptions(context), child: Icon(Icons.add), backgroundColor: Theme.of(context).primaryColor),
+            FloatingActionButton(heroTag: "addPost", onPressed: () => _showCreateOptions(context), child: Icon(Icons.add), backgroundColor: Color(0xFF078714)),
           ],
         ),
       ),
@@ -191,9 +193,9 @@ class CommunityView extends GetView<CommunityController> {
           margin: EdgeInsets.only(right: Get.size.width * 0.03),
           padding: EdgeInsets.all(Get.size.width * 0.01),
           decoration: BoxDecoration(
-            color: isSelected ? Get.theme.primaryColor.withOpacity(0.1) : Colors.transparent,
+            color: isSelected ? Color(0xFF078714).withOpacity(0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(Get.size.width * 0.02),
-            border: isSelected ? Border.all(color: Get.theme.primaryColor, width: 2) : null,
+            border: isSelected ? Border.all(color: Color(0xFF078714), width: 2) : null,
           ),
           child: Column(
             children: [
@@ -201,7 +203,7 @@ class CommunityView extends GetView<CommunityController> {
                 duration: Duration(milliseconds: 200),
                 child: CircleAvatar(
                   radius: Get.size.width * 0.0625,
-                  backgroundColor: isSelected ? Get.theme.primaryColor : Colors.grey[300],
+                  backgroundColor: isSelected ? Color(0xFF078714) : Colors.grey[300],
                   child: Text(
                     controller.categories[index].name.substring(0, 1),
                     style: TextStyle(color: isSelected ? Colors.white : Colors.black54, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
@@ -213,7 +215,7 @@ class CommunityView extends GetView<CommunityController> {
                 controller.categories[index].name,
                 style: TextStyle(
                   fontSize: Get.size.width * 0.0275,
-                  color: isSelected ? Get.theme.primaryColor : Colors.black87,
+                  color: isSelected ? Color(0xFF078714) : Colors.black87,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
                 maxLines: 1,
@@ -245,45 +247,10 @@ class CommunityView extends GetView<CommunityController> {
           ),
         ),
         // 참여 중인 커뮤니티 리스트
-        Expanded(child: ListView.builder(itemCount: 12, itemBuilder: (context, index) => _buildMyCommunityTile(context, index))),
+        Expanded(
+          child: ListView.builder(itemCount: controller.myPost.length, itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])),
+        ),
       ],
-    );
-  }
-
-  // 내 커뮤니티 타일
-  Widget _buildMyCommunityTile(BuildContext context, int index) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04, vertical: Get.size.height * 0.005),
-      child: ListTile(
-        title: Text('내 게시글 ${index + 1}'),
-        subtitle: SizedBox(
-          width: 150,
-          height: 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('위에서 관심있는 커뮤니티를 선택하면\n해당 커뮤니티의 게시글을 볼 수 있어요', style: TextStyle(overflow: TextOverflow.ellipsis)),
-              Row(
-                children: [
-                  Icon(Icons.favorite_border, color: Theme.of(context).primaryColor),
-                  SizedBox(width: 5),
-                  Text("2", style: TextStyle(color: Theme.of(context).primaryColor)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(width: Get.size.width * 0.02),
-            Icon(Icons.arrow_forward_ios, size: Get.size.width * 0.04),
-          ],
-        ),
-        onTap: () {
-          // 커뮤니티 상세 화면으로 이동
-        },
-      ),
     );
   }
 
@@ -313,7 +280,7 @@ class CommunityView extends GetView<CommunityController> {
               subtitle: Text('커뮤니티에 새 게시글을 작성하세요'),
               onTap: () {
                 Navigator.pop(context);
-                controller.createPost();
+                Get.toNamed(AppRoute.addpost);
               },
             ),
             ListTile(

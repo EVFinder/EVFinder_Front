@@ -12,11 +12,16 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   late TabController tabController;
   late ScrollController scrollController;
 
+  // 컨트롤러들
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
+
   // Reactive variables
   RxBool showScrollToTop = false.obs;
   RxnInt selectedCommunityIndex = RxnInt(); // null을 허용하는 RxInt
   RxList<CommunityCategory> categories = <CommunityCategory>[].obs;
   RxList<CommunityPost> post = <CommunityPost>[].obs;
+  RxList<CommunityPost> myPost = <CommunityPost>[].obs;
   Rxn<CommunityPost> postDetail = Rxn<CommunityPost>();
   RxInt categoryCount = 0.obs;
   RxString categoryId = ''.obs;
@@ -27,6 +32,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     tabController = TabController(length: 2, vsync: this);
     scrollController = ScrollController();
     scrollController.addListener(_scrollListener);
+    fetchPost(categoryId.value);
   }
 
   @override
@@ -56,11 +62,27 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
+  Future<void> initialize() async {
+    await fetchCategories();
+    await fetchMyPost();
+  }
+
   //------------------------------ 게시글 관련 ------------------//
   // 게시글 작성
-  void createPost() {
-    // 게시글 작성 로직
-    print('게시글 작성');
+  Future<bool> createPost(String cId, String title, String content) async {
+    try {
+      print('[DEBUG] createPost 시작 - cId: $cId');
+
+      bool isCreated = await PostService.addPost(cId, title, content);
+
+      print('[DEBUG] PostService.addPost 성공: $isCreated');
+      await fetchPost(cId);
+      await fetchMyPost();
+      return isCreated;
+    } catch (e) {
+      print('[DEBUG] PostService.addPost 실패: $e');
+      return false; // ✅ 예외 발생 시 false 반환
+    }
   }
 
   Future<List<CommunityPost>> fetchPost(String cId) async {
@@ -72,6 +94,17 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     try {
       postDetail.value = await PostService.fetchPostDetail(cId, pId);
       return postDetail.value;
+    } catch (e) {
+      print('게시글 로드 실패: $e');
+      postDetail.value = null;
+      return null;
+    }
+  }
+
+  Future<List<CommunityPost>?> fetchMyPost() async {
+    try {
+      myPost.value = await PostService.fetchMyPost();
+      return myPost;
     } catch (e) {
       print('게시글 로드 실패: $e');
       postDetail.value = null;
@@ -125,7 +158,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
       }
       return false;
     } finally {
-      initializeCategories();
+      initialize();
     }
   }
 
@@ -138,13 +171,22 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     }
   }
 
-  Future<void> initializeCategories() async {
-    await fetchCategories();
-  }
-
   Future<void> fetchCategories() async {
     List<CommunityCategory> resultCategories = await CommunityService.fetchCommunityCategory();
     categoryCount.value = resultCategories.length;
     categories.value = resultCategories;
+  }
+
+  // ✅ 선택된 카테고리 추가
+  Rx<CommunityCategory?> selectedCategory = Rx<CommunityCategory?>(null);
+
+  // 카테고리 선택 메서드
+  void selectCategory(CommunityCategory category) {
+    selectedCategory.value = category;
+  }
+
+  // 카테고리 초기화
+  void clearSelectedCategory() {
+    selectedCategory.value = null;
   }
 }

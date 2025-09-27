@@ -186,7 +186,7 @@ void showCreateCommunityDialog(CommunityController controller) {
                                   // 일반 오류 처리
                                   Get.snackbar(
                                     '오류',
-                                    '커뮤니티 생성 중 오류가 발생했습니다',
+                                    '카테고리 생성 권한이 없습니다.',
                                     snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.red[100],
                                     colorText: Colors.red[800],
