@@ -5,6 +5,7 @@ import 'package:evfinder_front/View/reserv_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 
 class ChargeDetailView extends GetView<ChargeDetailController> {
   const ChargeDetailView({super.key});
@@ -167,11 +168,21 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
 
                   ...controller.bnbReview.map((review) {
 
-                    final String reviewAuthorUidRaw = review['uid']?.toString() ?? '';
-                    final String reviewAuthorUidClean = reviewAuthorUidRaw.replaceAll(RegExp(r'[{}]'), '');
+                    final String reviewAuthorUid = review['uid']?.toString() ?? '';
 
-                    final bool isMine = controller.uid.value == reviewAuthorUidClean;
+
+                    final bool isMine = controller.uid.value == reviewAuthorUid;
                     final String reviewId = review['reviewId'] as String;
+                    final String create = review['createdAt'] as String;
+                    String dateText = '-';
+
+                    try {
+                      final createDate = DateTime.parse(create);
+                      dateText = DateFormat('yyyy-MM-dd').format(createDate);
+                    } catch (e) {
+                      print("날짜 파싱 에러: $create, 오류: $e");
+                      dateText = create;
+                    }
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
@@ -179,7 +190,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                         userName: review['userName'] as String,
                         rating: review['rating'] as int,
                         content: review['content'] as String,
-                        createdAt: review['createdAt'] as String,
+                        createdAt: dateText,
                         isMine: isMine,
                         onDelete: () {
                           Get.dialog(
@@ -234,8 +245,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            // TODO: 리뷰 전체 보기 페이지로 이동하는 로직 구현
-                            Get.snackbar('알림', '리뷰 더 보기 기능은 준비 중입니다.');
+                            Get.toNamed("reviewDetail", arguments: station);
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
