@@ -13,8 +13,8 @@ class CommunityService {
     final String jwt = prefs.getString('jwt') ?? '';
 
     final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
-    print('[DEBUG] 응답 코드: ${response.statusCode}');
-    print('[DEBUG] 응답 내용: ${response.body}');
+    print('[DEBUG] Fetch Category 응답 코드: ${response.statusCode}');
+    print('[DEBUG] Fetch Category 응답 내용: ${response.body}');
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);

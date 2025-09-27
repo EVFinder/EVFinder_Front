@@ -90,7 +90,7 @@ class CommunityView extends GetView<CommunityController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04),
+                    padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.06),
                     child: Text(
                       '내 커뮤니티',
                       style: TextStyle(fontSize: Get.size.width * 0.045, fontWeight: FontWeight.bold),
@@ -138,7 +138,39 @@ class CommunityView extends GetView<CommunityController> {
                       ),
                     ),
                   )
-                : SliverList(delegate: SliverChildBuilderDelegate((context, index) => buildPostCard(index), childCount: 20)),
+                : controller
+                      .post
+                      .isEmpty // 🔍 여기가 핵심!
+                ? SliverToBoxAdapter(
+                    child: Container(
+                      height: Get.size.height * 0.5,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.article_outlined, size: Get.size.width * 0.2, color: Colors.grey[400]),
+                            SizedBox(height: Get.size.height * 0.02),
+                            Text(
+                              '게시글이 없어요',
+                              style: TextStyle(fontSize: Get.size.width * 0.045, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            ),
+                            SizedBox(height: Get.size.height * 0.01),
+                            Text(
+                              '이 커뮤니티에 첫 번째 게시글을\n작성해보세요!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: Get.size.width * 0.035, color: Colors.grey[500]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => buildPostCard(controller.post[index], controller.categoryId.value),
+                      childCount: controller.post.length,
+                    ),
+                  ),
           ),
         ],
       ),

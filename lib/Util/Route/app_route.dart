@@ -19,5 +19,6 @@ class AppRoute {
   static final community = CommunityView.route;
   static final addpost = AddPostView.route;
   static final reservUser = ReservUserView.route;
+  static final postdetail = PostDetailView.route;
   static final splash = '/';
 }

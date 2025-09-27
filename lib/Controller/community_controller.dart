@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../Service/community_service.dart';
+import '../Service/post_service.dart';
 
 class CommunityController extends GetxController with GetSingleTickerProviderStateMixin {
   late TabController tabController;
@@ -15,7 +16,10 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   RxBool showScrollToTop = false.obs;
   RxnInt selectedCommunityIndex = RxnInt(); // null을 허용하는 RxInt
   RxList<CommunityCategory> categories = <CommunityCategory>[].obs;
+  RxList<CommunityPost> post = <CommunityPost>[].obs;
+  Rxn<CommunityPost> postDetail = Rxn<CommunityPost>();
   RxInt categoryCount = 0.obs;
+  RxString categoryId = ''.obs;
 
   @override
   void onInit() {
@@ -59,10 +63,48 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     print('게시글 작성');
   }
 
-  void fetchPost () {
-
+  Future<List<CommunityPost>> fetchPost(String cId) async {
+    post.value = await PostService.fetchPost(cId);
+    return post;
   }
 
+  Future<CommunityPost?> fetchPostDetail(String cId, String pId) async {
+    try {
+      postDetail.value = await PostService.fetchPostDetail(cId, pId);
+      return postDetail.value;
+    } catch (e) {
+      print('게시글 로드 실패: $e');
+      postDetail.value = null;
+      return null;
+    }
+  }
+
+  // 💝 좋아요 토글
+  void toggleLike(Map<String, dynamic> post) {
+    print('좋아요 토글: ${post['postId']}');
+    Get.snackbar('알림', (post['liked'] == true) ? '좋아요를 취소했습니다' : '좋아요를 눌렀습니다', snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 1));
+  }
+
+  // 🗑️ 삭제 확인 다이얼로그
+  void showDeleteDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('게시글 삭제'),
+        content: Text('정말로 이 게시글을 삭제하시겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text('취소')),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Get.back();
+              Get.snackbar('알림', '게시글이 삭제되었습니다');
+            },
+            child: Text('삭제', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 
   //------------------------------ 댓글 관련 ------------------//
 
@@ -89,7 +131,11 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
 
   // 커뮤니티 선택
   void selectCommunity(int index) {
-    selectedCommunityIndex.value = index;
+    if (selectedCommunityIndex.value != index) {
+      selectedCommunityIndex.value = index;
+      categoryId.value = categories[index].categoryId;
+      fetchPost(categories[index].categoryId);
+    }
   }
 
   Future<void> initializeCategories() async {
