@@ -40,7 +40,7 @@ class AppPages {
     GetPage(name: AppRoute.detail, page: () => const ChargeDetailView()),
     GetPage(name: AppRoute.bnbcharge, page: () => const BnbStationView()),
     GetPage(name: AppRoute.community, page: () => CommunityView()),
-    GetPage(name: AppRoute.community, page: () => const CommunityView()),
+    GetPage(name: AppRoute.community, page: () => CommunityView()),
     GetPage(name: AppRoute.reservUser, page: () => const ReservUserView())
   ];
 }
