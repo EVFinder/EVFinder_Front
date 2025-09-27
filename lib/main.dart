@@ -77,6 +77,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => BnbStationController(), fenix: true);
         Get.lazyPut(() => CommunityController(), fenix: true);
         Get.lazyPut(() => ChargeDetailController(), fenix: true);
+        Get.lazyPut(() => CommunityController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
