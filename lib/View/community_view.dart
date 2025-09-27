@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/community_controller.dart';
+import 'Widget/Community/add_category_dialog_widget.dart';
 import 'Widget/Community/post_card_widget.dart';
 import 'Widget/community_stat_item.dart';
 
@@ -37,7 +38,18 @@ class CommunityView extends GetView<CommunityController> {
           ],
         ),
       ),
-      body: TabBarView(controller: controller.tabController, children: [_buildHomeTab(), _buildMyCommunityTab()]),
+      body: FutureBuilder(
+        future: controller.initializeCategories(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
+          } else {
+            return TabBarView(controller: controller.tabController, children: [_buildHomeTab(), _buildMyCommunityTab()]);
+          }
+        },
+      ),
       floatingActionButton: Obx(
         () => Column(
           mainAxisSize: MainAxisSize.min,
@@ -85,14 +97,16 @@ class CommunityView extends GetView<CommunityController> {
                     ),
                   ),
                   SizedBox(height: Get.size.height * 0.015),
-                  Expanded(
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04),
-                      itemCount: controller.categories.length,
-                      itemBuilder: (context, index) => _buildCommunityItem(index),
-                    ),
-                  ),
+                  Obx(() {
+                    return Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04),
+                        itemCount: controller.categoryCount.value,
+                        itemBuilder: (context, index) => _buildCommunityItem(index),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -199,18 +213,34 @@ class CommunityView extends GetView<CommunityController> {
           ),
         ),
         // 참여 중인 커뮤니티 리스트
-        Expanded(child: ListView.builder(itemCount: 12, itemBuilder: (context, index) => _buildMyCommunityTile(index))),
+        Expanded(child: ListView.builder(itemCount: 12, itemBuilder: (context, index) => _buildMyCommunityTile(context, index))),
       ],
     );
   }
 
   // 내 커뮤니티 타일
-  Widget _buildMyCommunityTile(int index) {
+  Widget _buildMyCommunityTile(BuildContext context, int index) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04, vertical: Get.size.height * 0.005),
       child: ListTile(
-        title: Text('내 커뮤니티 ${index + 1}'),
-        subtitle: Text('멤버 ${(index + 1) * 50}명 • 새 게시글 ${index + 2}개'),
+        title: Text('내 게시글 ${index + 1}'),
+        subtitle: SizedBox(
+          width: 150,
+          height: 20,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('위에서 관심있는 커뮤니티를 선택하면\n해당 커뮤니티의 게시글을 볼 수 있어요', style: TextStyle(overflow: TextOverflow.ellipsis)),
+              Row(
+                children: [
+                  Icon(Icons.favorite_border, color: Theme.of(context).primaryColor),
+                  SizedBox(width: 5),
+                  Text("2", style: TextStyle(color: Theme.of(context).primaryColor)),
+                ],
+              ),
+            ],
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -263,8 +293,8 @@ class CommunityView extends GetView<CommunityController> {
               title: Text('커뮤니티 만들기'),
               subtitle: Text('새로운 커뮤니티를 만들어보세요'),
               onTap: () {
-                Navigator.pop(context);
-                controller.createCommunity();
+                showCreateCommunityDialog(controller);
+                // controller.createCommunity('공지사항', '공지사항입니다.');
               },
             ),
             SizedBox(height: Get.size.height * 0.025),
