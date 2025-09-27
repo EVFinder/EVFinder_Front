@@ -1,23 +1,43 @@
 import 'dart:convert';
+import 'package:evfinder_front/Controller/permission_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../Constants/api_constants.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 class BnbStationController extends GetxController {
   final bnbchargeStation = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
 
+  final PermissionController locationController = PermissionController();
+  Rx<Position?> userPosition = Rx<Position?>(null);
+  RxDouble lat = 37.5665.obs;
+  RxDouble lon = 126.9780.obs;
+
   @override
   void onInit() {
     super.onInit();
-    loadBnbCharge();
+    loadBnbCharge(lat: lat.value, lon: lon.value);
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> initLocation() async {
+    try {
+      Position? position = await locationController.getCurrentLocation();
+      userPosition.value = position;
+      lat.value = position!.latitude;
+      lon.value = position.longitude;
+      print('위치 로드 성공: ${lat.value}, ${lon.value}');
+    } catch (e) {
+      print('위치 로드 실패: $e');
+    }
   }
 
   Future<void> loadBnbCharge({double? lat, double? lon}) async {
