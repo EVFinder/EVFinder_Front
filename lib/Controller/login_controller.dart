@@ -78,8 +78,6 @@ class LoginController extends GetxController {
         await prefs.setString('email', email);
         await prefs.setString('name', userName);
 
-
-
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 
         success(context, jwt); // 구글 로그인과 동일하게 처리
