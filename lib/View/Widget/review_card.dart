@@ -7,50 +7,100 @@ class ReviewCard extends StatelessWidget {
     required this.rating,
     required this.content,
     required this.createdAt,
-});
+    this.isMine = false,
+    this.onEdit,
+    this.onDelete,
+  });
+
   final String userName;
   final int rating;
   final String content;
   final String createdAt;
+  final bool isMine;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: const Color(0xFFffffff),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(radius: 16, child: Icon(Icons.person, size: 18)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 상단: 작성자 / 별점 / 날짜
-                Row(
+          // 상단: 프로필 아이콘, 이름, 날짜, 메뉴 버튼
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CircleAvatar(
+                radius: 20,
+                backgroundColor: Color(0xFFF1F5F9),
+                child: Icon(Icons.person, size: 22, color: Color(0xFF94A3B8)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(userName,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                          overflow: TextOverflow.ellipsis),
+                    Text(
+                      userName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1E293B)),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 6),
-                    Stars(rating: rating),
-                    const SizedBox(width: 8),
-                    Text(createdAt, style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    const SizedBox(height: 4),
+                    Text(
+                      createdAt,
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                Text(content, style: const TextStyle(fontSize: 13, color: Color(0xFF334155))),
-              ],
-            ),
+              ),
+              if (isMine)
+                _buildPopupMenu(),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // 중간: 별점
+          Stars(rating: rating),
+          const SizedBox(height: 10),
+
+          // 하단: 리뷰 내용
+          Text(
+            content,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF334155), height: 1.5),
           ),
         ],
       ),
+    );
+  }
+
+  // 3. PopupMenuButton을 만드는 별도의 함수입니다.
+  Widget _buildPopupMenu() {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'edit') {
+          onEdit?.call(); // onEdit 콜백 실행
+        } else if (value == 'delete') {
+          onDelete?.call(); // onDelete 콜백 실행
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        const PopupMenuItem<String>(
+          value: 'edit',
+          child: Text('수정'),
+        ),
+        const PopupMenuItem<String>(
+          value: 'delete',
+          child: Text('삭제'),
+        ),
+      ],
+      icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
+      padding: EdgeInsets.zero,
     );
   }
 }
@@ -61,19 +111,17 @@ class Stars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(
         5,
-            (i) => const Icon(Icons.star, size: 14, color: Color(0xFFF59E0B))
-            .copyWith(icon: i < rating ? Icons.star : Icons.star_border),
+            (i) => Icon(
+          i < rating ? Icons.star_rounded : Icons.star_border_rounded,
+          size: 18,
+          color: const Color(0xFFFBBF24),
+        ),
       ),
     );
   }
 }
 
-extension on Icon {
-  Icon copyWith({IconData? icon}) =>
-      Icon(icon ?? this.icon, size: size, color: color);
-}
