@@ -8,7 +8,7 @@ import '../../../Util/convert_time.dart';
 
 Widget buildPostCard(CommunityPost post, String cId) {
   return GestureDetector(
-    onTap: () async{
+    onTap: () async {
       Get.toNamed(AppRoute.postdetail, arguments: {'pId': post.postId});
     },
     child: Card(
@@ -48,13 +48,13 @@ Widget buildPostCard(CommunityPost post, String cId) {
                 Text('조회 ${post.views}'),
                 Spacer(),
                 TextButton.icon(
-                  icon: Icon(Icons.favorite_border, size: Get.size.width * 0.05),
-                  label: Text(post.likes.toString()),
+                  icon: Icon(Icons.favorite_border, size: Get.size.width * 0.05, color: Color(0xFF078714)),
+                  label: Text(post.likes.toString(), style: TextStyle(color: Color(0xFF078714))),
                   onPressed: () {},
                 ),
                 TextButton.icon(
-                  icon: Icon(Icons.comment_outlined, size: Get.size.width * 0.05),
-                  label: Text('${1 * 2 + 1}'),
+                  icon: Icon(Icons.comment_outlined, size: Get.size.width * 0.05, color: Color(0xFF078714)),
+                  label: Text('${1 * 2 + 1}', style: TextStyle(color: Color(0xFF078714))),
                   onPressed: () {},
                 ),
               ],

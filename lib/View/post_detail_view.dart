@@ -33,7 +33,9 @@ class PostDetailView extends GetView<CommunityController> {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-                onPressed: () => Get.back(),
+                onPressed: () {
+                  Get.back();
+                },
               ),
             ),
             body: Center(child: Text('오류가 발생했습니다.')),
@@ -67,7 +69,7 @@ class PostDetailView extends GetView<CommunityController> {
                 ? Center(child: Text('게시글 정보가 없습니다.'))
                 : SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.only(left: 20, right: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -76,47 +78,54 @@ class PostDetailView extends GetView<CommunityController> {
                             controller.postDetail.value!.title ?? '제목 없음',
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
                           ),
-
                           SizedBox(height: 16),
-
                           // 👤 작성자 정보
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.blue[100],
-                                child: Text(
-                                  (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
-                                  style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.blue[100],
+                                  child: Text(
+                                    (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
+                                    style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      controller.postDetail.value!.authorName ?? '익명',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                                    ),
-                                    Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
-                                  ],
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        controller.postDetail.value!.authorName ?? '익명',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                                      ),
+                                      Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              // 📊 조회수
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
-                                    SizedBox(width: 4),
-                                    Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                  ],
+                                // 📊 조회수
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
+                                      SizedBox(width: 4),
+                                      Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
 
                           SizedBox(height: 24),
@@ -160,7 +169,7 @@ class PostDetailView extends GetView<CommunityController> {
                           //     ),
                           //   ),
                           // ),
-                          SizedBox(height: 40),
+                          Divider(thickness: 1),
                         ],
                       ),
                     ),
