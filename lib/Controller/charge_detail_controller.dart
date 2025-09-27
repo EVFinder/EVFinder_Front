@@ -34,7 +34,7 @@ class ChargeDetailController extends GetxController {
     loadReview();
   }
 
-  Future<String?> _loadUid() async {
+  Future<void> _loadUid() async {
     final prefs = await SharedPreferences.getInstance();
     uid.value = prefs.getString('uid') ?? '';
   }
@@ -44,10 +44,9 @@ class ChargeDetailController extends GetxController {
     isLoading.value = true;
     try {
 
-      final String? uid = await _loadUid();
-      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/status?status=$status');
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/${uid.value}/${shareId}/status?status=${status}');
       final response = await http.patch(url);
-      
+      print('Uid $uid');
       print('상태 변경 코드: ${response.statusCode}');
       print('상태 변경 내용: ${response.body}');
 
@@ -113,7 +112,7 @@ class ChargeDetailController extends GetxController {
     try {
       isLoading.value = true;
       
-      final url = Uri.parse('${ApiConstants.reviewBaseUrl}/delete/$uid/$reviewId');
+      final url = Uri.parse('${ApiConstants.reviewBaseUrl}/delete/${uid.value}/$reviewId');
       final response = await http.delete(url);
 
       print("리뷰 삭제 응답 코드: ${response.statusCode}");
