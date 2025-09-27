@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/Controller/review_write_controller.dart';
 import 'package:evfinder_front/View/add_charge_view.dart';
+import 'package:evfinder_front/View/add_post_view.dart';
 import 'package:evfinder_front/View/bnb_station_view.dart';
 import 'package:evfinder_front/View/charge_detail_view.dart';
 import 'package:evfinder_front/View/community_view.dart';
@@ -42,8 +43,10 @@ class AppPages {
     GetPage(name: AppRoute.detail, page: () => const ChargeDetailView()),
     GetPage(name: AppRoute.bnbcharge, page: () => const BnbStationView()),
     GetPage(name: AppRoute.community, page: () => const CommunityView()),
-    GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
     GetPage(name: AppRoute.reviewWrite, page: () => const ReviewWriteView()),
     GetPage(name: AppRoute.reviewdetail, page: () => const ReviewDetailView())
+    GetPage(name: AppRoute.community, page: () => CommunityView()),
+    GetPage(name: AppRoute.community, page: () => CommunityView()),
+    GetPage(name: AppRoute.reservUser, page: () => const ReservUserView())
   ];
 }

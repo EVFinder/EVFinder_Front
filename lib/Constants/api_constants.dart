@@ -12,6 +12,7 @@ class ApiConstants {
   static const String reviewBaseUrl = '$baseUrl/api/review';
   static const String reservApiBaseUrl = '$baseUrl/reserve';
   static const String coorToAddr = '$baseUrl/place/address';
+  static const String communityApiBaseUrl = '$baseUrl/api/community';
 
 
 
