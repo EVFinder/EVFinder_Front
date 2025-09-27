@@ -6,8 +6,8 @@ class CommunityPost {
   final String authorName;
   final int views;
   final int likes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
   final bool isOwner;
 
   CommunityPost({
@@ -32,8 +32,8 @@ class CommunityPost {
       authorName: json['authorName'] ?? '',
       views: json['views'] ?? 0,
       likes: json['likes'] ?? 0,
-      createdAt: json['createdAt'] ?? DateTime.now(),
-      updatedAt: json['updatedAt'] ?? DateTime.now(),
+      createdAt: json['createdAt'] ?? '',
+      updatedAt: json['updatedAt'] ?? '',
       isOwner: json['isOwner'] ?? false,
     );
   }
