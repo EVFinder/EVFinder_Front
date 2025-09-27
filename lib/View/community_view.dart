@@ -243,7 +243,7 @@ class CommunityView extends GetView<CommunityController> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [buildStatItem('참여 중', '12', Icons.group), buildStatItem('내 게시글', '45', Icons.post_add), buildStatItem('받은 좋아요', '128', Icons.favorite)],
+            children: [buildStatItem('내 게시글', controller.myPost.length.toString(), Icons.post_add), buildStatItem('받은 좋아요', '128', Icons.favorite)],
           ),
         ),
         // 참여 중인 커뮤니티 리스트

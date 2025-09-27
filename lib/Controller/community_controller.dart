@@ -25,6 +25,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   Rxn<CommunityPost> postDetail = Rxn<CommunityPost>();
   RxInt categoryCount = 0.obs;
   RxString categoryId = ''.obs;
+  RxInt calLikes = 0.obs;
 
   @override
   void onInit() {
