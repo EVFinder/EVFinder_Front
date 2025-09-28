@@ -6,6 +6,7 @@ import 'package:evfinder_front/View/add_post_view.dart';
 import 'package:evfinder_front/View/bnb_station_view.dart';
 import 'package:evfinder_front/View/charge_detail_view.dart';
 import 'package:evfinder_front/View/community_view.dart';
+import 'package:evfinder_front/View/edit_post_view.dart';
 import 'package:evfinder_front/View/favortie_station_view.dart';
 import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
@@ -50,5 +51,6 @@ class AppPages {
     GetPage(name: AppRoute.addpost, page: () => AddPostView()),
     GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
     GetPage(name: AppRoute.postdetail, page: () => const PostDetailView()),
+    GetPage(name: AppRoute.editpost, page: () => const EditPostView()),
   ];
 }

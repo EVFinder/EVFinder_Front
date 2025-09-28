@@ -77,4 +77,39 @@ class PostService {
       throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
     }
   }
+
+  static Future<bool> editPost(String cId, String pId, String title, String content) async {
+    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/$pId');
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+    final body = {"title": title, "content": content};
+
+    final response = await http.put(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'}, body: json.encode(body));
+
+    print('[DEBUG] Edit Post 응답 코드: ${response.statusCode}');
+    print('[DEBUG] Edit Post 응답 내용: ${response.body}');
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('게시글을 수정하는데 실패했습니다: ${response.statusCode}');
+    }
+  }
+
+  static Future<bool> deletePost(String cId, String pId) async {
+    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/$pId');
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    final response = await http.delete(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+    print('[DEBUG] Delete Post 응답 코드: ${response.statusCode}');
+    print('[DEBUG] Delete Post 응답 내용: ${response.body}');
+
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
+    }
+  }
 }
