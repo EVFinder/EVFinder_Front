@@ -51,7 +51,7 @@ class PostDetailView extends GetView<CommunityController> {
                 onPressed: () => Get.back(),
               ),
               actions: [
-                if (controller.postDetail.value!.isOwner == true)
+                if (controller.postDetail.value!.owner == true)
                   PopupMenuButton<String>(
                     icon: Icon(Icons.more_vert, color: Colors.black87),
                     onSelected: (value) {
@@ -74,9 +74,26 @@ class PostDetailView extends GetView<CommunityController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // 📝 제목
-                          Text(
-                            controller.postDetail.value!.title ?? '제목 없음',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                          Row(
+                            children: [
+                              Text(
+                                controller.postDetail.value!.title ?? '제목 없음',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                              ),
+                              Spacer(),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
+                                    SizedBox(width: 4),
+                                    Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 16),
                           // 👤 작성자 정보
@@ -108,19 +125,6 @@ class PostDetailView extends GetView<CommunityController> {
                                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
                                       ),
                                       Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
-                                    ],
-                                  ),
-                                ),
-                                // 📊 조회수
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
-                                      SizedBox(width: 4),
-                                      Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                     ],
                                   ),
                                 ),
@@ -170,6 +174,23 @@ class PostDetailView extends GetView<CommunityController> {
                           //   ),
                           // ),
                           Divider(thickness: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              '댓글',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Text('asdf', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
+                          ),
                         ],
                       ),
                     ),

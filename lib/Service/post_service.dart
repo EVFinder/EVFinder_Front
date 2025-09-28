@@ -34,7 +34,6 @@ class PostService {
     print('[DEBUG] Fetch Detail Post 응답 내용: ${response.body}');
 
     if (response.statusCode == 200) {
-      // 🔥 수정: 단일 객체로 처리
       final Map<String, dynamic> jsonData = json.decode(response.body);
       return CommunityPost.fromJson(jsonData);
     } else {
