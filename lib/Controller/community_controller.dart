@@ -16,8 +16,11 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
+
+
   // Reactive variables
   RxBool showScrollToTop = false.obs;
+  final RxBool isLoadingPosts = false.obs;
   RxnInt selectedCommunityIndex = RxnInt(); // null을 허용하는 RxInt
   RxList<CommunityCategory> categories = <CommunityCategory>[].obs;
   RxList<CommunityPost> post = <CommunityPost>[].obs;
@@ -129,31 +132,32 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     return likes;
   }
 
+  Future<String> editPost(String pId, String title, String content) async {
+    List<CommunityPost>? forCid = await fetchMyPost();
+    for (CommunityPost post in forCid!) {
+      if (post.postId == pId) {
+        await PostService.editPost(post.categoryId, pId, title, content);
+        return post.categoryId;
+      }
+    }
+    return '';
+  }
+
+  Future<bool> deletePost(String cId, String pId) async {
+    bool result = await PostService.deletePost(cId, pId);
+    if (result) {
+      await fetchPost(cId);
+      await fetchMyPost();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // 💝 좋아요 토글
   void toggleLike(Map<String, dynamic> post) {
     print('좋아요 토글: ${post['postId']}');
     Get.snackbar('알림', (post['liked'] == true) ? '좋아요를 취소했습니다' : '좋아요를 눌렀습니다', snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 1));
-  }
-
-  // 🗑️ 삭제 확인 다이얼로그
-  void showDeleteDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: Text('게시글 삭제'),
-        content: Text('정말로 이 게시글을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('취소')),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              Get.back();
-              Get.snackbar('알림', '게시글이 삭제되었습니다');
-            },
-            child: Text('삭제', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
   }
 
   //------------------------------ 댓글 관련 ------------------//
@@ -170,11 +174,9 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
       print('커뮤니티 생성 오류: $e');
 
       // 특정 오류들은 그대로 전달 (변환하지 않음)
-      if (e.toString().contains('DUPLICATE_COMMUNITY') ||
-          e.toString().contains('UNAUTHORIZED') ||
-          e.toString().contains('FORBIDDEN') ||
-          e.toString().contains('CREATION_FAILED')) {  // 이것도 추가
-        rethrow;  // 원본 예외를 그대로 전달
+      if (e.toString().contains('DUPLICATE_COMMUNITY') || e.toString().contains('UNAUTHORIZED') || e.toString().contains('FORBIDDEN') || e.toString().contains('CREATION_FAILED')) {
+        // 이것도 추가
+        rethrow; // 원본 예외를 그대로 전달
       }
       throw Exception('CREATION_ERROR');
     } finally {
@@ -184,10 +186,16 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
 
   // 커뮤니티 선택
   void selectCommunity(int index) {
-    if (selectedCommunityIndex.value != index) {
-      selectedCommunityIndex.value = index;
-      categoryId.value = categories[index].categoryId;
+    // selectCommunity 메서드 수정
+    selectedCommunityIndex.value = index;
+    categoryId.value = categories[index].categoryId;
+    // 로딩 시작
+    isLoadingPosts.value = true;
+    try {
       fetchPost(categories[index].categoryId);
+    } finally {
+      // 로딩 완료
+      isLoadingPosts.value = false;
     }
   }
 

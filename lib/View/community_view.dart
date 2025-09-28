@@ -114,6 +114,7 @@ class CommunityView extends GetView<CommunityController> {
             ),
           ),
           // 선택된 커뮤니티에 따른 콘텐츠 표시
+          // UI에서 로딩 상태 처리
           Obx(
             () => controller.selectedCommunityIndex.value == null
                 ? SliverToBoxAdapter(
@@ -141,8 +142,27 @@ class CommunityView extends GetView<CommunityController> {
                     ),
                   )
                 : controller
-                      .post
-                      .isEmpty // 🔍 여기가 핵심!
+                      .isLoadingPosts
+                      .value // 로딩 상태 체크
+                ? SliverToBoxAdapter(
+                    child: Container(
+                      height: Get.size.height * 0.5,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF078714))),
+                            SizedBox(height: Get.size.height * 0.02),
+                            Text(
+                              '게시글을 불러오는 중...',
+                              style: TextStyle(fontSize: Get.size.width * 0.035, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : controller.post.isEmpty
                 ? SliverToBoxAdapter(
                     child: Container(
                       height: Get.size.height * 0.5,
@@ -292,7 +312,7 @@ class CommunityView extends GetView<CommunityController> {
                 decoration: BoxDecoration(color: Colors.green[100], borderRadius: BorderRadius.circular(Get.size.width * 0.02)),
                 child: Icon(Icons.group_add, color: Colors.green),
               ),
-              title: Text('커뮤니티 만들기'),
+              title: Text('커뮤니티 만들기(관리자 권한)'),
               subtitle: Text('새로운 커뮤니티를 만들어보세요'),
               onTap: () {
                 showCreateCommunityDialog(controller);
