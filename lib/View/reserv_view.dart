@@ -85,7 +85,7 @@ class ReservView extends GetView<ReservController> {
                               pickedTime.hour,
                               pickedTime.minute,
                             );
-                            controller.startController.text = dateTime.toUtc().toIso8601String();
+                            controller.startController.text = dateTime.toIso8601String();
                           }
                         }
                       },
@@ -119,8 +119,8 @@ class ReservView extends GetView<ReservController> {
                               pickedDate.day,
                               pickedTime.hour,
                               pickedTime.minute,
-                            );
-                            controller.endController.text = dateTime.toUtc().toIso8601String();
+                            ); //toUtc(). 뻄
+                            controller.endController.text = dateTime.toIso8601String();
                           }
                         }
                       },

@@ -71,13 +71,29 @@ class ReservController extends GetxController {
     final startTime = startController.text;
     final endTime = endController.text;
     final headers = {'Content-Type': 'application/json'};
+
+    if (userPNumber.isEmpty || startTime.isEmpty || endTime.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('연락처와 시간을 모두 입력해주세요.')),
+      );
+      return;
+    }
+
+    String toUtcIso(String v) {
+      final dt = DateTime.parse(v);
+      return dt.toUtc().toIso8601String();
+    }
+
+    final startUtc = toUtcIso(startTime);
+    final endUtc   = toUtcIso(endTime);
+
     final body = jsonEncode({
       'shareId': shareId,
       "ownerUid": ownerUid,
       'userName': userName,
       'userPNumber': userPNumber,
-      'startTime': startTime,
-      'endTime': endTime,
+      'startTime': startUtc,
+      'endTime': endUtc,
       'lat': 37.25
     });
     try {

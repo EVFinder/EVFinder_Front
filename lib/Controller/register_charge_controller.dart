@@ -72,6 +72,12 @@ class RegisterChargeController extends GetxController {
     final power = powerController.text;
     final pricePerHour = priceContoller.text;
     final status = selectedStat.value;
+    if(address.isEmpty || hostContact.isEmpty || stationName.isEmpty|| chargerType.isEmpty || power.isEmpty || pricePerHour.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('모든 필드를 채워주세요.')),
+      );
+      return;
+    }
 
     try {
       final response = await http.post(

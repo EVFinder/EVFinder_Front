@@ -43,6 +43,8 @@ class AddChargeView extends GetView<AddChargeController> {
           return const Center(child: Text("등록한 충전소가 없습니다."));
         }
         return SafeArea(
+            child: RefreshIndicator(
+              onRefresh: controller.loadHostCharge,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: ListView.separated(
@@ -59,6 +61,7 @@ class AddChargeView extends GetView<AddChargeController> {
                 separatorBuilder: (context, index) => const Divider(),
               ),
             ),
+            )
         );
       })
     );

@@ -25,8 +25,12 @@ class ReservUserView extends GetView<ReservUserController> {
           return const Center(child: Text("예약 내역이 없습니다."));
         }
 
-        return Column(
-          children: controller.reserveStation.map((reservation) {
+        return ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            itemCount: controller.reserveStation.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final reservation = controller.reserveStation[index];
             String dateText = '-';
             String timeText = '-';
 
@@ -35,23 +39,22 @@ class ReservUserView extends GetView<ReservUserController> {
             final String reserveId = reservation['id'];
 
             if (startTimeString != null && endTimeString != null) {
-              // 1. ISO 8601 형식의 문자열을 DateTime 객체로 파싱
-              final startTime = DateTime.parse(startTimeString);
-              final endTime = DateTime.parse(endTimeString);
+              final startTime = DateTime.parse(startTimeString).toLocal();
+              final endTime = DateTime.parse(endTimeString).toLocal();
 
               // 년-월-일 형식
               dateText = DateFormat('yyyy-MM-dd').format(startTime);
 
               // 시간:분:초 형식
-              final startTimePart = DateFormat('HH시mm분ss초').format(startTime);
-              final endTimePart = DateFormat('HH시mm분ss초').format(endTime);
+              final startTimePart = DateFormat('HH시 mm분').format(startTime);
+              final endTimePart = DateFormat('HH시 mm분').format(endTime);
 
               timeText = '$startTimePart-$endTimePart';
             }
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
-              rating: 4.8,
+              rating: (reservation['rating'] ?? 0.0) * 1.0,
               statusText: '예약 확정',
               dateText: dateText,
               timeText: timeText,
@@ -63,8 +66,7 @@ class ReservUserView extends GetView<ReservUserController> {
                 Get.toNamed("/reserv", arguments : {'type': ReserveType.update, 'reservation': reservation});
               },
             );
-          }).toList(),
-        );
+          });
       }),
     );
   }
