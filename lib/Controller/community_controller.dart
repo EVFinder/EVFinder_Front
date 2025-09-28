@@ -4,6 +4,7 @@ import 'package:evfinder_front/Model/community_category.dart';
 import 'package:evfinder_front/Model/community_post.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Service/category_service.dart';
 import '../Service/post_service.dart';
@@ -13,8 +14,6 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   late ScrollController scrollController;
 
   // 컨트롤러들
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
 
   // Reactive variables
   RxBool showScrollToTop = false.obs;
@@ -28,6 +27,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   RxInt categoryCount = 0.obs;
   RxString categoryId = ''.obs;
   RxInt likesCount = 0.obs;
+  late SharedPreferences prefs;
 
   @override
   void onInit() {
@@ -78,6 +78,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     getRole();
     await fetchCategories();
     await fetchMyPost();
+    prefs = await SharedPreferences.getInstance();
   }
 
   //------------------------------ 게시글 관련 ------------------//

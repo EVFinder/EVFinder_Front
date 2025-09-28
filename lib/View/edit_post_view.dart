@@ -43,8 +43,6 @@ class EditPostView extends GetView<CommunityController> {
                   await controller.fetchPost(cId);
                   Get.snackbar('성공', '게시글이 수정되었습니다.');
                   controller.clearSelectedCategory();
-                  controller.titleController.clear();
-                  controller.contentController.clear();
                   Get.offAndToNamed(AppRoute.main);
                 } else {
                   Get.snackbar('오류', '게시글 수정에 실패했습니다.');
