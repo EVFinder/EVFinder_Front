@@ -338,19 +338,19 @@ class CommunityView extends GetView<CommunityController> {
                 Get.toNamed(AppRoute.addpost);
               },
             ),
-            ListTile(
-              leading: Container(
-                padding: EdgeInsets.all(Get.size.width * 0.02),
-                decoration: BoxDecoration(color: Colors.green[100], borderRadius: BorderRadius.circular(Get.size.width * 0.02)),
-                child: Icon(Icons.group_add, color: Colors.green),
-              ),
-              title: Text('커뮤니티 만들기(관리자 권한)'),
-              subtitle: Text('새로운 커뮤니티를 만들어보세요'),
-              onTap: () {
-                showCreateCommunityDialog(controller);
-                // controller.createCommunity('공지사항', '공지사항입니다.');
-              },
-            ),
+            // ListTile(
+            //   leading: Container(
+            //     padding: EdgeInsets.all(Get.size.width * 0.02),
+            //     decoration: BoxDecoration(color: Colors.green[100], borderRadius: BorderRadius.circular(Get.size.width * 0.02)),
+            //     child: Icon(Icons.group_add, color: Colors.green),
+            //   ),
+            //   title: Text('커뮤니티 만들기(관리자 권한)'),
+            //   subtitle: Text('새로운 커뮤니티를 만들어보세요'),
+            //   onTap: () {
+            //     showCreateCategoryDialog(controller);
+            //     // controller.createCommunity('공지사항', '공지사항입니다.');
+            //   },
+            // ),
             SizedBox(height: Get.size.height * 0.025),
           ],
         ),
