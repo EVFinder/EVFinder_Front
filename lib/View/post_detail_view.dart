@@ -15,6 +15,12 @@ class PostDetailView extends GetView<CommunityController> {
     // null 체크 추가
     final arguments = Get.arguments as Map<String, dynamic>?;
     final String postId = arguments?['pId'] ?? '';
+    final String? categoryIdFromArgs = arguments?['cId'];
+
+    // categoryId 결정: arguments에서 온 cId가 있으면 사용, 없으면 controller의 categoryId 사용
+    final String categoryId = categoryIdFromArgs?.isNotEmpty == true
+        ? categoryIdFromArgs!
+        : controller.categoryId.value;
 
     // postId가 비어있으면 오류 화면 표시
     if (postId.isEmpty) {
@@ -44,7 +50,8 @@ class PostDetailView extends GetView<CommunityController> {
     }
 
     return FutureBuilder(
-      future: controller.fetchPostDetail(controller.categoryId.value, postId),
+      // categoryId 변수 사용
+      future: controller.fetchPostDetail(categoryId, postId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -112,7 +119,8 @@ class PostDetailView extends GetView<CommunityController> {
                                 onPressed: () {
                                   Get.back();
                                   Get.back();
-                                  controller.deletePost(controller.categoryId.value, controller.postDetail.value!.postId);
+                                  // categoryId 변수 사용
+                                  controller.deletePost(categoryId, controller.postDetail.value!.postId);
                                   Get.snackbar('알림', '게시글이 삭제되었습니다');
                                 },
                                 child: Text('삭제', style: TextStyle(color: Colors.red)),
@@ -122,116 +130,119 @@ class PostDetailView extends GetView<CommunityController> {
                         );
                       }
                     },
-                    itemBuilder: (context) => [PopupMenuItem(value: 'edit', child: Text('수정')), PopupMenuItem(value: 'delete', child: Text('삭제'))],
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: 'edit', child: Text('수정')),
+                      PopupMenuItem(value: 'delete', child: Text('삭제'))
+                    ],
                   ),
               ],
             ),
             body: controller.postDetail.value == null
                 ? Center(child: Text('게시글 정보가 없습니다.'))
                 : SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 📝 제목
-                          Row(
+              child: Padding(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 📝 제목
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            controller.postDetail.value!.title ?? '제목 없음',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  controller.postDetail.value!.title ?? '제목 없음',
-                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
-                                    SizedBox(width: 4),
-                                    Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                  ],
-                                ),
-                              ),
+                              Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
+                              SizedBox(width: 4),
+                              Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                             ],
                           ),
-                          SizedBox(height: 16),
-                          // 👤 작성자 정보
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    // 👤 작성자 정보
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.blue[100],
+                            child: Text(
+                              (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
+                              style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
                             ),
-                            child: Row(
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: Colors.blue[100],
-                                  child: Text(
-                                    (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
-                                    style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
-                                  ),
+                                Text(
+                                  controller.postDetail.value!.authorName ?? '익명',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
                                 ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        controller.postDetail.value!.authorName ?? '익명',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                                      ),
-                                      Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
-                                    ],
-                                  ),
-                                ),
+                                Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                               ],
                             ),
-                          ),
-
-                          SizedBox(height: 24),
-
-                          // 📄 내용
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            child: Text(controller.postDetail.value!.content ?? '내용이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
-                          ),
-
-                          SizedBox(height: 24),
-
-                          Divider(thickness: 1),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              '댓글',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-                            ),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            child: Text('asdf', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
                           ),
                         ],
                       ),
                     ),
-                  ),
+
+                    SizedBox(height: 24),
+
+                    // 📄 내용
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Text(controller.postDetail.value!.content ?? '내용이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
+                    ),
+
+                    SizedBox(height: 24),
+
+                    Divider(thickness: 1),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '댓글',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Text('asdf', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         }
       },
