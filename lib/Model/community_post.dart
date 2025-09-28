@@ -1,5 +1,6 @@
 class CommunityPost {
   final String postId;
+  final String categoryId;
   final String title;
   final String content;
   final String uid;
@@ -12,6 +13,7 @@ class CommunityPost {
 
   CommunityPost({
     required this.postId,
+    required this.categoryId,
     required this.title,
     required this.content,
     required this.uid,
@@ -26,6 +28,7 @@ class CommunityPost {
   factory CommunityPost.fromJson(Map<String, dynamic> json) {
     return CommunityPost(
       postId: json['postId'] ?? '',
+      categoryId: json['categoryId'] ?? '',
       title: json['title'] ?? '',
       content: json['content'] ?? '',
       uid: json['uid'] ?? '',
