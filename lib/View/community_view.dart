@@ -1,3 +1,4 @@
+import 'package:evfinder_front/View/Widget/Community/popup_menu_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/community_controller.dart';
@@ -9,6 +10,8 @@ import 'Widget/community_stat_item.dart';
 
 class CommunityView extends GetView<CommunityController> {
   static String route = '/community';
+
+  const CommunityView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,16 +89,31 @@ class CommunityView extends GetView<CommunityController> {
           // 참여 중인 커뮤니티 슬라이더
           SliverToBoxAdapter(
             child: Container(
-              height: Get.size.height * 0.18,
+              height: Get.size.height * 0.21,
               padding: EdgeInsets.symmetric(vertical: Get.size.height * 0.02),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.06),
-                    child: Text(
-                      '내 커뮤니티',
-                      style: TextStyle(fontSize: Get.size.width * 0.045, fontWeight: FontWeight.bold),
+                    padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04),
+                    child: Row(
+                      children: [
+                        Text(
+                          '내 커뮤니티',
+                          style: TextStyle(fontSize: Get.size.width * 0.045, fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert, color: Colors.black87),
+                          onSelected: (value) {
+                            if (value == 'manage') {
+                              Get.toNamed(AppRoute.managecategory);
+                              print('카테고리 관리');
+                            }
+                          },
+                          itemBuilder: (context) => [PopupMenuItem(value: 'manage', child: Text('카테고리 관리'))],
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: Get.size.height * 0.015),
@@ -250,46 +268,45 @@ class CommunityView extends GetView<CommunityController> {
   }
 
   // 내 커뮤니티 탭
-// 내 커뮤니티 탭
+  // 내 커뮤니티 탭
   Widget _buildMyCommunityTab() {
-    return Obx(() => Column(
-      children: [
-        // 통계 카드
-        Container(
-          margin: EdgeInsets.all(Get.size.width * 0.04),
-          padding: EdgeInsets.all(Get.size.width * 0.05),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.blue[400]!, Colors.blue[600]!], begin: Alignment.topLeft, end: Alignment.bottomRight),
-            borderRadius: BorderRadius.circular(Get.size.width * 0.0375),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              buildStatItem('내 게시글', controller.myPost.length.toString(), Icons.post_add),
-              buildStatItem('받은 좋아요', controller.likesCount.value.toString(), Icons.favorite),
-            ],
-          ),
-        ),
-        // 참여 중인 커뮤니티 리스트
-        Expanded(
-          child: controller.myPost.isEmpty
-              ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Obx(
+      () => Column(
+        children: [
+          // 통계 카드
+          Container(
+            margin: EdgeInsets.all(Get.size.width * 0.04),
+            padding: EdgeInsets.all(Get.size.width * 0.05),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.blue[400]!, Colors.blue[600]!], begin: Alignment.topLeft, end: Alignment.bottomRight),
+              borderRadius: BorderRadius.circular(Get.size.width * 0.0375),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Icon(Icons.article_outlined, size: 64, color: Colors.grey[400]),
-                SizedBox(height: 16),
-                Text('작성한 게시글이 없습니다.', style: TextStyle(color: Colors.grey[600])),
+                buildStatItem('내 게시글', controller.myPost.length.toString(), Icons.post_add),
+                buildStatItem('받은 좋아요', controller.likesCount.value.toString(), Icons.favorite),
               ],
             ),
-          )
-              : ListView.builder(
-              itemCount: controller.myPost.length,
-              itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])
           ),
-        ),
-      ],
-    ));
+          // 참여 중인 커뮤니티 리스트
+          Expanded(
+            child: controller.myPost.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.article_outlined, size: 64, color: Colors.grey[400]),
+                        SizedBox(height: 16),
+                        Text('작성한 게시글이 없습니다.', style: TextStyle(color: Colors.grey[600])),
+                      ],
+                    ),
+                  )
+                : ListView.builder(itemCount: controller.myPost.length, itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])),
+          ),
+        ],
+      ),
+    );
   }
 
   // 생성 옵션 모달
