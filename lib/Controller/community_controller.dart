@@ -5,7 +5,7 @@ import 'package:evfinder_front/Model/community_post.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../Service/community_service.dart';
+import '../Service/category_service.dart';
 import '../Service/post_service.dart';
 
 class CommunityController extends GetxController with GetSingleTickerProviderStateMixin {
@@ -118,7 +118,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
       likesCount.value = calLikesCount(myPost);
       return myPost;
     } catch (e) {
-      print('게시글 로드 실패: $e');
+      print('내 게시글 로드 실패: $e');
       postDetail.value = null;
       return null;
     }

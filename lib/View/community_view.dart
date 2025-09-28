@@ -250,8 +250,9 @@ class CommunityView extends GetView<CommunityController> {
   }
 
   // 내 커뮤니티 탭
+// 내 커뮤니티 탭
   Widget _buildMyCommunityTab() {
-    return Column(
+    return Obx(() => Column(
       children: [
         // 통계 카드
         Container(
@@ -271,10 +272,24 @@ class CommunityView extends GetView<CommunityController> {
         ),
         // 참여 중인 커뮤니티 리스트
         Expanded(
-          child: ListView.builder(itemCount: controller.myPost.length, itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])),
+          child: controller.myPost.isEmpty
+              ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.article_outlined, size: 64, color: Colors.grey[400]),
+                SizedBox(height: 16),
+                Text('작성한 게시글이 없습니다.', style: TextStyle(color: Colors.grey[600])),
+              ],
+            ),
+          )
+              : ListView.builder(
+              itemCount: controller.myPost.length,
+              itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])
+          ),
         ),
       ],
-    );
+    ));
   }
 
   // 생성 옵션 모달
