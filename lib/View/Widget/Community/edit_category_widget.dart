@@ -1,12 +1,13 @@
 import 'package:evfinder_front/Controller/community_controller.dart';
+import 'package:evfinder_front/Model/community_category.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 
-void showCreateCategoryDialog(CommunityController controller) {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
+void showEditCategoryDialog(CommunityController controller, CommunityCategory category) {
+  final TextEditingController nameController = TextEditingController(text: category.name);
+  final TextEditingController descriptionController = TextEditingController(text: category.description);
   final RxBool isLoading = false.obs;
 
   Get.dialog(
@@ -31,8 +32,8 @@ void showCreateCategoryDialog(CommunityController controller) {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('커뮤니티 만들기', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      Text('새로운 커뮤니티를 생성합니다', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                      Text('커뮤니티 수정', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('새로운 커뮤니티를 수정합니다', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                     ],
                   ),
                 ),
@@ -54,7 +55,6 @@ void showCreateCategoryDialog(CommunityController controller) {
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                hintText: '커뮤니티 이름을 입력하세요',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey[300]!),
@@ -81,7 +81,6 @@ void showCreateCategoryDialog(CommunityController controller) {
             TextField(
               controller: descriptionController,
               decoration: InputDecoration(
-                hintText: '커뮤니티에 대한 설명을 입력하세요',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey[300]!),
@@ -126,42 +125,17 @@ void showCreateCategoryDialog(CommunityController controller) {
 
                               if (isLoading.value) return;
 
-                              // 유효성 검사
-                              if (name.isEmpty) {
-                                Get.snackbar(
-                                  '오류',
-                                  '커뮤니티 이름을 입력해주세요',
-                                  snackPosition: SnackPosition.TOP,
-                                  backgroundColor: Colors.red[100],
-                                  colorText: Colors.red[800],
-                                  icon: Icon(Icons.error, color: Colors.red),
-                                );
-                                return;
-                              }
-
-                              if (description.isEmpty) {
-                                Get.snackbar(
-                                  '오류',
-                                  '커뮤니티 설명을 입력해주세요',
-                                  snackPosition: SnackPosition.TOP,
-                                  backgroundColor: Colors.red[100],
-                                  colorText: Colors.red[800],
-                                  icon: Icon(Icons.error, color: Colors.red),
-                                );
-                                return;
-                              }
-
                               try {
                                 isLoading.value = true;
                                 print('커뮤니티 생성 중...');
 
-                                bool result = await controller.createCategory(name, description);
+                                bool result = await controller.editCategory(category.categoryId, name, description);
 
                                 if (result) {
                                   Get.back(); // 다이얼로그 닫기
                                   Get.snackbar(
                                     '성공',
-                                    '커뮤니티 "$name"이 성공적으로 생성되었습니다!',
+                                    '커뮤니티 "$name"이 성공적으로 수정되었습니다!',
                                     snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.green[100],
                                     colorText: Colors.green[800],
@@ -169,7 +143,7 @@ void showCreateCategoryDialog(CommunityController controller) {
                                   );
                                 }
                               } catch (e) {
-                                print('[ERROR] 커뮤니티 생성 과정 실패: $e');
+                                print('[ERROR] 커뮤니티 수정 과정 실패: $e');
                               } finally {
                                 isLoading.value = false;
                               }
@@ -184,7 +158,7 @@ void showCreateCategoryDialog(CommunityController controller) {
                       child: isLoading.value
                           ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
                           : Text(
-                              '만들기',
+                              '수정',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                             ),
                     ),

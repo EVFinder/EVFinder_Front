@@ -30,15 +30,6 @@ class EditPostView extends GetView<CommunityController> {
         actions: [
           TextButton(
             onPressed: () async {
-              // if (controller.titleController.text.trim().isEmpty) {
-              //   Get.snackbar('알림', '제목을 입력해주세요.');
-              //   return;
-              // }
-              // if (controller.contentController.text.trim().isEmpty) {
-              //   Get.snackbar('알림', '내용을 입력해주세요.');
-              //   return;
-              // }
-
               // ✅ 로딩 표시
               Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
 

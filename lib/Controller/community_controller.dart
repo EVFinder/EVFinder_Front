@@ -16,8 +16,6 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
-
-
   // Reactive variables
   RxBool showScrollToTop = false.obs;
   final RxBool isLoadingPosts = false.obs;
@@ -92,6 +90,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   Future<List<CommunityPost>?> fetchPost(String cId) async {
     try {
       post.value = await PostService.fetchPost(cId);
+      post.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return post;
     } catch (e) {
       print('게시글 로드 실패: $e');
@@ -116,6 +115,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     try {
       myPost.value = await PostService.fetchMyPost();
       likesCount.value = calLikesCount(myPost);
+      myPost.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return myPost;
     } catch (e) {
       print('내 게시글 로드 실패: $e');
@@ -164,7 +164,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
 
   //------------------------------ 커뮤니티 관련 ------------------//
 
-  Future<bool> createCommunity(String name, String description) async {
+  Future<bool> createCategory(String name, String description) async {
     try {
       print('커뮤니티 생성 시작: $name');
       bool result = await CommunityService.generateCategory(name, description);
@@ -199,10 +199,31 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     }
   }
 
+  Future<bool> editCategory(String cId, String name, String description) async {
+    bool result = await CommunityService.editCategory(cId, name, description);
+    if (result) {
+      fetchCategories();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> deleteCategory(String cId, String name, String description) async {
+    bool result = await CommunityService.deleteCategory(cId, name, description);
+    if (result) {
+      await fetchCategories();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<void> fetchCategories() async {
     List<CommunityCategory> resultCategories = await CommunityService.fetchCommunityCategory();
     categoryCount.value = resultCategories.length;
     categories.value = resultCategories;
+    categories.sort((a, b) => a.name.compareTo(b.name));
   }
 
   // ✅ 선택된 카테고리 추가
