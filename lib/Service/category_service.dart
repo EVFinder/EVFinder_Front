@@ -76,14 +76,6 @@ class CommunityService {
     final String jwt = prefs.getString('jwt') ?? '';
 
     try {
-      List<CommunityCategory> existingCategories = await fetchCommunityCategory();
-      bool isDuplicate = existingCategories.any((category) => category.name.toLowerCase() == name.toLowerCase());
-
-      if (isDuplicate) {
-        print('[DEBUG] 이미 존재하는 카테고리: $name');
-        throw Exception('DUPLICATE_COMMUNITY');
-      }
-
       final createUrl = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId');
       final body = {'name': name, 'description': description};
 
@@ -95,75 +87,58 @@ class CommunityService {
       if (createResponse.statusCode == 200 || createResponse.statusCode == 201) {
         print('[SUCCESS] 카테고리 수정 성공: $name');
         return true;
-      } else if (createResponse.statusCode == 401) {
-        // 인증 실패
-        print('[ERROR] 인증 실패: JWT 토큰이 유효하지 않음');
-        throw Exception('UNAUTHORIZED');
-      } else if (createResponse.statusCode == 403) {
-        // 권한 없음 (admin이 아님)
-        print('[ERROR] 권한 없음: 관리자 권한이 필요함');
-        throw Exception('FORBIDDEN');
-      } else {
-        print('[ERROR] 카테고리 수정 실패: ${createResponse.statusCode}');
-        throw Exception('CREATION_FAILED');
       }
     } catch (e) {
-      print('[ERROR] generateCategory 오류: $e');
-
-      // 특정 오류들은 그대로 전달
-      if (e.toString().contains('DUPLICATE_COMMUNITY') || e.toString().contains('UNAUTHORIZED') || e.toString().contains('FORBIDDEN')) {
-        rethrow;
-      }
-      throw Exception('CREATION_ERROR');
+      print('[ERROR] Edit Category 오류: $e');
     }
+    return false;
   }
 
+  static Future<bool> deleteCategory(String cId, String name, String description) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
 
-  // static Future<bool> deleteCategory(String name, String description) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final String jwt = prefs.getString('jwt') ?? '';
-  //
-  //   try {
-  //     List<CommunityCategory> existingCategories = await fetchCommunityCategory();
-  //     bool isDuplicate = existingCategories.any((category) => category.name.toLowerCase() == name.toLowerCase());
-  //
-  //     if (isDuplicate) {
-  //       print('[DEBUG] 이미 존재하는 커뮤니티: $name');
-  //       throw Exception('DUPLICATE_COMMUNITY');
-  //     }
-  //
-  //     final createUrl = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories');
-  //     final body = {'name': name, 'description': description};
-  //
-  //     final createResponse = await http.post(createUrl, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'}, body: json.encode(body));
-  //
-  //     print('[DEBUG] 생성 응답 코드: ${createResponse.statusCode}');
-  //     print('[DEBUG] 생성 응답 내용: ${createResponse.body}');
-  //
-  //     if (createResponse.statusCode == 200 || createResponse.statusCode == 201) {
-  //       print('[SUCCESS] 커뮤니티 생성 성공: $name');
-  //       return true;
-  //     } else if (createResponse.statusCode == 401) {
-  //       // 인증 실패
-  //       print('[ERROR] 인증 실패: JWT 토큰이 유효하지 않음');
-  //       throw Exception('UNAUTHORIZED');
-  //     } else if (createResponse.statusCode == 403) {
-  //       // 권한 없음 (admin이 아님)
-  //       print('[ERROR] 권한 없음: 관리자 권한이 필요함');
-  //       throw Exception('FORBIDDEN');
-  //     } else {
-  //       print('[ERROR] 커뮤니티 생성 실패: ${createResponse.statusCode}');
-  //       throw Exception('CREATION_FAILED');
-  //     }
-  //   } catch (e) {
-  //     print('[ERROR] generateCategory 오류: $e');
-  //
-  //     // 특정 오류들은 그대로 전달
-  //     if (e.toString().contains('DUPLICATE_COMMUNITY') || e.toString().contains('UNAUTHORIZED') || e.toString().contains('FORBIDDEN')) {
-  //       rethrow;
-  //     }
-  //     throw Exception('CREATION_ERROR');
-  //   }
-  // }
+    try {
+      final createUrl = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId');
+      final body = {'name': name, 'description': description};
 
+      final createResponse = await http.delete(createUrl, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'}, body: json.encode(body));
+
+      print('[DEBUG] Delete Category 응답 코드: ${createResponse.statusCode}');
+      print('[DEBUG] Delete Category 응답 내용: ${createResponse.body}');
+
+      if (createResponse.statusCode == 204) {
+        print('[SUCCESS] 커뮤니티 삭제 성공: $name');
+        return true;
+      }
+    } catch (e) {
+      print('[ERROR] Delete Category 오류: $e');
+    }
+    return false;
+  }
+
+  static Future<String> getRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    try {
+      final createUrl = Uri.parse('${ApiConstants.authApiBaseUrl}/role');
+
+      final createResponse = await http.get(createUrl, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+      print('[DEBUG] Get Role 응답 코드: ${createResponse.statusCode}');
+      print('[DEBUG] Get Role 응답 내용: ${createResponse.body}');
+
+      if (createResponse.statusCode == 200) {
+        print('[SUCCESS] Get Role 성공');
+        final Map<String, dynamic> data = json.decode(createResponse.body);
+        return data['role'];
+      } else {
+        throw Exception('좋아요 상태를 불러오는데 실패했습니다: ${createResponse.statusCode}');
+      }
+    } catch (e) {
+      print('[ERROR] Delete Category 오류: $e');
+    }
+    return '';
+  }
 }

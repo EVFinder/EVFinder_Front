@@ -27,7 +27,6 @@ Widget popupMenuButton(VoidCallback editFunc, VoidCallback deleteFunc, String ti
                 ElevatedButton(
                   onPressed: () {
                     Get.back();
-                    Get.back();
                     deleteFunc();
                     Get.snackbar('성공', '카테고리가 삭제되었습니다.');
                   },

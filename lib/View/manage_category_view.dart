@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../Controller/community_controller.dart';
 import '../Model/community_category.dart';
 import 'Widget/Community/add_category_dialog_widget.dart';
+import 'Widget/Community/edit_category_widget.dart';
 
 class ManageCategoryView extends GetView<CommunityController> {
   ManageCategoryView({super.key});
@@ -69,27 +70,29 @@ class ManageCategoryView extends GetView<CommunityController> {
             ),
 
             // 카테고리 리스트
-            Expanded(
-              child: controller.categories.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.category_outlined, size: 64, color: Colors.grey[400]),
-                          SizedBox(height: 16),
-                          Text('카테고리가 없습니다.', style: TextStyle(color: Colors.grey[600])),
-                        ],
+            Obx(() {
+              return Expanded(
+                child: controller.categories.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.category_outlined, size: 64, color: Colors.grey[400]),
+                            SizedBox(height: 16),
+                            Text('카테고리가 없습니다.', style: TextStyle(color: Colors.grey[600])),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.categories.length,
+                        itemBuilder: (context, index) {
+                          final category = controller.categories[index];
+                          return _buildCategoryTile(context, category);
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: controller.categories.length,
-                      itemBuilder: (context, index) {
-                        final category = controller.categories[index];
-                        return _buildCategoryTile(category);
-                      },
-                    ),
-            ),
+              );
+            }),
           ],
         ),
       ),
@@ -98,15 +101,16 @@ class ManageCategoryView extends GetView<CommunityController> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _showAddCategoryDialog(context);
+          controller.fetchCategories();
         },
-        icon: Icon(Icons.add),
-        label: Text('카테고리 추가'),
+        icon: Icon(Icons.add, color: Colors.white),
+        label: Text('카테고리 추가', style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF078714),
       ),
     );
   }
 
-  Widget _buildCategoryTile(CommunityCategory category) {
+  Widget _buildCategoryTile(BuildContext context, CommunityCategory category) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -137,12 +141,25 @@ class ManageCategoryView extends GetView<CommunityController> {
                 ),
               )
             : null,
-        trailing: popupMenuButton(() {}, () {}, category.name, true),
+        trailing: popupMenuButton(
+          () {
+            _showEditCategoryDialog(context, category);
+          },
+          () {
+            controller.deleteCategory(category.categoryId, category.name, category.description);
+          },
+          category.name,
+          true,
+        ),
       ),
     );
   }
 
   void _showAddCategoryDialog(BuildContext context) {
-    showCreateCommunityDialog(controller);
+    showCreateCategoryDialog(controller);
+  }
+
+  void _showEditCategoryDialog(BuildContext context, CommunityCategory category) {
+    showEditCategoryDialog(controller, category);
   }
 }
