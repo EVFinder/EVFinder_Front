@@ -19,7 +19,7 @@ class PostService {
       final List<dynamic> jsonData = json.decode(response.body);
       return jsonData.map((e) => CommunityPost.fromJson(e)).toList();
     } else {
-      throw Exception('Failed to load community categories');
+      throw Exception('Failed to load community post');
     }
   }
 

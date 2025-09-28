@@ -25,7 +25,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   Rxn<CommunityPost> postDetail = Rxn<CommunityPost>();
   RxInt categoryCount = 0.obs;
   RxString categoryId = ''.obs;
-  RxInt calLikes = 0.obs;
+  RxInt likesCount = 0.obs;
 
   @override
   void onInit() {
@@ -86,9 +86,15 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     }
   }
 
-  Future<List<CommunityPost>> fetchPost(String cId) async {
-    post.value = await PostService.fetchPost(cId);
-    return post;
+  Future<List<CommunityPost>?> fetchPost(String cId) async {
+    try {
+      post.value = await PostService.fetchPost(cId);
+      return post;
+    } catch (e) {
+      print('게시글 로드 실패: $e');
+      postDetail.value = null;
+      return null;
+    }
   }
 
   Future<CommunityPost?> fetchPostDetail(String cId, String pId) async {
@@ -103,14 +109,24 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   }
 
   Future<List<CommunityPost>?> fetchMyPost() async {
+    likesCount.value = 0;
     try {
       myPost.value = await PostService.fetchMyPost();
+      likesCount.value = calLikesCount(myPost);
       return myPost;
     } catch (e) {
       print('게시글 로드 실패: $e');
       postDetail.value = null;
       return null;
     }
+  }
+
+  int calLikesCount(List<CommunityPost> posts) {
+    int likes = 0;
+    for (CommunityPost post in posts) {
+      likes += post.likes ?? 0;
+    }
+    return likes;
   }
 
   // 💝 좋아요 토글
@@ -153,11 +169,14 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     } catch (e) {
       print('커뮤니티 생성 오류: $e');
 
-      // 중복 오류 구분해서 처리
-      if (e.toString().contains('DUPLICATE_COMMUNITY')) {
-        throw Exception('DUPLICATE_COMMUNITY'); // 중복 오류 전달
+      // 특정 오류들은 그대로 전달 (변환하지 않음)
+      if (e.toString().contains('DUPLICATE_COMMUNITY') ||
+          e.toString().contains('UNAUTHORIZED') ||
+          e.toString().contains('FORBIDDEN') ||
+          e.toString().contains('CREATION_FAILED')) {  // 이것도 추가
+        rethrow;  // 원본 예외를 그대로 전달
       }
-      return false;
+      throw Exception('CREATION_ERROR');
     } finally {
       initialize();
     }
