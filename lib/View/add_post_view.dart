@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Controller/community_controller.dart';
 import '../Util/Route/app_page.dart';
@@ -11,6 +12,8 @@ class AddPostView extends GetView<CommunityController> {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController contentController = TextEditingController();
     // ✅ 카테고리 로드
     // controller.fetchCategories();
     return Scaffold(
@@ -34,11 +37,11 @@ class AddPostView extends GetView<CommunityController> {
                 return;
               }
 
-              if (controller.titleController.text.trim().isEmpty) {
+              if (titleController.text.trim().isEmpty) {
                 Get.snackbar('알림', '제목을 입력해주세요.');
                 return;
               }
-              if (controller.contentController.text.trim().isEmpty) {
+              if (contentController.text.trim().isEmpty) {
                 Get.snackbar('알림', '내용을 입력해주세요.');
                 return;
               }
@@ -49,7 +52,7 @@ class AddPostView extends GetView<CommunityController> {
               Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
 
               try {
-                bool isCreated = await controller.createPost(cId, controller.titleController.text.trim(), controller.contentController.text.trim());
+                bool isCreated = await controller.createPost(cId, titleController.text.trim(), contentController.text.trim());
 
                 // ✅ 로딩 닫기
                 Get.back();
@@ -58,8 +61,8 @@ class AddPostView extends GetView<CommunityController> {
                   await controller.fetchPost(cId);
                   Get.snackbar('성공', '게시글이 작성되었습니다.');
                   controller.clearSelectedCategory();
-                  controller.titleController.clear();
-                  controller.contentController.clear();
+                  titleController.clear();
+                  contentController.clear();
                   Get.offAndToNamed(AppRoute.main);
                 } else {
                   Get.snackbar('오류', '게시글 작성에 실패했습니다.');
@@ -99,7 +102,7 @@ class AddPostView extends GetView<CommunityController> {
                   border: Border.all(color: Colors.grey[200]!),
                 ),
                 child: TextField(
-                  controller: controller.titleController,
+                  controller: titleController,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                   decoration: InputDecoration(
                     hintText: '제목을 입력하세요',
@@ -127,7 +130,7 @@ class AddPostView extends GetView<CommunityController> {
                       radius: 20,
                       backgroundColor: Colors.blue[100],
                       child: Text(
-                        'M', // 현재 사용자 이름 첫 글자
+                        controller.prefs.getString('name')!.substring(0, 1), // 현재 사용자 이름 첫 글자
                         style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -137,10 +140,13 @@ class AddPostView extends GetView<CommunityController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '나', // 현재 사용자 이름
+                            controller.prefs.getString('name')!, // 현재 사용자 이름 첫 글자
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
                           ),
-                          Text('지금', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                          Text(
+                            controller.prefs.getString('email')!, // 현재 사용자 이름 첫 글자
+                            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                          ),
                         ],
                       ),
                     ),
@@ -160,7 +166,7 @@ class AddPostView extends GetView<CommunityController> {
                   border: Border.all(color: Colors.grey[200]!),
                 ),
                 child: TextField(
-                  controller: controller.contentController,
+                  controller: contentController,
                   style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6),
                   decoration: InputDecoration(
                     hintText: '내용을 입력하세요',
