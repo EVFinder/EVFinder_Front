@@ -5,7 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../../Util/Route/app_page.dart';
 
-Widget buildMyCommunityTile(BuildContext context, CommunityPost myPost) {
+Widget buildMyCommunityTile(BuildContext context, CommunityPost myPost, bool isLike) {
   return Card(
     margin: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04, vertical: Get.size.height * 0.005),
     child: ListTile(
@@ -19,8 +19,8 @@ Widget buildMyCommunityTile(BuildContext context, CommunityPost myPost) {
             // Text('위에서 관심있는 커뮤니티를 선택하면\n해당 커뮤니티의 게시글을 볼 수 있어요', style: TextStyle(overflow: TextOverflow.ellipsis)),
             Row(
               children: [
-                Icon(Icons.favorite_border, color: Color(0xFF078714)),
-                SizedBox(width: 5),
+                Icon(isLike ? Icons.favorite : Icons.favorite_border, size: Get.size.width * 0.06, color: Color(0xFF078714)),
+                SizedBox(width: Get.size.width * 0.02),
                 Text("${myPost.likes}", style: TextStyle(color: Color(0xFF078714))), // 하드코딩된 "2"를 실제 likes 값으로 변경
               ],
             ),
@@ -34,9 +34,6 @@ Widget buildMyCommunityTile(BuildContext context, CommunityPost myPost) {
           Icon(Icons.arrow_forward_ios, size: Get.size.width * 0.04),
         ],
       ),
-      onTap: () {
-        Get.toNamed(AppRoute.postdetail, arguments: {'pId': myPost.postId, 'cId': myPost.categoryId});
-      },
     ),
   );
 }

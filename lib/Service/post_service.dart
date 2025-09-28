@@ -7,19 +7,21 @@ import '../Model/community_post.dart';
 
 class PostService {
   static Future<List<CommunityPost>> fetchPost(String cId) async {
-    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/list');
-    final prefs = await SharedPreferences.getInstance();
-    final String jwt = prefs.getString('jwt') ?? '';
+    if (cId != null) {
+      final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/list');
+      final prefs = await SharedPreferences.getInstance();
+      final String jwt = prefs.getString('jwt') ?? '';
 
-    final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
-    print('[DEBUG] Fetch Post 응답 코드: ${response.statusCode}');
-    print('[DEBUG] Fetch Post 응답 내용: ${response.body}');
+      final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+      print('[DEBUG] Fetch Post 응답 코드: ${response.statusCode}');
+      print('[DEBUG] Fetch Post 응답 내용: ${response.body}');
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((e) => CommunityPost.fromJson(e)).toList();
-    } else {
-      throw Exception('Failed to load community post');
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        return jsonData.map((e) => CommunityPost.fromJson(e)).toList();
+      } else {
+        throw Exception('Failed to load community post');
+      }
     }
   }
 
@@ -110,6 +112,54 @@ class PostService {
       return true;
     } else {
       throw Exception('게시글을 불러오는데 실패했습니다: ${response.statusCode}');
+    }
+  }
+
+  static Future<bool> updateLike(String way, String cId, String pId) async {
+    final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/$pId/like');
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    late final http.Response response;
+    if (way == "add") {
+      response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+      print('[DEBUG] Add Like 응답 코드: ${response.statusCode}');
+      print('[DEBUG] Add Like 응답 내용: ${response.body}');
+    } else if (way == "remove") {
+      response = await http.delete(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+      print('[DEBUG] Delete Like 응답 코드: ${response.statusCode}');
+      print('[DEBUG] Delete Like 응답 내용: ${response.body}');
+    }
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return true;
+    } else {
+      throw Exception('좋아요 업데이트 실패: ${response.statusCode}');
+    }
+  }
+
+  static Future<bool> fetchLike(String cId, String pId) async {
+    try {
+      final url = Uri.parse('${ApiConstants.communityApiBaseUrl}/categories/$cId/posts/$pId/islike');
+      final prefs = await SharedPreferences.getInstance();
+      final String jwt = prefs.getString('jwt') ?? '';
+
+      final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+      print('[DEBUG] Fetch Like 응답 코드: ${response.statusCode}');
+      print('[DEBUG] Fetch Like 응답 내용: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // JSON 파싱
+        final Map<String, dynamic> data = json.decode(response.body);
+        return data['isLiked'] ?? false; // isLiked 값 반환, 없으면 false
+      } else {
+        throw Exception('좋아요 상태를 불러오는데 실패했습니다: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('[ERROR] fetchLike 오류: $e');
+      return false; // 오류 시 기본값 false 반환
     }
   }
 }
