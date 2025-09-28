@@ -1,10 +1,8 @@
-import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/profile_controller.dart';
 import '../View/Widget/profile_card.dart';
-import 'package:evfinder_front/View/Widget/reserv_user_card.dart';
-import 'package:intl/intl.dart';
+import 'Widget/chatbot_card.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -31,119 +29,190 @@ class ProfileView extends GetView<ProfileController> {
               padding: const EdgeInsets.only(bottom: 16),
               child: Column(
                 children: [
-                  // Obx(() {
-                  //   if (controller.isLoading.value) {
-                  //     return const Center(child: CircularProgressIndicator());
-                  //   }
-                  //   if (controller.reserveStation.isEmpty) {
-                  //     return const Padding(
-                  //       padding: EdgeInsets.all(20.0),
-                  //       child: Center(child: Text('예약 내역이 없습니다.')),
-                  //     );
-                  //   }
-                  //   return Column(
-                  //     children: controller.reserveStation.map((reservation) {
-                  //       String dateText = '-';
-                  //       String timeText = '-';
-                  //
-                  //       final startTimeString = reservation['startTime'];
-                  //       final endTimeString = reservation['endTime'];
-                  //       final String reserveId = reservation['id'];
-                  //
-                  //       if (startTimeString != null && endTimeString != null) {
-                  //         // 1. ISO 8601 형식의 문자열을 DateTime 객체로 파싱
-                  //         final startTime = DateTime.parse(startTimeString);
-                  //         final endTime = DateTime.parse(endTimeString);
-                  //
-                  //         // 년-월-일 형식
-                  //         dateText = DateFormat('yyyy-MM-dd').format(startTime);
-                  //
-                  //         // 시간:분:초 형식
-                  //         final startTimePart = DateFormat('HH시mm분ss초').format(startTime);
-                  //         final endTimePart = DateFormat('HH시mm분ss초').format(endTime);
-                  //
-                  //         timeText = '$startTimePart-$endTimePart';
-                  //       }
-                  //       return ReservUserCard(
-                  //           stationName: reservation['stationName'],
-                  //           address: reservation['address'],
-                  //           rating: 4.8,
-                  //           statusText: '예약 확정',
-                  //           dateText: dateText,
-                  //           timeText: timeText,
-                  //           onCancel: () {
-                  //             controller.confirmDeleteReverse(reserveId);
-                  //           },
-                  //         onUpdate: () {
-                  //             print("수정 전달 데이터 $reservation");
-                  //             Get.toNamed("/reserv", arguments : {'type': ReserveType.update, 'reservation': reservation});
-                  //         },
-                  //       );
-                  //     }).toList(),
-                  //   );
-                  // }),
-                  //
-                  // const SizedBox(height: 15),
+                 //챗봇 버튼
+                  const SizedBox(height: 8),
+                  ChatbotCard(onTap: () => Get.toNamed('/chatbot')),
+                  const SizedBox(height: 18),
 
                   // 버튼들
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.toNamed("/reservUser");
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                // --- 버튼들 (카드형 리스트) ---
+                Padding(
+                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => Get.toNamed("/reservUser"),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAF8),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE7EBE5)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withOpacity(0.04),
+                              blurRadius: 10, offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF3B82F6).withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.event_available_rounded,
+                                  size: 22, color: Color(0xFF3B82F6)),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text('내 예약 확인하기',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+                          ],
+                        ),
                       ),
-                      child: const Text('내 예약 확인하기', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: controller.handleChangePassword,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: controller.handleChangePassword,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAF8),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE7EBE5)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withOpacity(0.04),
+                              blurRadius: 10, offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.lock_rounded,
+                                  size: 22, color: Color(0xFF10B981)),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text('비밀번호 변경',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+                          ],
+                        ),
                       ),
-                      child: const Text('비밀번호 변경', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: controller.handleLogout,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6B7280),
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: controller.handleLogout,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAF8),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE7EBE5)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withOpacity(0.04),
+                              blurRadius: 10, offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF9CA3AF).withOpacity(0.18),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.logout_rounded,
+                                  size: 22, color: Color(0xFF6B7280)),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text('로그아웃',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+                          ],
+                        ),
                       ),
-                      child: const Text('로그아웃', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: controller.confirmDeleteAccount,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFEF4444),
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: controller.confirmDeleteAccount,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAF8),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE7EBE5)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withOpacity(0.04),
+                              blurRadius: 10, offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEF4444).withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.person_remove_rounded,
+                                  size: 22, color: Color(0xFFEF4444)),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text('회원 탈퇴',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+                          ],
+                        ),
                       ),
-                      child: const Text('회원 탈퇴', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                ),
+                const SizedBox(height: 20),
                 ],
               ),
             ),
