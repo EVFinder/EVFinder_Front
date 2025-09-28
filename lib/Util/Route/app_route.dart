@@ -24,5 +24,6 @@ class AppRoute {
   static final reviewdetail = ReviewDetailView.route;
   static final editpost = EditPostView.route;
   static final managecategory = ManageCategoryView.route;
+  static final chatbot = ChatbotView.route;
   static final splash = '/';
 }

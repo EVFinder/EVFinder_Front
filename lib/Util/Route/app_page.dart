@@ -5,6 +5,7 @@ import 'package:evfinder_front/View/add_charge_view.dart';
 import 'package:evfinder_front/View/add_post_view.dart';
 import 'package:evfinder_front/View/bnb_station_view.dart';
 import 'package:evfinder_front/View/charge_detail_view.dart';
+import 'package:evfinder_front/View/chatbot_view.dart';
 import 'package:evfinder_front/View/community_view.dart';
 import 'package:evfinder_front/View/edit_post_view.dart';
 import 'package:evfinder_front/View/favortie_station_view.dart';
@@ -54,5 +55,6 @@ class AppPages {
     GetPage(name: AppRoute.postdetail, page: () => const PostDetailView()),
     GetPage(name: AppRoute.editpost, page: () => const EditPostView()),
     GetPage(name: AppRoute.managecategory, page: () => ManageCategoryView()),
+    GetPage(name: AppRoute.chatbot, page: () => const ChatbotView())
   ];
 }
