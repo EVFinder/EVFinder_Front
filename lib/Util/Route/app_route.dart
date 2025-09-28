@@ -23,5 +23,6 @@ class AppRoute {
   static final reviewWrite = ReviewWriteView.route;
   static final reviewdetail = ReviewDetailView.route;
   static final editpost = EditPostView.route;
+  static final managecategory = ManageCategoryView.route;
   static final splash = '/';
 }

@@ -10,6 +10,7 @@ import 'package:evfinder_front/View/edit_post_view.dart';
 import 'package:evfinder_front/View/favortie_station_view.dart';
 import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
+import 'package:evfinder_front/View/manage_category_view.dart';
 import 'package:evfinder_front/View/map_view.dart';
 import 'package:evfinder_front/View/post_detail_view.dart';
 import 'package:evfinder_front/View/register_charge_view.dart';
@@ -52,5 +53,6 @@ class AppPages {
     GetPage(name: AppRoute.reservUser, page: () => const ReservUserView()),
     GetPage(name: AppRoute.postdetail, page: () => const PostDetailView()),
     GetPage(name: AppRoute.editpost, page: () => const EditPostView()),
+    GetPage(name: AppRoute.managecategory, page: () => ManageCategoryView()),
   ];
 }
