@@ -30,7 +30,6 @@ class CommunityService {
 
     try {
       List<CommunityCategory> existingCategories = await fetchCommunityCategory();
-      // 대소문자 구분 없이 중복 체크
       bool isDuplicate = existingCategories.any((category) => category.name.toLowerCase() == name.toLowerCase());
 
       if (isDuplicate) {
@@ -49,6 +48,14 @@ class CommunityService {
       if (createResponse.statusCode == 200 || createResponse.statusCode == 201) {
         print('[SUCCESS] 커뮤니티 생성 성공: $name');
         return true;
+      } else if (createResponse.statusCode == 401) {
+        // 인증 실패
+        print('[ERROR] 인증 실패: JWT 토큰이 유효하지 않음');
+        throw Exception('UNAUTHORIZED');
+      } else if (createResponse.statusCode == 403) {
+        // 권한 없음 (admin이 아님)
+        print('[ERROR] 권한 없음: 관리자 권한이 필요함');
+        throw Exception('FORBIDDEN');
       } else {
         print('[ERROR] 커뮤니티 생성 실패: ${createResponse.statusCode}');
         throw Exception('CREATION_FAILED');
@@ -56,9 +63,9 @@ class CommunityService {
     } catch (e) {
       print('[ERROR] generateCategory 오류: $e');
 
-      // 중복 오류는 특별히 처리
-      if (e.toString().contains('DUPLICATE_COMMUNITY')) {
-        throw Exception('DUPLICATE_COMMUNITY');
+      // 특정 오류들은 그대로 전달
+      if (e.toString().contains('DUPLICATE_COMMUNITY') || e.toString().contains('UNAUTHORIZED') || e.toString().contains('FORBIDDEN')) {
+        rethrow;
       }
       throw Exception('CREATION_ERROR');
     }

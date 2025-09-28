@@ -19,15 +19,15 @@ class CommunityView extends GetView<CommunityController> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                // 검색 화면으로 이동
-              },
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(right: 16.0),
+          //   child: IconButton(
+          //     icon: Icon(Icons.search),
+          //     onPressed: () {
+          //       // 검색 화면으로 이동
+          //     },
+          //   ),
+          // ),
         ],
         bottom: TabBar(
           controller: controller.tabController,
@@ -243,7 +243,10 @@ class CommunityView extends GetView<CommunityController> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [buildStatItem('내 게시글', controller.myPost.length.toString(), Icons.post_add), buildStatItem('받은 좋아요', '128', Icons.favorite)],
+            children: [
+              buildStatItem('내 게시글', controller.myPost.length.toString(), Icons.post_add),
+              buildStatItem('받은 좋아요', controller.likesCount.value.toString(), Icons.favorite),
+            ],
           ),
         ),
         // 참여 중인 커뮤니티 리스트
