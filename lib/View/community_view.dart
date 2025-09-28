@@ -103,16 +103,17 @@ class CommunityView extends GetView<CommunityController> {
                           style: TextStyle(fontSize: Get.size.width * 0.045, fontWeight: FontWeight.bold),
                         ),
                         Spacer(),
-                        PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert, color: Colors.black87),
-                          onSelected: (value) {
-                            if (value == 'manage') {
-                              Get.toNamed(AppRoute.managecategory);
-                              print('카테고리 관리');
-                            }
-                          },
-                          itemBuilder: (context) => [PopupMenuItem(value: 'manage', child: Text('카테고리 관리'))],
-                        ),
+                        if (controller.isAdmin.value)
+                          PopupMenuButton<String>(
+                            icon: Icon(Icons.more_vert, color: Colors.black87),
+                            onSelected: (value) {
+                              if (value == 'manage') {
+                                Get.toNamed(AppRoute.managecategory);
+                                print('카테고리 관리');
+                              }
+                            },
+                            itemBuilder: (context) => [PopupMenuItem(value: 'manage', child: Text('카테고리 관리'))],
+                          ),
                       ],
                     ),
                   ),
@@ -205,9 +206,25 @@ class CommunityView extends GetView<CommunityController> {
                       ),
                     ),
                   )
-                : SliverList(
+                : // CommunityView의 _buildHomeTab에서
+                  SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) => buildPostCard(controller.post[index], controller.categoryId.value),
+                      (context, index) => FutureBuilder<bool>(
+                        future: controller.fetchLike(controller.categoryId.value, controller.post[index].postId),
+                        builder: (context, snapshot) {
+                          bool isLike = snapshot.data ?? false;
+                          return GestureDetector(
+                            onTap: () {
+                              Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.post[index].postId, 'isLike': isLike.obs});
+                            },
+                            child: buildPostCard(
+                              controller.post[index],
+                              controller.categoryId.value,
+                              isLike, // ✅ isLike 전달
+                            ),
+                          );
+                        },
+                      ),
                       childCount: controller.post.length,
                     ),
                   ),
@@ -268,7 +285,6 @@ class CommunityView extends GetView<CommunityController> {
   }
 
   // 내 커뮤니티 탭
-  // 내 커뮤니티 탭
   Widget _buildMyCommunityTab() {
     return Obx(
       () => Column(
@@ -302,7 +318,30 @@ class CommunityView extends GetView<CommunityController> {
                       ],
                     ),
                   )
-                : ListView.builder(itemCount: controller.myPost.length, itemBuilder: (context, index) => buildMyCommunityTile(context, controller.myPost[index])),
+                : // CommunityView의 _buildMyCommunityTab에서
+                  ListView.builder(
+                    itemCount: controller.myPost.length,
+                    itemBuilder: (context, index) => FutureBuilder<bool>(
+                      future: controller.fetchLike(
+                        controller.myPost[index].categoryId, // ✅ myPost의 categoryId 사용
+                        controller.myPost[index].postId,
+                      ),
+                      builder: (context, snapshot) {
+                        bool isLike = snapshot.data ?? false;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs});
+                          },
+                          child: buildMyCommunityTile(
+                            context,
+                            controller.myPost[index],
+                            isLike, // ✅ isLike 전달
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
