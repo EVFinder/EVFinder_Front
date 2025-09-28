@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:evfinder_front/Controller/community_controller.dart';
 import 'package:evfinder_front/Util/convert_time.dart';
 import 'package:evfinder_front/View/Widget/Community/popup_menu_button.dart';
@@ -17,6 +19,7 @@ class PostDetailView extends GetView<CommunityController> {
     final arguments = Get.arguments as Map<String, dynamic>?;
     final String postId = arguments?['pId'] ?? '';
     final String? categoryIdFromArgs = arguments?['cId'];
+    final RxBool isLike = (arguments?['isLike'] ?? false);
 
     // categoryId 결정: arguments에서 온 cId가 있으면 사용, 없으면 controller의 categoryId 사용
     final String categoryId = categoryIdFromArgs?.isNotEmpty == true ? categoryIdFromArgs! : controller.categoryId.value;
@@ -100,6 +103,27 @@ class PostDetailView extends GetView<CommunityController> {
                 onPressed: () => Get.back(),
               ),
               actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Obx(() {
+                    return IconButton(
+                      icon: Icon(isLike.value ? Icons.favorite : Icons.favorite_border, size: Get.size.width * 0.06, color: Color(0xFF078714)),
+                      onPressed: () {
+                        try {
+                          if (isLike.value) {
+                            controller.updateLike("remove", categoryId, postId);
+                          } else {
+                            controller.updateLike("add", categoryId, postId);
+                          }
+                          isLike.value = !isLike.value;
+                          print(isLike.value);
+                        } catch (e) {
+                          print('좋아요 처리 중 오류 발생: $e');
+                        }
+                      },
+                    );
+                  }),
+                ),
                 if (controller.postDetail.value?.owner == true)
                   popupMenuButton(
                     () {
@@ -115,110 +139,114 @@ class PostDetailView extends GetView<CommunityController> {
             ),
             body: controller.postDetail.value == null
                 ? Center(child: Text('게시글 정보가 없습니다.'))
-                : SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 📝 제목
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  controller.postDetail.value!.title ?? '제목 없음',
-                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
-                                    SizedBox(width: 4),
-                                    Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          // 👤 작성자 정보
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            child: Row(
+                : Obx(() {
+                    return SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 📝 제목
+                            Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: Colors.blue[100],
+                                Expanded(
                                   child: Text(
-                                    (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
-                                    style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                    controller.postDetail.value!.title ?? '제목 없음',
+                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
                                   ),
                                 ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Text("좋아요: ${controller.postDetail.value!.likes}", style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                SizedBox(width: Get.size.width * 0.02),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        controller.postDetail.value!.authorName ?? '익명',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                                      ),
-                                      Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                                      Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
+                                      SizedBox(width: 4),
+                                      Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-
-                          SizedBox(height: 24),
-
-                          // 📄 내용
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
+                            SizedBox(height: 16),
+                            // 👤 작성자 정보
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.blue[100],
+                                    child: Text(
+                                      (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
+                                      style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          controller.postDetail.value!.authorName ?? '익명',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                                        ),
+                                        Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Text(controller.postDetail.value!.content ?? '내용이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
-                          ),
 
-                          SizedBox(height: 24),
+                            SizedBox(height: 24),
 
-                          Divider(thickness: 1),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              '댓글',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                            // 📄 내용
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Text(controller.postDetail.value!.content ?? '내용이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
                             ),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[200]!),
+
+                            SizedBox(height: 24),
+
+                            Divider(thickness: 1),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '댓글',
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                              ),
                             ),
-                            child: Text('asdf', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
-                          ),
-                        ],
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Text('asdf', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
           );
         }
       },

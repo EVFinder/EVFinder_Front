@@ -116,4 +116,29 @@ class CommunityService {
     }
     return false;
   }
+
+  static Future<String> getRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jwt = prefs.getString('jwt') ?? '';
+
+    try {
+      final createUrl = Uri.parse('${ApiConstants.authApiBaseUrl}/role');
+
+      final createResponse = await http.get(createUrl, headers: {"Content-Type": "application/json", "Authorization": 'Bearer $jwt'});
+
+      print('[DEBUG] Get Role 응답 코드: ${createResponse.statusCode}');
+      print('[DEBUG] Get Role 응답 내용: ${createResponse.body}');
+
+      if (createResponse.statusCode == 200) {
+        print('[SUCCESS] Get Role 성공');
+        final Map<String, dynamic> data = json.decode(createResponse.body);
+        return data['role'];
+      } else {
+        throw Exception('좋아요 상태를 불러오는데 실패했습니다: ${createResponse.statusCode}');
+      }
+    } catch (e) {
+      print('[ERROR] Delete Category 오류: $e');
+    }
+    return '';
+  }
 }

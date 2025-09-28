@@ -19,6 +19,7 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   // Reactive variables
   RxBool showScrollToTop = false.obs;
   final RxBool isLoadingPosts = false.obs;
+  RxBool isAdmin = false.obs;
   RxnInt selectedCommunityIndex = RxnInt(); // null을 허용하는 RxInt
   RxList<CommunityCategory> categories = <CommunityCategory>[].obs;
   RxList<CommunityPost> post = <CommunityPost>[].obs;
@@ -64,7 +65,17 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
+  void getRole() async {
+    String role = await CommunityService.getRole();
+    if (role == 'ADMIN') {
+      isAdmin.value = true;
+    } else {
+      isAdmin.value = false;
+    }
+  }
+
   Future<void> initialize() async {
+    getRole();
     await fetchCategories();
     await fetchMyPost();
   }
@@ -154,10 +165,24 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     }
   }
 
-  // 💝 좋아요 토글
-  void toggleLike(Map<String, dynamic> post) {
-    print('좋아요 토글: ${post['postId']}');
-    Get.snackbar('알림', (post['liked'] == true) ? '좋아요를 취소했습니다' : '좋아요를 눌렀습니다', snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 1));
+  Future<bool> updateLike(String way, String cId, String pId) async {
+    bool result = await PostService.updateLike(way, cId, pId);
+    if (result) {
+      fetchPost(cId);
+      fetchMyPost();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> fetchLike(String cId, String pId) async {
+    bool result = await PostService.fetchLike(cId, pId);
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   //------------------------------ 댓글 관련 ------------------//
