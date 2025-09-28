@@ -1,5 +1,7 @@
 import 'package:evfinder_front/Controller/addCharge_controller.dart';
 import 'package:evfinder_front/Controller/bnb_station_controller.dart';
+import 'package:evfinder_front/Controller/changePassword_controller.dart';
+import 'package:evfinder_front/Controller/chatbot_controller.dart';
 import 'package:evfinder_front/Controller/community_controller.dart';
 import 'package:evfinder_front/Controller/charge_detail_controller.dart';
 import 'package:evfinder_front/Controller/favorite_station_controller.dart';
@@ -84,6 +86,8 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => ReviewWriteController(), fenix: true);
         Get.lazyPut(() => ReviewDetailController(), fenix: true);
         Get.lazyPut(() => CommunityController(), fenix: true);
+        Get.lazyPut(() => ChatbotController(), fenix: true);
+        Get.lazyPut(() => ChangePasswordController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),

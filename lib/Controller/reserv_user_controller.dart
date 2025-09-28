@@ -10,6 +10,7 @@ class ReservUserController extends GetxController {
   RxBool isLoading = false.obs;
   final reserveStation = <Map<String, dynamic>>[].obs;
   final uid = ''.obs;
+  final ratings = <String, double>{}.obs;
 
   @override
   void onInit() {
@@ -41,11 +42,67 @@ class ReservUserController extends GetxController {
             "startTime": e['startTime']?.toString() ?? '알 수 없음',
             "endTime": e['endTime']?.toString() ?? '알 수 없음',
             "createdAt": e['createdAt']?.toString() ?? '알 수 없음',
+            "rating"     : 0.0,
+            "ratingCount": 0,
           },
         ),
       );
     } finally {
       isLoading.value = false;
+    }
+    _fillRatingsForAll();
+  }
+
+  final Map<String, Map<String, dynamic>> _ratingCache = {};
+  Future<void> _fillRatingsForAll() async {
+    final seen = <String>{};
+
+    for (var i = 0; i < reserveStation.length; i++) {
+      final shareId = reserveStation[i]['shareId']?.toString() ?? '';
+      if (shareId.isEmpty || shareId == '알 수 없음') continue;
+      if (seen.contains(shareId)) {
+        final cached = _ratingCache[shareId];
+        if (cached != null) {
+          final updated = Map<String, dynamic>.from(reserveStation[i]);
+          updated['rating'] = (cached['averageRating'] as num).toDouble();
+          updated['ratingCount'] = (cached['count'] as num).toInt();
+          reserveStation[i] = updated;
+        }
+        continue;
+      }
+
+      try {
+        final stats = _ratingCache[shareId] ?? await fetchReviewStats(shareId);
+        _ratingCache[shareId] = stats;
+
+        final avg = (stats['averageRating'] is num)
+            ? (stats['averageRating'] as num).toDouble()
+            : double.tryParse('${stats['averageRating']}') ?? 0.0;
+
+        final cnt = (stats['count'] is num)
+            ? (stats['count'] as num).toInt()
+            : int.tryParse('${stats['count']}') ?? 0;
+
+        final updated = Map<String, dynamic>.from(reserveStation[i]);
+        updated['rating'] = avg;
+        updated['ratingCount'] = cnt;
+        reserveStation[i] = updated;
+
+        seen.add(shareId);
+      } catch (_) {
+      }
+    }
+  }
+
+
+  static Future<Map<String, dynamic>> fetchReviewStats(String stationId) async {
+    final url = Uri.parse('${ApiConstants.reviewBaseUrl}/stats/$stationId');
+    final res = await http.get(url);
+    if (res.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(res.body);
+      return json;
+    } else {
+      throw Exception('Failed to fetch review stats');
     }
   }
 
