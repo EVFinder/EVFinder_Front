@@ -1,7 +1,10 @@
 import 'package:evfinder_front/Controller/community_controller.dart';
 import 'package:evfinder_front/Util/convert_time.dart';
+import 'package:evfinder_front/View/Widget/Community/popup_menu_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../Util/Route/app_page.dart';
 
 class PostDetailView extends GetView<CommunityController> {
   const PostDetailView({super.key});
@@ -10,9 +13,44 @@ class PostDetailView extends GetView<CommunityController> {
 
   @override
   Widget build(BuildContext context) {
-    String postId = Get.arguments['pId'] ?? '';
+    // null 체크 추가
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    final String postId = arguments?['pId'] ?? '';
+    final String? categoryIdFromArgs = arguments?['cId'];
+
+    // categoryId 결정: arguments에서 온 cId가 있으면 사용, 없으면 controller의 categoryId 사용
+    final String categoryId = categoryIdFromArgs?.isNotEmpty == true ? categoryIdFromArgs! : controller.categoryId.value;
+
+    // postId가 비어있으면 오류 화면 표시
+    if (postId.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
+            onPressed: () => Get.back(),
+          ),
+          title: Text('오류', style: TextStyle(color: Colors.black87)),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.red),
+              SizedBox(height: 16),
+              Text('게시글 정보가 없습니다.', style: TextStyle(fontSize: 16)),
+              SizedBox(height: 16),
+              ElevatedButton(onPressed: () => Get.back(), child: Text('돌아가기')),
+            ],
+          ),
+        ),
+      );
+    }
+
     return FutureBuilder(
-      future: controller.fetchPostDetail(controller.categoryId.value, postId),
+      // categoryId 변수 사용
+      future: controller.fetchPostDetail(categoryId, postId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -33,12 +71,23 @@ class PostDetailView extends GetView<CommunityController> {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-                onPressed: () {
-                  Get.back();
-                },
+                onPressed: () => Get.back(),
               ),
             ),
-            body: Center(child: Text('오류가 발생했습니다.')),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  SizedBox(height: 16),
+                  Text('오류가 발생했습니다.', style: TextStyle(fontSize: 16)),
+                  SizedBox(height: 8),
+                  Text('${snapshot.error}', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  SizedBox(height: 16),
+                  ElevatedButton(onPressed: () => Get.back(), child: Text('돌아가기')),
+                ],
+              ),
+            ),
           );
         } else {
           return Scaffold(
@@ -51,17 +100,16 @@ class PostDetailView extends GetView<CommunityController> {
                 onPressed: () => Get.back(),
               ),
               actions: [
-                if (controller.postDetail.value!.owner == true)
-                  PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Colors.black87),
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        print('게시글 수정');
-                      } else if (value == 'delete') {
-                        controller.showDeleteDialog();
-                      }
+                if (controller.postDetail.value?.owner == true)
+                  popupMenuButton(
+                    () {
+                      Get.toNamed(AppRoute.editpost);
                     },
-                    itemBuilder: (context) => [PopupMenuItem(value: 'edit', child: Text('수정')), PopupMenuItem(value: 'delete', child: Text('삭제'))],
+                    () {
+                      controller.deletePost(categoryId, controller.postDetail.value!.postId);
+                    },
+                    controller.postDetail.value!.title,
+                    false,
                   ),
               ],
             ),
@@ -76,11 +124,12 @@ class PostDetailView extends GetView<CommunityController> {
                           // 📝 제목
                           Row(
                             children: [
-                              Text(
-                                controller.postDetail.value!.title ?? '제목 없음',
-                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                              Expanded(
+                                child: Text(
+                                  controller.postDetail.value!.title ?? '제목 없음',
+                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                                ),
                               ),
-                              Spacer(),
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
@@ -148,31 +197,6 @@ class PostDetailView extends GetView<CommunityController> {
 
                           SizedBox(height: 24),
 
-                          // 💝 좋아요 버튼
-                          // Container(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     onPressed: () => _toggleLike(post),
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: (post['liked'] == true) ? Colors.red[50] : Colors.grey[50],
-                          //       foregroundColor: (post['liked'] == true) ? Colors.red : Colors.grey[700],
-                          //       elevation: 0,
-                          //       padding: EdgeInsets.symmetric(vertical: 16),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(12),
-                          //         side: BorderSide(color: (post['liked'] == true) ? Colors.red[200]! : Colors.grey[300]!),
-                          //       ),
-                          //     ),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Icon((post['liked'] == true) ? Icons.favorite : Icons.favorite_border, size: 20),
-                          //         SizedBox(width: 8),
-                          //         Text('좋아요 ${post['likes'] ?? 0}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
                           Divider(thickness: 1),
                           Padding(
                             padding: const EdgeInsets.all(8.0),

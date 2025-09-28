@@ -4,15 +4,16 @@ import 'package:get/get.dart';
 import '../Controller/community_controller.dart';
 import '../Util/Route/app_page.dart';
 
-class AddPostView extends GetView<CommunityController> {
-  const AddPostView({super.key});
+class EditPostView extends GetView<CommunityController> {
+  const EditPostView({super.key});
 
-  static String route = '/addpost';
+  static String route = '/editpost';
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController editTitleController = TextEditingController(text: controller.postDetail.value!.title);
+    final TextEditingController editContentController = TextEditingController(text: controller.postDetail.value!.content);
     // ✅ 카테고리 로드
-    // controller.fetchCategories();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -29,44 +30,38 @@ class AddPostView extends GetView<CommunityController> {
         actions: [
           TextButton(
             onPressed: () async {
-              if (controller.selectedCategory.value == null) {
-                Get.snackbar('알림', '카테고리를 선택해주세요.');
-                return;
-              }
-
-              if (controller.titleController.text.trim().isEmpty) {
-                Get.snackbar('알림', '제목을 입력해주세요.');
-                return;
-              }
-              if (controller.contentController.text.trim().isEmpty) {
-                Get.snackbar('알림', '내용을 입력해주세요.');
-                return;
-              }
-
-              String cId = controller.selectedCategory.value!.categoryId;
+              // if (controller.titleController.text.trim().isEmpty) {
+              //   Get.snackbar('알림', '제목을 입력해주세요.');
+              //   return;
+              // }
+              // if (controller.contentController.text.trim().isEmpty) {
+              //   Get.snackbar('알림', '내용을 입력해주세요.');
+              //   return;
+              // }
 
               // ✅ 로딩 표시
               Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
 
               try {
-                bool isCreated = await controller.createPost(cId, controller.titleController.text.trim(), controller.contentController.text.trim());
+                String cId = await controller.editPost(controller.postDetail.value!.postId, editTitleController.text.trim(), editContentController.text.trim());
 
                 // ✅ 로딩 닫기
                 Get.back();
 
-                if (isCreated) {
+                if (cId != '') {
                   await controller.fetchPost(cId);
-                  Get.snackbar('성공', '게시글이 작성되었습니다.');
+                  Get.snackbar('성공', '게시글이 수정되었습니다.');
                   controller.clearSelectedCategory();
                   controller.titleController.clear();
                   controller.contentController.clear();
                   Get.offAndToNamed(AppRoute.main);
                 } else {
-                  Get.snackbar('오류', '게시글 작성에 실패했습니다.');
+                  Get.snackbar('오류', '게시글 수정에 실패했습니다.');
                 }
               } catch (e) {
                 // ✅ 로딩 닫기
                 Get.back();
+                print(e);
                 Get.snackbar('오류', '네트워크 오류가 발생했습니다.');
               }
             },
@@ -84,11 +79,6 @@ class AddPostView extends GetView<CommunityController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-
-              // ✅ 카테고리 선택 추가
-              _buildCategorySelector(),
-              SizedBox(height: 16),
-
               // 📝 제목 입력
               Container(
                 width: double.infinity,
@@ -98,14 +88,10 @@ class AddPostView extends GetView<CommunityController> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey[200]!),
                 ),
-                child: TextField(
-                  controller: controller.titleController,
+                child: TextFormField(
+                  controller: editTitleController,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-                  decoration: InputDecoration(
-                    hintText: '제목을 입력하세요',
-                    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 20, fontWeight: FontWeight.bold),
-                    border: InputBorder.none,
-                  ),
+                  decoration: InputDecoration(border: InputBorder.none),
                   maxLines: null,
                 ),
               ),
@@ -159,14 +145,10 @@ class AddPostView extends GetView<CommunityController> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey[200]!),
                 ),
-                child: TextField(
-                  controller: controller.contentController,
+                child: TextFormField(
+                  controller: editContentController,
                   style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6),
-                  decoration: InputDecoration(
-                    hintText: '내용을 입력하세요',
-                    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-                    border: InputBorder.none,
-                  ),
+                  decoration: InputDecoration(border: InputBorder.none),
                   maxLines: null,
                   minLines: 10, // 최소 10줄 높이
                 ),

@@ -172,7 +172,7 @@ void showCreateCommunityDialog(CommunityController controller) {
                                 print('[ERROR] 커뮤니티 생성 과정 실패: $e');
 
                                 if (e.toString().contains('DUPLICATE_COMMUNITY')) {
-                                  // 🚫 중복 오류 처리
+                                  // 중복 오류 처리
                                   Get.snackbar(
                                     '중복 오류',
                                     '이미 존재하는 커뮤니티 이름입니다\n다른 이름을 사용해주세요',
@@ -182,11 +182,36 @@ void showCreateCommunityDialog(CommunityController controller) {
                                     icon: Icon(Icons.warning, color: Colors.orange),
                                     duration: Duration(seconds: 3),
                                   );
+                                } else if (e.toString().contains('UNAUTHORIZED')) {
+                                  // 인증 실패 처리
+                                  Get.snackbar(
+                                    '인증 오류',
+                                    '로그인이 만료되었습니다\n다시 로그인해주세요',
+                                    snackPosition: SnackPosition.TOP,
+                                    backgroundColor: Colors.red[100],
+                                    colorText: Colors.red[800],
+                                    icon: Icon(Icons.login, color: Colors.red),
+                                    duration: Duration(seconds: 4),
+                                  );
+                                  // 필요시 로그인 페이지로 이동
+                                  // Get.offAllNamed('/login');
+                                } else if (e.toString().contains('FORBIDDEN')) {
+                                  Get.back(); // 다이얼로그 닫기
+                                  // 권한 없음 처리
+                                  Get.snackbar(
+                                    '권한 없음',
+                                    '커뮤니티 생성은 관리자만 가능합니다\n관리자에게 문의해주세요',
+                                    snackPosition: SnackPosition.TOP,
+                                    backgroundColor: Colors.red[100],
+                                    colorText: Colors.red[800],
+                                    icon: Icon(Icons.admin_panel_settings, color: Colors.red),
+                                    duration: Duration(seconds: 4),
+                                  );
                                 } else {
-                                  // 일반 오류 처리
+                                  // 일반 오류 처리 (CREATION_ERROR, CREATION_FAILED 모두 포함)
                                   Get.snackbar(
                                     '오류',
-                                    '카테고리 생성 권한이 없습니다.',
+                                    '커뮤니티 생성 권한이 없습니다.',
                                     snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.red[100],
                                     colorText: Colors.red[800],
@@ -197,6 +222,7 @@ void showCreateCommunityDialog(CommunityController controller) {
                                 isLoading.value = false;
                               }
                             },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: EdgeInsets.symmetric(vertical: 12),

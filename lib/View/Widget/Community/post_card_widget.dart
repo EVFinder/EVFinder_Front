@@ -31,7 +31,7 @@ Widget buildPostCard(CommunityPost post, String cId) {
                 SizedBox(width: Get.size.width * 0.02),
               ],
             ),
-            trailing: Icon(Icons.more_vert),
+            // trailing: Icon(Icons.more_vert),
           ),
 
           // 게시글 내용
