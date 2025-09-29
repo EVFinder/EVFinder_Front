@@ -38,6 +38,10 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   var isLoadingComment = false.obs;
   RxMap<String, bool> commentExpandStates = <String, bool>{}.obs;
 
+  // 댓글 수정 상태 관리
+  RxMap<String, bool> editingComments = <String, bool>{}.obs;
+  RxMap<String, TextEditingController> editControllers = <String, TextEditingController>{}.obs;
+
   // 대댓글 관련 변수 추가
   RxString replyingToCommentId = ''.obs; // 현재 답글 중인 댓글 ID
   RxBool isReplying = false.obs; // 답글 모드 여부
@@ -55,6 +59,12 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   void onClose() {
     tabController.dispose();
     scrollController.dispose();
+    // ✅ 모든 편집 컨트롤러 해제
+    for (var controller in editControllers.values) {
+      controller.dispose();
+    }
+    editControllers.clear();
+
     super.onClose();
   }
 
@@ -231,6 +241,141 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
     } finally {
       isLoadingComment.value = false;
     }
+  }
+
+  // ✅ 댓글 수정 시작
+  void startEditComment(String commentId, String currentContent) {
+    editingComments[commentId] = true;
+    editControllers[commentId] = TextEditingController(text: currentContent);
+  }
+
+  // ✅ 댓글 수정 취소
+  void cancelEditComment(String commentId) {
+    editingComments[commentId] = false;
+    editControllers[commentId]?.dispose();
+    editControllers.remove(commentId);
+  }
+
+  // ✅ 댓글 수정 완료 - 수정된 버전
+  Future<void> updateComment(String commentId) async {
+    try {
+      final content = editControllers[commentId]?.text ?? '';
+      if (content.trim().isEmpty) {
+        Get.snackbar('오류', '댓글 내용을 입력해주세요.');
+        return;
+      }
+
+      // ✅ categoryId 우선순위: postDetail -> 현재 선택된 categoryId
+      String cId = '';
+      String pId = '';
+
+      if (postDetail.value != null) {
+        // postDetail에서 categoryId가 비어있다면 현재 선택된 categoryId 사용
+        cId = postDetail.value!.categoryId.isNotEmpty ? postDetail.value!.categoryId : categoryId.value;
+        pId = postDetail.value!.postId;
+      } else {
+        Get.snackbar('오류', '게시글 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      // ✅ 여전히 cId가 비어있다면 에러
+      if (cId.isEmpty) {
+        Get.snackbar('오류', '카테고리 정보를 찾을 수 없습니다.');
+        print('[ERROR] categoryId를 찾을 수 없음 - postDetail.categoryId: ${postDetail.value?.categoryId}, current categoryId: ${categoryId.value}');
+        return;
+      }
+
+      print('[DEBUG] updateComment - cId: $cId, pId: $pId, commentId: $commentId');
+
+      // 기존 서비스 사용
+      final success = await CommentService.editComment(cId, pId, commentId, content.trim());
+
+      if (success) {
+        // 로컬 데이터 업데이트
+        final index = comments.indexWhere((c) => c.commentId == commentId);
+        if (index != -1) {
+          comments[index] = comments[index].copyWith(content: content.trim(), updatedAt: DateTime.now());
+        }
+
+        cancelEditComment(commentId);
+        Get.snackbar('성공', '댓글이 수정되었습니다.', backgroundColor: Colors.green[100], colorText: Colors.green[800]);
+      } else {
+        Get.snackbar('오류', '댓글 수정에 실패했습니다.', backgroundColor: Colors.red[100], colorText: Colors.red[800]);
+      }
+    } catch (e) {
+      print('[ERROR] 댓글 수정 중 오류: $e');
+      Get.snackbar('오류', '댓글 수정 중 오류가 발생했습니다.', backgroundColor: Colors.red[100], colorText: Colors.red[800]);
+    }
+  }
+
+  // ✅ 댓글 삭제도 동일하게 수정
+  Future<void> deleteComment(String commentId) async {
+    try {
+      final result = await Get.dialog<bool>(
+        AlertDialog(
+          title: Text('댓글 삭제'),
+          content: Text('정말로 삭제하시겠습니까?\n삭제된 댓글은 복구할 수 없습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: Text('취소', style: TextStyle(color: Colors.grey[600])),
+            ),
+            TextButton(
+              onPressed: () => Get.back(result: true),
+              child: Text('삭제', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+
+      if (result != true) return;
+
+      // ✅ categoryId 우선순위: postDetail -> 현재 선택된 categoryId
+      String cId = '';
+      String pId = '';
+
+      if (postDetail.value != null) {
+        cId = postDetail.value!.categoryId.isNotEmpty ? postDetail.value!.categoryId : categoryId.value;
+        pId = postDetail.value!.postId;
+      } else {
+        Get.snackbar('오류', '게시글 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      if (cId.isEmpty) {
+        Get.snackbar('오류', '카테고리 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      print('[DEBUG] deleteComment - cId: $cId, pId: $pId, commentId: $commentId');
+
+      Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
+
+      final success = await CommentService.deleteComment(cId, pId, commentId, '');
+
+      Get.back();
+
+      if (success) {
+        comments.removeWhere((c) => c.commentId == commentId);
+        comments.removeWhere((c) => c.parentId == commentId);
+
+        Get.snackbar('성공', '댓글이 삭제되었습니다.', backgroundColor: Colors.green[100], colorText: Colors.green[800]);
+      } else {
+        Get.snackbar('오류', '댓글 삭제에 실패했습니다.', backgroundColor: Colors.red[100], colorText: Colors.red[800]);
+      }
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      print('[ERROR] 댓글 삭제 중 오류: $e');
+      Get.snackbar('오류', '댓글 삭제 중 오류가 발생했습니다.', backgroundColor: Colors.red[100], colorText: Colors.red[800]);
+    }
+  }
+
+  // ✅ 댓글 수정 중인지 확인
+  bool isEditingComment(String commentId) {
+    return editingComments[commentId] ?? false;
   }
 
   List<CommunityComment> get parentComments {
