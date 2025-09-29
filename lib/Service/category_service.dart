@@ -4,7 +4,6 @@ import 'package:evfinder_front/Model/community_category.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Constants/api_constants.dart';
-import '../Model/ev_charger.dart';
 
 class CommunityService {
   static Future<List<CommunityCategory>> fetchCommunityCategory() async {

@@ -6,28 +6,41 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Model/community_comment.dart';
 import '../Service/category_service.dart';
+import '../Service/comment_service.dart';
 import '../Service/post_service.dart';
 
 class CommunityController extends GetxController with GetSingleTickerProviderStateMixin {
   late TabController tabController;
   late ScrollController scrollController;
-
-  // 컨트롤러들
+  RxBool showScrollToTop = false.obs;
+  late SharedPreferences prefs;
 
   // Reactive variables
-  RxBool showScrollToTop = false.obs;
   final RxBool isLoadingPosts = false.obs;
   RxBool isAdmin = false.obs;
+
+  //====Category===
   RxnInt selectedCommunityIndex = RxnInt(); // null을 허용하는 RxInt
   RxList<CommunityCategory> categories = <CommunityCategory>[].obs;
+  RxInt categoryCount = 0.obs;
+  RxString categoryId = ''.obs;
+
+  //====Post===
   RxList<CommunityPost> post = <CommunityPost>[].obs;
   RxList<CommunityPost> myPost = <CommunityPost>[].obs;
   Rxn<CommunityPost> postDetail = Rxn<CommunityPost>();
-  RxInt categoryCount = 0.obs;
-  RxString categoryId = ''.obs;
   RxInt likesCount = 0.obs;
-  late SharedPreferences prefs;
+
+  //====Commnet===
+  var comments = <CommunityComment>[].obs;
+  var isLoadingComment = false.obs;
+  RxMap<String, bool> commentExpandStates = <String, bool>{}.obs;
+
+  // 대댓글 관련 변수 추가
+  RxString replyingToCommentId = ''.obs; // 현재 답글 중인 댓글 ID
+  RxBool isReplying = false.obs; // 답글 모드 여부
 
   @override
   void onInit() {
@@ -187,6 +200,70 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   }
 
   //------------------------------ 댓글 관련 ------------------//
+
+  Future<void> createComment(String cId, String pId, String comment, String? parentId) async {
+    try {
+      bool isCreated = await CommentService.createComment(cId, pId, comment, parentId);
+      if (isCreated) {
+        fetchComment(cId, pId);
+        print('댓글 작성 성공');
+      }
+    } catch (e) {
+      print('댓글 작성 실패: $e');
+    }
+  }
+
+  Future<void> fetchComment(String cId, String pId) async {
+    try {
+      comments.clear();
+      isLoadingComment.value = true;
+
+      List<CommunityComment>? fetchedComments = await CommentService.fetchComment(cId, pId);
+
+      if (fetchedComments != null) {
+        comments.value = fetchedComments;
+        print('[SUCCESS] ${fetchedComments.length}개의 댓글을 불러왔습니다.');
+      } else {
+        print('[ERROR] 댓글을 불러오는데 실패했습니다.');
+        // 사용자에게 에러 메시지 표시
+        Get.snackbar('오류', '댓글을 불러오는데 실패했습니다.');
+      }
+    } finally {
+      isLoadingComment.value = false;
+    }
+  }
+
+  List<CommunityComment> get parentComments {
+    return comments.where((comment) => comment.parentId == null).toList();
+  }
+
+  List<CommunityComment> getReplies(String parentId) {
+    return comments.where((comment) => comment.parentId == parentId).toList();
+  }
+
+  // 대댓글 입력 취소
+  void cancelReply() {
+    replyingToCommentId.value = '';
+    isReplying.value = false;
+  }
+
+  // 대댓글 모드 시작
+  void startReply(String commentId) {
+    replyingToCommentId.value = commentId;
+    isReplying.value = true;
+  }
+
+  // 댓글 펼침/접힘 상태 (commentId: isExpanded)
+
+  // 댓글 펼침/접힘 토글
+  void toggleCommentExpand(String commentId) {
+    commentExpandStates[commentId] = !(commentExpandStates[commentId] ?? true);
+  }
+
+  // 댓글 펼침 상태 확인
+  bool isCommentExpanded(String commentId) {
+    return commentExpandStates[commentId] ?? true; // 기본값: 펼쳐진 상태
+  }
 
   //------------------------------ 커뮤니티 관련 ------------------//
 
