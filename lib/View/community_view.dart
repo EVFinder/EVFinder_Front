@@ -215,6 +215,7 @@ class CommunityView extends GetView<CommunityController> {
                           bool isLike = snapshot.data ?? false;
                           return GestureDetector(
                             onTap: () {
+                              controller.fetchComment(controller.categoryId.value, controller.post[index].postId);
                               Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.post[index].postId, 'isLike': isLike.obs});
                             },
                             child: buildPostCard(
@@ -331,6 +332,7 @@ class CommunityView extends GetView<CommunityController> {
 
                         return GestureDetector(
                           onTap: () {
+                            controller.fetchComment(controller.myPost[index].categoryId, controller.myPost[index].postId);
                             Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs});
                           },
                           child: buildMyCommunityTile(
