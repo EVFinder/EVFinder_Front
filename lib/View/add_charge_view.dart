@@ -51,11 +51,25 @@ class AddChargeView extends GetView<AddChargeController> {
                 itemCount: controller.hostchargeStation.length,
                 itemBuilder: (context, index) {
                   final station = controller.hostchargeStation[index];
+
+                  final raw = (station['status'] ?? '').toString();
+                  final statusText = raw == 'available'
+                      ? '사용 가능'
+                      : raw == 'unavailable'
+                      ? '사용 불가'
+                      : '알 수 없음';
+
                   return AddChargeCard(
                       stationName: station['stationName'],
                       stationAddress: station['address'],
-                      chargerStat: station['status'],
-                        onTap: () => Get.toNamed('/detail', arguments: {'station': station, 'isHost': true}),
+                      chargerStat: statusText,
+                        onTap: () async {
+                        final changed = await Get.toNamed('/detail', arguments: {'station': station, 'isHost': true});
+                        if (changed == true) {
+                          controller.loadHostCharge();
+                        }
+                        }
+                        // => Get.toNamed('/detail', arguments: {'station': station, 'isHost': true}),
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(),

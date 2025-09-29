@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key});
+  const ProfileCard({
+    super.key,
+    required this.userName,
+    required this.email,
+  });
+
+  final String userName;
+  final String email;
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +29,8 @@ class ProfileCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("user", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-                  Text("test123@naver.com", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text(userName, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  Text(email, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   // SizedBox(
                   //   width: 200,
                   //   child: Text("===설명===", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), softWrap: true),

@@ -15,6 +15,8 @@ class ProfileController extends GetxController {
   final newPasswordController = TextEditingController();
   final reserveStation = <Map<String, dynamic>>[].obs;
   final uid = ''.obs;
+  final userName = ''.obs;
+  final email = ''.obs;
 
   @override
   void onInit() {
@@ -32,6 +34,9 @@ class ProfileController extends GetxController {
   Future<void> loadUidAndreserv() async {
     final prefs = await SharedPreferences.getInstance();
     uid.value = prefs.getString('uid') ?? '';
+    userName.value = prefs.getString('name') ?? '';
+    email.value = prefs.getString('email') ?? '';
+
     await loadreservCharge();
   }
 
