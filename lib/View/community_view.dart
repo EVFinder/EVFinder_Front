@@ -222,6 +222,7 @@ class CommunityView extends GetView<CommunityController> {
                               controller.post[index],
                               controller.categoryId.value,
                               isLike, // ✅ isLike 전달
+                              controller,
                             ),
                           );
                         },
@@ -339,6 +340,7 @@ class CommunityView extends GetView<CommunityController> {
                             context,
                             controller.myPost[index],
                             isLike, // ✅ isLike 전달
+                            controller,
                           ),
                         );
                       },

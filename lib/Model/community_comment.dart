@@ -52,4 +52,17 @@ class CommunityComment {
       return DateTime.now(); // 파싱 실패 시 현재 시간 반환
     }
   }
+
+  CommunityComment copyWith({String? commentId, String? parentId, String? content, String? uid, String? authorName, DateTime? createdAt, DateTime? updatedAt, bool? owner}) {
+    return CommunityComment(
+      commentId: commentId ?? this.commentId,
+      parentId: parentId ?? this.parentId,
+      content: content ?? this.content,
+      uid: uid ?? this.uid,
+      authorName: authorName ?? this.authorName,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      owner: owner ?? this.owner,
+    );
+  }
 }
