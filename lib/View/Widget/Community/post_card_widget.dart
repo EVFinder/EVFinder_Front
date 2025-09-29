@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/community_controller.dart';
 import 'package:evfinder_front/Model/community_post.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import '../../../Util/Route/app_page.dart';
 import '../../../Util/convert_time.dart';
 
-Widget buildPostCard(CommunityPost post, String cId, bool isLike) {
+Widget buildPostCard(CommunityPost post, String cId, bool isLike, CommunityController controller) {
   return Card(
     margin: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04, vertical: Get.size.height * 0.01),
     child: Column(
@@ -49,7 +50,16 @@ Widget buildPostCard(CommunityPost post, String cId, bool isLike) {
               SizedBox(width: Get.size.width * 0.03),
               Icon(Icons.comment_outlined, size: Get.size.width * 0.06, color: Color(0xFF078714)),
               SizedBox(width: Get.size.width * 0.02),
-              Text('${1 * 2 + 1}', style: TextStyle(color: Color(0xFF078714))),
+              FutureBuilder<int>(
+                future: controller.getCommentCount(cId, post.postId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text('${snapshot.data}', style: TextStyle(color: Color(0xFF078714)));
+                  } else {
+                    return Text('0', style: TextStyle(color: Color(0xFF078714)));
+                  }
+                },
+              ),
             ],
           ),
         ),
