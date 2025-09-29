@@ -72,7 +72,7 @@ class BnbStationController extends GetxController {
     var urlString = '${ApiConstants.chargerbnbApiUrl}/all';
 
     if(lat != null && lon != null) {
-      urlString += '?lat=$lat&lon=$lon&radiusKm=100';
+      urlString += '?lat=$lat&lon=$lon&radiusKm=20';
     }
 
     final url = Uri.parse(urlString);
