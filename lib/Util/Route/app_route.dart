@@ -25,5 +25,6 @@ class AppRoute {
   static final editpost = EditPostView.route;
   static final managecategory = ManageCategoryView.route;
   static final chatbot = ChatbotView.route;
+  static final find = FindPasswordView.route;
   static final splash = '/';
 }
