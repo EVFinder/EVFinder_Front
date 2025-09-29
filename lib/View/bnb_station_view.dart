@@ -51,10 +51,18 @@ class BnbStationView extends GetView<BnbStationController> {
                     itemCount: controller.bnbchargeStation.length,
                     itemBuilder: (context, index) {
                       final station = controller.bnbchargeStation[index];
+
+                      final raw = (station['status'] ?? '').toString();
+                      final statusText = raw == 'available'
+                          ? '사용 가능'
+                          : raw == 'unavailable'
+                          ? '사용 불가'
+                          : '알 수 없음';
+
                       return BnbChargeCard(
                         stationName: station['stationName'],
                         stationAddress: station['address'],
-                        chargerStat: station['status'],
+                        chargerStat: statusText,
                         chargerType: station['chargerType'],
                         pricePerHour: station['pricePerHour'],
                         power: station['power'],

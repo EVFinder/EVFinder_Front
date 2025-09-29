@@ -19,7 +19,14 @@ class ProfileView extends GetView<ProfileController> {
     return SafeArea(
       child: Column(
         children: [
-          const ProfileCard(), // 지금은 하드 코딩
+          // const ProfileCard(
+          //   userName: ,
+          //   email: ,
+          // ),
+          Obx(() => ProfileCard(
+              userName: controller.userName.value,
+              email: controller.email.value
+          )),
           const SizedBox(height: 20),
           const Divider(thickness: 1.5, endIndent: 20, indent: 20),
 
