@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:evfinder_front/Constants/api_constants.dart';
+import 'package:evfinder_front/Controller/reserv_user_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -103,6 +104,9 @@ class ReservController extends GetxController {
         final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
         response = await http.put(url, headers: headers, body: body);
         successMessage = '수정이 완료되었습니다.';
+        if (Get.isRegistered<ReservUserController>()) {
+          Get.find<ReservUserController>().loadreservCharge();
+        }
       } else {
         final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}');
         response = await http.post(url, headers: headers, body: body);
