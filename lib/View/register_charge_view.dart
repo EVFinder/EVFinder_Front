@@ -178,10 +178,11 @@ class RegisterChargeView extends GetView<RegisterChargeController> {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // 동작은 기존 그대로 사용 (원하면 이동 제거 가능)
-                          controller.register(context);
-                          Get.toNamed("/main");
+                        onPressed: () async {
+                          final ok = await controller.register(context);
+                          if(ok) {
+                            Get.back(result: true);
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _accent,

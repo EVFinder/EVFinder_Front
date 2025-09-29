@@ -17,8 +17,13 @@ class AddChargeView extends GetView<AddChargeController> {
           Padding(
               padding: const EdgeInsets.only(right: 12),
           child: TextButton(
-              onPressed: () {
-                Get.toNamed('/register/new'); //충전소 등록 페이지로 이동해야 함
+              onPressed: () async {
+                final create = await Get.toNamed('/register/new');
+                if(create == true) {
+                  await controller.loadHostCharge();
+                  Get.snackbar('', '새 충전소가 등록되었습니다.',
+                      snackPosition: SnackPosition.BOTTOM);
+                }
               },
             style: TextButton.styleFrom(
               foregroundColor: Colors.white,
