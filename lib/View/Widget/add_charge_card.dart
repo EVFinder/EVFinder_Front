@@ -17,7 +17,7 @@ class AddChargeCard extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    final statusColor = chargerStat == 'available'
+    final statusColor = chargerStat == '사용 가능'
         ? const Color(0xFF10B981)
         : const Color(0xFFEF4444);
 
