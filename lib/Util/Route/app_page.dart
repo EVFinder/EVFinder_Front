@@ -9,6 +9,7 @@ import 'package:evfinder_front/View/chatbot_view.dart';
 import 'package:evfinder_front/View/community_view.dart';
 import 'package:evfinder_front/View/edit_post_view.dart';
 import 'package:evfinder_front/View/favortie_station_view.dart';
+import 'package:evfinder_front/View/find_password_view.dart';
 import 'package:evfinder_front/View/login_view.dart';
 import 'package:evfinder_front/View/main_view.dart';
 import 'package:evfinder_front/View/manage_category_view.dart';
@@ -55,6 +56,7 @@ class AppPages {
     GetPage(name: AppRoute.postdetail, page: () => const PostDetailView()),
     GetPage(name: AppRoute.editpost, page: () => const EditPostView()),
     GetPage(name: AppRoute.managecategory, page: () => ManageCategoryView()),
-    GetPage(name: AppRoute.chatbot, page: () => const ChatbotView())
+    GetPage(name: AppRoute.chatbot, page: () => const ChatbotView()),
+    GetPage(name: AppRoute.find, page: () => const FindPasswordView())
   ];
 }
