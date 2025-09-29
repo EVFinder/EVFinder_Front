@@ -110,7 +110,7 @@ class LoginView extends GetView<LoginController> {
               // 구글 로그인 버튼
               OutlinedButton(
                 onPressed: () {
-                  controller.handleGoogleLogin(context);
+                  controller.signInWithGoogle(context);
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFA7F3D0)), // emerald-200
@@ -137,6 +137,15 @@ class LoginView extends GetView<LoginController> {
                   onPressed: controller.handleSignup,
                   child: const Text(
                     '아직 계정이 없으신가요? 회원가입',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ),
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: () => Get.toNamed("/find"),
+                  child: const Text(
+                    '비밀번호 찾기',
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 ),
