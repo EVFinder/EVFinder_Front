@@ -19,12 +19,13 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
     final isHost = args['isHost'] as bool;
 
     return Scaffold(
+      backgroundColor: Color(0xFFF7F9FC),
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: const BackButton(),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 기존 타이틀은 Expanded로 감싸서 긴 이름도 잘리지 않게 처리
             Expanded(
               child: Text(
                 station['stationName'],
@@ -44,16 +45,22 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                         content: const Text('충전소의 상태를 선택해주세요.'),
                         actions: [
                           TextButton(
-                            onPressed: () {
-                              controller.statChange(station['id'], "available");
-                              Get.toNamed("/main");
+                            onPressed: () async {
+                              final ok = await controller.statChange(station['id'], "available");
+                              if (ok) {
+                                Get.back();
+                                Get.back(result: true);
+                              }
                             },
                             child: const Text('사용 가능'),
                           ),
                           TextButton(
-                            onPressed: () {
-                              controller.statChange(station['id'], "unavailable");
-                              Get.toNamed("/main");
+                            onPressed: () async {
+                              final ok = await controller.statChange(station['id'], "unavailable");
+                              if (ok) {
+                                Get.back();
+                                Get.back(result: true);
+                              }
                             },
                             child: const Text('불가능'),
                           ),
@@ -98,7 +105,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
               onPressed: () {
                 Get.toNamed('/reserv', arguments: station);
               },
-              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0XFF10B981), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
               child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             ),
           ),
@@ -301,7 +308,7 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: const Color(0xFFf2f2f2),
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),

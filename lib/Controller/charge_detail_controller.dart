@@ -39,7 +39,7 @@ class ChargeDetailController extends GetxController {
     uid.value = prefs.getString('uid') ?? '';
   }
 
-  Future<void> statChange(String shareId, String status) async {
+  Future<bool> statChange(String shareId, String status) async {
 
     isLoading.value = true;
     try {
@@ -51,13 +51,15 @@ class ChargeDetailController extends GetxController {
       print('상태 변경 내용: ${response.body}');
 
       if (response.statusCode == 200) {
-        Get.snackbar('', '상태 변경 완료');
+        return true;
       } else{
         throw Exception('Failed to update status. Server responded with ${response.statusCode}');
+        return false;
       }
     } catch (e) {
       print("Error in statChange: $e");
       Get.snackbar("오류", "상태 변경 중 문제가 발생했습니다.");
+      return false;
     }
     finally {
       isLoading.value = false;
