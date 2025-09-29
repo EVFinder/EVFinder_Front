@@ -399,6 +399,8 @@ class PostDetailView extends GetView<CommunityController> {
                                           commentController.text,
                                           parentCommentId, // 대댓글이면 부모 댓글 ID 전달
                                         );
+                                        controller.getCommentCount(categoryId, postId);
+                                        controller.postCommentCounts.refresh();
 
                                         commentController.clear();
                                         controller.cancelReply(); // 대댓글 모드 종료
