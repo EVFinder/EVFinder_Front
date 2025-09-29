@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Service/category_service.dart';
+import '../Service/comment_service.dart';
 import '../Service/post_service.dart';
 
 class CommunityController extends GetxController with GetSingleTickerProviderStateMixin {
@@ -187,6 +188,17 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
   }
 
   //------------------------------ 댓글 관련 ------------------//
+
+  Future<void> createComment(String cId, String pId, String comment, String? parentId) async {
+    try {
+      bool isCreated = await CommentService.createComment(cId, pId, comment, parentId);
+      if (isCreated) {
+        print('댓글 작성 성공');
+      }
+    } catch (e) {
+      print('댓글 작성 실패: $e');
+    }
+  }
 
   //------------------------------ 커뮤니티 관련 ------------------//
 
