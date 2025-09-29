@@ -96,33 +96,33 @@ class LoginController extends GetxController {
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
+      isLoading.value = true;
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return; // 로그인 취소
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
+      if(googleAuth.idToken == null || googleAuth.accessToken==null) {
+        throw Exception('Google 토큰을 가져오지 못했습니다.');
+      }
 
-      final OAuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      final fire = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
+      );
 
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userfire = await FirebaseAuth.instance.signInWithCredential(fire);
+      final user = userfire.user;
+      if (user == null) throw Exception('Firebase 사용자 정보를 가져오지 못했습니다.');
 
-      // final String? idToken = await userCredential.user?.getIdToken();
-      final uid = userCredential.user?.uid;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('uid', uid!);
+      final firebaseIdToken = await user.getIdToken(true);
 
-      // if (idToken == null) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')),
-      //   );
-      //   return;
-      // }
-
-      final User? user = userCredential.user;
       if (user != null) {
         final response = await http.post(
-          Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
+          Uri.parse('${ApiConstants.authApiBaseUrl}/google'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': googleUser.email, 'password': 'GOOGLE_LOGIN_$uid'}), // 구글 로그인 시 비밀번호는 필요 없음
+          body: jsonEncode({
+            'idToken': firebaseIdToken
+          }),
         );
 
         if (response.statusCode == 200) {
@@ -130,54 +130,54 @@ class LoginController extends GetxController {
 
           // if (decoded['success'] == true) {
           final String jwt = decoded['jwt'];
-
           final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('uid', user.uid);
+          await prefs.setString('name', user.displayName!);
+          await prefs.setString('email', user.email!);
           await prefs.setString('jwt', jwt);
 
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Google 로그인 성공')));
 
           success(context, jwt);
-          // } else {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     SnackBar(content: Text('로그인 실패: ${decoded['message']}')),
-          //   );
-          // }
+
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류 발생')));
         }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google 로그인 실패: ${e.toString()}')));
+    }finally {
+      isLoading.value = false;
     }
   }
 
-  Future<void> changePassword(BuildContext context, String newPassword) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      final idToken = await user?.getIdToken();
-
-      if (idToken == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID 토큰을 가져올 수 없습니다.")));
-        return;
-      }
-
-      final response = await http.post(
-        Uri.parse('${ApiConstants.authApiBaseUrl}/changepw'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'idToken': idToken, 'newPassword': newPassword}),
-      );
-
-      final decoded = jsonDecode(response.body);
-      if (decoded['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("비밀번호 변경 완료")));
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("실패: ${decoded['message']}")));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("에러 발생: $e")));
-    }
-  }
+  // Future<void> changePassword(BuildContext context, String newPassword) async {
+  //   try {
+  //     final user = FirebaseAuth.instance.currentUser;
+  //     final idToken = await user?.getIdToken();
+  //
+  //     if (idToken == null) {
+  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID 토큰을 가져올 수 없습니다.")));
+  //       return;
+  //     }
+  //
+  //     final response = await http.post(
+  //       Uri.parse('${ApiConstants.authApiBaseUrl}/changepw'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({'idToken': idToken, 'newPassword': newPassword}),
+  //     );
+  //
+  //     final decoded = jsonDecode(response.body);
+  //     if (decoded['success']) {
+  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("비밀번호 변경 완료")));
+  //       Navigator.pop(context);
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("실패: ${decoded['message']}")));
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("에러 발생: $e")));
+  //   }
+  // }
 
   Future<void> deleteAccount(BuildContext context) async {
     try {
@@ -207,15 +207,15 @@ class LoginController extends GetxController {
     }
   }
 
-  void handleGoogleLogin(BuildContext context) async {
-    isLoading.value = true; // 먼저 로딩 시작
-
-    try {
-      await signInWithGoogle(context); // await 추가
-    } finally {
-      isLoading.value = false; // 항상 로딩 종료
-    }
-  }
+  // void handleGoogleLogin(BuildContext context) async {
+  //   isLoading.value = true; // 먼저 로딩 시작
+  //
+  //   try {
+  //     await signInWithGoogle(context); // await 추가
+  //   } finally {
+  //     isLoading.value = false; // 항상 로딩 종료
+  //   }
+  // }
 
   void handleLogin(BuildContext context) async {
     isLoading.value = true; // 먼저 로딩 시작
