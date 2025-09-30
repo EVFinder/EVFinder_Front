@@ -67,7 +67,7 @@ class BnbStationView extends GetView<BnbStationController> {
                         chargerType: station['chargerType'],
                         pricePerHour: station['pricePerHour'],
                         power: station['power'],
-                        onTap: () => Get.toNamed('/detail', arguments: {'station': station, 'isHost': false}),
+                        onTap: () => Get.toNamed('/detail', arguments: {'station': station}),
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(),
