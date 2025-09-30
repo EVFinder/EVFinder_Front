@@ -145,9 +145,6 @@ class ReservController extends GetxController {
       }
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
-        contactController.clear();
-        startController.clear();
-        endController.clear();
       }else if(_isOverlapError(response)){
         Get.snackbar('', '이미 예약된 시간입니다.');
       }
@@ -162,6 +159,10 @@ class ReservController extends GetxController {
       print('Response Body: ${response.body}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
+    } finally {
+      contactController.clear();
+      startController.clear();
+      endController.clear();
     }
   }
 }
