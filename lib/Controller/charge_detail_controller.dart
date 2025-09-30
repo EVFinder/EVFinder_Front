@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:evfinder_front/Constants/api_constants.dart';
+import 'package:evfinder_front/Controller/bnb_station_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ class ChargeDetailController extends GetxController {
   final bnbReview = <Map<String, dynamic>>[].obs;
   final uid = ''.obs;
   String? stationId;
+  BnbStationController bnbStationController = Get.find<BnbStationController>();
 
   @override
   void dispose() {
@@ -51,6 +53,7 @@ class ChargeDetailController extends GetxController {
       print('상태 변경 내용: ${response.body}');
 
       if (response.statusCode == 200) {
+        bnbStationController.loadBnbCharge(lat: bnbStationController.searchLat.value, lon: bnbStationController.searchLon.value);
         return true;
       } else {
         throw Exception(
