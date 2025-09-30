@@ -80,7 +80,7 @@ class LoginController extends GetxController {
         await prefs.setString('uid', uid); //uid 저장
         await prefs.setString('email', email);
         await prefs.setString('name', userName);
-        Get.snackbar('성공', '로그인 성공');
+        // Get.snackbar('성공', '로그인 성공');
         // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 
         success(context, jwt); // 구글 로그인과 동일하게 처리
@@ -139,7 +139,7 @@ class LoginController extends GetxController {
           // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Google 로그인 성공')));
           Get.snackbar('성공', 'Google 로그인 성공');
 
-          success(context, jwt);
+          // success(context, jwt);
         } else {
           Get.snackbar('오류', '서버 오류 발생');
           // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류 발생')));
