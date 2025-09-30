@@ -16,7 +16,10 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
   Widget build(BuildContext context) {
     final args = Get.arguments as Map<String, dynamic>;
     final station = args['station'] as Map<String, dynamic>;
-    final isHost = args['isHost'] as bool;
+    final ownerUid = station['ownerUid']?.toString();
+    print('$station');
+    print('station uid : $ownerUid');
+    print('컨트롤러 uid :${controller.uid.value}');
 
     return Scaffold(
       backgroundColor: Color(0xFFF7F9FC),
@@ -34,8 +37,12 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
               ),
             ),
             // isHost가 true일 때만 버튼을 보여줍니다.
-            if (isHost)
-              Padding(
+
+            Obx(() {
+              final isOwner = controller.uid.value == ownerUid;
+              if (!isOwner) return const SizedBox.shrink();
+
+              return Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: ElevatedButton(
                   onPressed: () {
@@ -47,20 +54,14 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                           TextButton(
                             onPressed: () async {
                               final ok = await controller.statChange(station['id'], "available");
-                              if (ok) {
-                                Get.back();
-                                Get.back(result: true);
-                              }
+                              if (ok) { Get.back(); Get.back(result: true); }
                             },
                             child: const Text('사용 가능'),
                           ),
                           TextButton(
                             onPressed: () async {
                               final ok = await controller.statChange(station['id'], "unavailable");
-                              if (ok) {
-                                Get.back();
-                                Get.back(result: true);
-                              }
+                              if (ok) { Get.back(); Get.back(result: true); }
                             },
                             child: const Text('불가능'),
                           ),
@@ -73,15 +74,16 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade50,
-                      foregroundColor: Colors.blue.shade800,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      textStyle:
-                      const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    backgroundColor: Colors.blue.shade50,
+                    foregroundColor: Colors.blue.shade800,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
                   child: const Text('상태 변경'),
                 ),
-              ),
+              );
+            }),
           ],
         ),
       ),
@@ -90,25 +92,30 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: SizedBox(
-            height: 52,
-            width: double.infinity,
-            child: isHost
-                ? ElevatedButton(
-              onPressed: () {
-                Get.toNamed('/management', arguments: station);
-              },
-              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-              child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-            )
-                : ElevatedButton(
-              onPressed: () {
-                Get.toNamed('/reserv', arguments: station);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0XFF10B981), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-              child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-            ),
-          ),
+          child: Obx(() {
+            final isOwner = controller.uid.value == ownerUid;
+            return SizedBox(
+              height: 52,
+              width: double.infinity,
+              child: isOwner
+                  ? ElevatedButton(
+                onPressed: () => Get.toNamed('/management', arguments: station),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0XFFFF3B82F6),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+              )
+                  : ElevatedButton(
+                onPressed: () => Get.toNamed('/reserv', arguments: station),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0XFF10B981),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+              ),
+            );
+          }),
         ),
       ),
 

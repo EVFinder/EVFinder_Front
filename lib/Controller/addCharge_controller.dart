@@ -47,6 +47,7 @@ class AddChargeController extends GetxController {
                   "power": e['power']?.toString() ?? '알 수 없음',
                   "pricePerHour": e['pricePerHour'] ?? 0.0,
                   "status": e['status']?.toString() ?? '알 수 없음',
+                  "ownerUid": e['ownerUid']?.toString() ?? '알 수 없음,'
                 },
         ),
       );

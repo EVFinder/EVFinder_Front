@@ -71,7 +71,7 @@ class AddChargeView extends GetView<AddChargeController> {
                       stationAddress: station['address'],
                       chargerStat: statusText,
                         onTap: () async {
-                        final changed = await Get.toNamed('/detail', arguments: {'station': station, 'isHost': true});
+                        final changed = await Get.toNamed('/detail', arguments: {'station': station});
                         if (changed == true) {
                           controller.loadHostCharge();
                         }
