@@ -97,7 +97,7 @@ class ReservUserView extends GetView<ReservUserController> {
                   : () {
                 Get.toNamed(
                   "/reserv",
-                  arguments: {'type': ReserveType.update, 'reservation': reservation},
+                  arguments: {'reservation': reservation, 'isUpdate': true},
                 );
               };
             return ReservUserCard(
