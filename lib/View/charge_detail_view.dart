@@ -1,5 +1,4 @@
 import 'package:evfinder_front/Controller/charge_detail_controller.dart';
-import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:evfinder_front/View/Widget/host_card.dart';
 import 'package:evfinder_front/View/Widget/review_card.dart';
 import 'package:evfinder_front/View/reserv_view.dart';
@@ -108,9 +107,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                 child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
               )
                   : ElevatedButton(
-                onPressed: ()  {
-                  Get.delete<ReservController>(force: true);
-                  Get.toNamed('/reserv', arguments: station);},
+                onPressed: () => Get.toNamed('/reserv', arguments: station),
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF10B981),
                     foregroundColor: Colors.white,
