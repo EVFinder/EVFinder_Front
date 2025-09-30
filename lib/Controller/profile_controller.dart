@@ -40,14 +40,14 @@ class ProfileController extends GetxController {
     await loadreservCharge();
   }
 
-  Future <void> loadreservCharge()async {
+  Future<void> loadreservCharge() async {
     isLoading.value = true;
 
     try {
       final rawReservCharge = await fetchReservCharge(uid.value);
       reserveStation.assignAll(
         rawReservCharge.map(
-              (e) => {
+          (e) => {
             "id": e['id']?.toString() ?? '알 수 없음', //reserveid
             "shareId": e['shareId']?.toString() ?? '알 수 없음',
             "address": e['address']?.toString() ?? '알 수 없음',
@@ -76,14 +76,14 @@ class ProfileController extends GetxController {
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
       return List<Map<String, dynamic>>.from(json);
-    } else{
+    } else {
       throw Exception('Failed to fetch hostCharge');
     }
   }
 
-  Future <void> deleteReserv(String reserveId) async{
+  Future<void> deleteReserv(String reserveId) async {
     if (reserveId == null || reserveId.isEmpty || reserveId == '알 수 없음') {
-      Get.snackbar('', '예약 정보가 올바르지 않습니다.', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('', '예약 정보가 올바르지 않습니다.');
       return;
     }
 
@@ -92,11 +92,11 @@ class ProfileController extends GetxController {
       final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
       final response = await http.delete(url);
 
-      if(response.statusCode == 200) {
-        Get.snackbar('', '예약 취소가 완료되었습니다.', snackPosition: SnackPosition.BOTTOM);
+      if (response.statusCode == 200) {
+        Get.snackbar('', '예약 취소가 완료되었습니다.');
         loadreservCharge();
       } else {
-        Get.snackbar('', '예약 취소를 실패하었습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '예약 취소를 실패하었습니다.');
       }
     } finally {
       isLoading.value = false;
@@ -129,15 +129,15 @@ class ProfileController extends GetxController {
       await FirebaseAuth.instance.signOut();
       await prefs.clear();
       Get.offAll(() => const LoginView());
-      Get.snackbar('', '로그아웃 되었습니다.', snackPosition: SnackPosition.BOTTOM);
-    } catch(e) {
-      Get.snackbar('', '로그아웃 중 문제 발생하였습니다: $e', snackPosition: SnackPosition.BOTTOM);
-    } finally{
+      Get.snackbar('', '로그아웃 되었습니다.');
+    } catch (e) {
+      Get.snackbar('', '로그아웃 중 문제 발생하였습니다: $e');
+    } finally {
       isLoading.value = false;
     }
   }
 
-//비밀번호 변경
+  //비밀번호 변경
   Future<void> changePassword(String newPassword) async {
     try {
       isLoading.value = true;
@@ -146,39 +146,35 @@ class ProfileController extends GetxController {
       final idToken = await user?.getIdToken();
 
       if (idToken == null) {
-        Get.snackbar('', 'ID 토큰을 가져올 수 없습니다.',snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', 'ID 토큰을 가져올 수 없습니다.');
         return;
       }
 
       final response = await http.post(
         Uri.parse('${ApiConstants.authApiBaseUrl}/changepw'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'idToken': idToken,
-          'newPassword': newPassword,
-        }),
+        body: jsonEncode({'idToken': idToken, 'newPassword': newPassword}),
       );
 
-      if(response.statusCode != 200) {
-        Get.snackbar('', '서버 오류 (${response.statusCode})',
-            snackPosition: SnackPosition.BOTTOM);
+      if (response.statusCode != 200) {
+        Get.snackbar('', '서버 오류 (${response.statusCode})');
         return;
       }
 
       final decoded = jsonDecode(response.body);
       if (decoded['success']) {
-        Get.snackbar('', '비밀번호 변경 완료',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '비밀번호 변경 완료');
         Get.back();
       } else {
-        Get.snackbar('', '실패: ${decoded['message']}', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '실패: ${decoded['message']}');
       }
     } catch (e) {
-      Get.snackbar('', '에러 발생: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('', '에러 발생: $e');
     } finally {
       isLoading.value = false;
     }
   }
+
   Future<void> deleteAccount() async {
     try {
       isLoading.value = true;
@@ -187,31 +183,26 @@ class ProfileController extends GetxController {
       final jwt = prefs.getString('jwt'); // 저장된 JWT 토큰
 
       if (jwt == null) {
-        Get.snackbar('', '로그인이 필요합니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '로그인이 필요합니다.');
         return;
       }
 
-      final response = await http.delete(
-        Uri.parse('${ApiConstants.authApiBaseUrl}/delete'),
-        headers: {
-          'Authorization': 'Bearer $jwt',
-          'Content-Type': 'application/json',
-        },
-      );
+      final response = await http.delete(Uri.parse('${ApiConstants.authApiBaseUrl}/delete'), headers: {'Authorization': 'Bearer $jwt', 'Content-Type': 'application/json'});
 
       final decoded = jsonDecode(response.body);
       if (decoded['success'] == true) {
         await FirebaseAuth.instance.signOut();
         await prefs.clear(); // 로그인 정보 삭제
         Get.offAll(() => const LoginView());
-        Get.snackbar('', '회원탈퇴가 완료되었습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '회원탈퇴가 완료되었습니다.');
       } else {
-        Get.snackbar('', '실패: ${decoded['message']}', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '실패: ${decoded['message']}');
       }
     } catch (e) {
-      Get.snackbar('', '오류 발생: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('', '오류 발생: $e');
     }
   }
+
   void confirmDeleteAccount() {
     Get.defaultDialog(
       title: '회원 탈퇴',

@@ -16,7 +16,8 @@ class LoginController extends GetxController {
   // final UserModel _model = UserModel();
 
   Future<void> success(BuildContext context, String jwt) async {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공")));
+    Get.snackbar('성공', '로그인 성공');
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공")));
     await Get.offAndToNamed(AppRoute.main);
   }
 
@@ -36,7 +37,8 @@ class LoginController extends GetxController {
     final password = passwordController.text;
 
     if (!_isValidInput(email, password)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("이메일 또는 비밀번호를 확인하세요.")));
+      Get.snackbar('실패', '이메일 또는 비밀번호를 확인하세요');
+      // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("이메일 또는 비밀번호를 확인하세요.")));
       return;
     }
 
@@ -52,7 +54,8 @@ class LoginController extends GetxController {
       final String? idToken = await userCredential.user?.getIdToken();
 
       if (idToken == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')));
+        Get.snackbar('오류', 'Database에서 ID 토큰을 가져오지 못했습니다.');
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firebase ID 토큰을 가져오지 못했습니다')));
         return;
       }
 
@@ -77,8 +80,8 @@ class LoginController extends GetxController {
         await prefs.setString('uid', uid); //uid 저장
         await prefs.setString('email', email);
         await prefs.setString('name', userName);
-
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
+        // Get.snackbar('성공', '로그인 성공');
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 
         success(context, jwt); // 구글 로그인과 동일하게 처리
         // } else {
@@ -87,10 +90,12 @@ class LoginController extends GetxController {
         //   );
         // }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류가 발생했습니다.')));
+        Get.snackbar('오류', '서버 오류가 발생했습니다.');
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류가 발생했습니다.')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패: ${e.toString()}')));
+      Get.snackbar('실패', '로그인 실패: ${e.toString()}');
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패: ${e.toString()}')));
     }
   }
 
@@ -101,14 +106,11 @@ class LoginController extends GetxController {
       if (googleUser == null) return; // 로그인 취소
 
       final googleAuth = await googleUser.authentication;
-      if(googleAuth.idToken == null || googleAuth.accessToken==null) {
+      if (googleAuth.idToken == null || googleAuth.accessToken == null) {
         throw Exception('Google 토큰을 가져오지 못했습니다.');
       }
 
-      final fire = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
-      );
+      final fire = GoogleAuthProvider.credential(idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
 
       final userfire = await FirebaseAuth.instance.signInWithCredential(fire);
       final user = userfire.user;
@@ -120,9 +122,7 @@ class LoginController extends GetxController {
         final response = await http.post(
           Uri.parse('${ApiConstants.authApiBaseUrl}/google'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'idToken': firebaseIdToken
-          }),
+          body: jsonEncode({'idToken': firebaseIdToken}),
         );
 
         if (response.statusCode == 200) {
@@ -136,17 +136,19 @@ class LoginController extends GetxController {
           await prefs.setString('email', user.email!);
           await prefs.setString('jwt', jwt);
 
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Google 로그인 성공')));
+          // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Google 로그인 성공')));
+          Get.snackbar('성공', 'Google 로그인 성공');
 
-          success(context, jwt);
-
+          // success(context, jwt);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류 발생')));
+          Get.snackbar('오류', '서버 오류 발생');
+          // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류 발생')));
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google 로그인 실패: ${e.toString()}')));
-    }finally {
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google 로그인 실패: ${e.toString()}')));
+      Get.snackbar('오류', 'Google 로그인 실패: ${e.toString()}');
+    } finally {
       isLoading.value = false;
     }
   }
@@ -185,7 +187,8 @@ class LoginController extends GetxController {
       final jwt = prefs.getString('jwt'); // 저장된 JWT 토큰
 
       if (jwt == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("로그인이 필요합니다.")));
+        Get.snackbar('경고', '로그인이 필요합니다');
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("로그인이 필요합니다.")));
         return;
       }
 
@@ -197,13 +200,15 @@ class LoginController extends GetxController {
         await prefs.clear(); // 로그인 정보 삭제
 
         await Get.toNamed(AppRoute.login);
-
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("회원탈퇴가 완료되었습니다.")));
+        Get.snackbar('성공', '회원탈퇴가 완료되었습니다');
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("회원탈퇴가 완료되었습니다.")));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("실패: ${decoded['message']}")));
+        Get.snackbar('실패', '회원탈퇴 실패');
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("실패: ${decoded['message']}")));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("오류 발생: $e")));
+      Get.snackbar('오류', '오류 발생: ${e.toString()}');
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("오류 발생: $e")));
     }
   }
 
