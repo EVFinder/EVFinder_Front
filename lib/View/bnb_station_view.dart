@@ -30,10 +30,10 @@ class BnbStationView extends GetView<BnbStationController> {
             onTap: () async {
               final result = await Get.to(() => const SearchChargerView(searchType: SearchType.bnb));
               if (result != null && result is SearchChargers) {
-                final lat = double.parse(result.y);
-                final lon = double.parse(result.x);
+                controller.searchLat.value = double.parse(result.y);
+                controller.searchLon.value = double.parse(result.x);
 
-                controller.loadBnbCharge(lat: lat, lon: lon);
+                controller.loadBnbCharge(lat: controller.searchLat.value, lon: controller.searchLon.value);
               }
             },
           ),

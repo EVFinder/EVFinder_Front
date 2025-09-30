@@ -169,7 +169,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
             // ),
 
             Obx(() => _SectionCard(
-            title: '리뷰 (${controller.bnbReview.length})',
+            // title: '리뷰 (${controller.bnbReview.length})',
+              title: '리뷰',
               child: Column(
                 children: [
                   if (controller.isLoading.value)
