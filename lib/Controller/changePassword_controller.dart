@@ -33,7 +33,7 @@ class ChangePasswordController extends GetxController {
     final confirmPw = confirmController.text.trim();
 
     if (newPassword.isEmpty) {
-      Get.snackbar('', '비밀번호를 입력하세요', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('', '비밀번호를 입력하세요');
       return;
     }
 
