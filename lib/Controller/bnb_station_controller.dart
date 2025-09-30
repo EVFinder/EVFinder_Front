@@ -17,6 +17,8 @@ class BnbStationController extends GetxController {
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
+  RxDouble searchLat = 37.5665.obs;
+  RxDouble searchLon = 126.9780.obs;
 
   @override
   void onInit() {
