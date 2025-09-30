@@ -15,6 +15,7 @@ class HostView extends GetView<HostController> {
       length: 2,
       child: Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         toolbarHeight: 0,
         bottom: TabBar(
             tabs: <Widget>[

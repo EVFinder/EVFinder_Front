@@ -11,8 +11,10 @@ class AddChargeView extends GetView<AddChargeController> {
   Widget build(BuildContext context) {
     controller.loadHostCharge();
     return Scaffold(
+        backgroundColor: Color(0xFFF7F9FC),
       appBar: AppBar(
         title: const Text("내 충전소"),
+        backgroundColor: Color(0xFFF7F9FC),
         actions: [
           Padding(
               padding: const EdgeInsets.only(right: 12),

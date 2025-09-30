@@ -7,7 +7,6 @@ class ReservUserCard extends StatelessWidget {
     required this.address,
     required this.rating,          // 별점 4.9
     required this.statusText,      // 예: 예약 확정
-    this.statusColor = const Color(0xFF10B981), // ✅ 기본: 그린 칩
     required this.dateText,        // 예: 2025. 09. 26.
     required this.timeText,        // 예: 19시 31분 - 23시 31분
     this.onCancel,
@@ -18,7 +17,6 @@ class ReservUserCard extends StatelessWidget {
   final String address;
   final double rating;
   final String statusText;
-  final Color statusColor;
   final String dateText;
   final String timeText;
   final VoidCallback? onCancel;
@@ -26,6 +24,11 @@ class ReservUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final statusColor = statusText == '예약 확정'
+      ? const Color(0xFF10B981)
+      : const Color(0xFFEF4444);
+
     const textDark = Color(0xFF0F172A);
     const textSub  = Color(0xFF64748B);
     const star     = Color(0xFFF59E0B);
@@ -139,6 +142,7 @@ class ReservUserCard extends StatelessWidget {
             // 버튼들
             Row(
               children: [
+                if(onUpdate != null || onCancel != null)
                 // 예약 수정(그린 아웃라인)
                 Expanded(
                   child: OutlinedButton.icon(
@@ -155,6 +159,7 @@ class ReservUserCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 // 취소(레드 아웃라인)
+                if(onUpdate != null || onCancel != null)
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: onCancel,
