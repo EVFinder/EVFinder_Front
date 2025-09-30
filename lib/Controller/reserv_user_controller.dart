@@ -24,14 +24,14 @@ class ReservUserController extends GetxController {
     await loadreservCharge();
   }
 
-  Future <void> loadreservCharge()async {
+  Future<void> loadreservCharge() async {
     isLoading.value = true;
 
     try {
       final rawReservCharge = await fetchReservCharge(uid.value);
       reserveStation.assignAll(
         rawReservCharge.map(
-              (e) => {
+          (e) => {
             "id": e['id']?.toString() ?? '알 수 없음', //reserveid
             "shareId": e['shareId']?.toString() ?? '알 수 없음',
             "address": e['address']?.toString() ?? '알 수 없음',
@@ -42,7 +42,7 @@ class ReservUserController extends GetxController {
             "startTime": e['startTime']?.toString() ?? '알 수 없음',
             "endTime": e['endTime']?.toString() ?? '알 수 없음',
             "createdAt": e['createdAt']?.toString() ?? '알 수 없음',
-            "rating"     : 0.0,
+            "rating": 0.0,
             "ratingCount": 0,
           },
         ),
@@ -54,6 +54,7 @@ class ReservUserController extends GetxController {
   }
 
   final Map<String, Map<String, dynamic>> _ratingCache = {};
+
   Future<void> _fillRatingsForAll() async {
     final seen = <String>{};
 
@@ -75,13 +76,9 @@ class ReservUserController extends GetxController {
         final stats = _ratingCache[shareId] ?? await fetchReviewStats(shareId);
         _ratingCache[shareId] = stats;
 
-        final avg = (stats['averageRating'] is num)
-            ? (stats['averageRating'] as num).toDouble()
-            : double.tryParse('${stats['averageRating']}') ?? 0.0;
+        final avg = (stats['averageRating'] is num) ? (stats['averageRating'] as num).toDouble() : double.tryParse('${stats['averageRating']}') ?? 0.0;
 
-        final cnt = (stats['count'] is num)
-            ? (stats['count'] as num).toInt()
-            : int.tryParse('${stats['count']}') ?? 0;
+        final cnt = (stats['count'] is num) ? (stats['count'] as num).toInt() : int.tryParse('${stats['count']}') ?? 0;
 
         final updated = Map<String, dynamic>.from(reserveStation[i]);
         updated['rating'] = avg;
@@ -89,11 +86,9 @@ class ReservUserController extends GetxController {
         reserveStation[i] = updated;
 
         seen.add(shareId);
-      } catch (_) {
-      }
+      } catch (_) {}
     }
   }
-
 
   static Future<Map<String, dynamic>> fetchReviewStats(String stationId) async {
     final url = Uri.parse('${ApiConstants.reviewBaseUrl}/stats/$stationId');
@@ -116,14 +111,14 @@ class ReservUserController extends GetxController {
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
       return List<Map<String, dynamic>>.from(json);
-    } else{
+    } else {
       throw Exception('Failed to fetch hostCharge');
     }
   }
 
-  Future <void> deleteReserv(String reserveId) async{
+  Future<void> deleteReserv(String reserveId) async {
     if (reserveId == null || reserveId.isEmpty || reserveId == '알 수 없음') {
-      Get.snackbar('', '예약 정보가 올바르지 않습니다.', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('', '예약 정보가 올바르지 않습니다.');
       return;
     }
 
@@ -132,11 +127,11 @@ class ReservUserController extends GetxController {
       final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
       final response = await http.delete(url);
 
-      if(response.statusCode == 200) {
-        Get.snackbar('', '예약 취소가 완료되었습니다.', snackPosition: SnackPosition.BOTTOM);
+      if (response.statusCode == 200) {
+        Get.snackbar('', '예약 취소가 완료되었습니다.');
         loadreservCharge();
       } else {
-        Get.snackbar('', '예약 취소를 실패하었습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '예약 취소를 실패하었습니다.');
       }
     } finally {
       isLoading.value = false;
