@@ -41,7 +41,7 @@ class MainView extends GetView<MainController> {
                     onPressed: () {
                       controller.setView(0);
                     },
-                    icon: Icon(Icons.groups, size: 25),
+                    icon: Icon(Icons.forum, size: 25),
                     color: controller.selectedIndex.value == 0 ? Colors.green : Colors.black12,
                   ),
                   IconButton(
@@ -62,7 +62,7 @@ class MainView extends GetView<MainController> {
                     onPressed: () {
                       controller.setView(3);
                     },
-                    icon: Icon(Icons.manage_accounts, size: 25),
+                    icon: Icon(Icons.ev_station, size: 25),
                     color: controller.selectedIndex.value == 3 ? Colors.green : Colors.black12,
                   ),
                   IconButton(
