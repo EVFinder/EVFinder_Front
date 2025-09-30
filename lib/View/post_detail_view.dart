@@ -23,9 +23,12 @@ class PostDetailView extends GetView<CommunityController> {
     final String? categoryIdFromArgs = arguments?['cId'];
     final RxBool isLike = (arguments?['isLike'] ?? false);
     TextEditingController commentController = TextEditingController();
+    // controller.isReplying.value = false;
 
     // categoryId 결정: arguments에서 온 cId가 있으면 사용, 없으면 controller의 categoryId 사용
-    final String categoryId = categoryIdFromArgs?.isNotEmpty == true ? categoryIdFromArgs! : controller.categoryId.value;
+    final String categoryId = categoryIdFromArgs?.isNotEmpty == true
+        ? categoryIdFromArgs!
+        : controller.categoryId.value;
 
     // postId가 비어있으면 오류 화면 표시
     if (postId.isEmpty) {
@@ -77,7 +80,9 @@ class PostDetailView extends GetView<CommunityController> {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-                onPressed: () => Get.back(),
+                onPressed: () {
+                  Get.back();
+                },
               ),
             ),
             body: Center(
@@ -88,9 +93,15 @@ class PostDetailView extends GetView<CommunityController> {
                   SizedBox(height: 16),
                   Text('오류가 발생했습니다.', style: TextStyle(fontSize: 16)),
                   SizedBox(height: 8),
-                  Text('${snapshot.error}', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(
+                    '${snapshot.error}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                   SizedBox(height: 16),
-                  ElevatedButton(onPressed: () => Get.back(), child: Text('돌아가기')),
+                  ElevatedButton(
+                    onPressed: () => Get.back(),
+                    child: Text('돌아가기'),
+                  ),
                 ],
               ),
             ),
@@ -103,14 +114,24 @@ class PostDetailView extends GetView<CommunityController> {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-                onPressed: () => Get.back(),
+                onPressed: () {
+                  if(controller.isReplying.value) {
+                    controller.isReplying.value = false;
+                  }
+                  // print(controller.isReplying.value);
+                  Get.back();
+                },
               ),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Obx(() {
                     return IconButton(
-                      icon: Icon(isLike.value ? Icons.favorite : Icons.favorite_border, size: Get.size.width * 0.06, color: Color(0xFF078714)),
+                      icon: Icon(
+                        isLike.value ? Icons.favorite : Icons.favorite_border,
+                        size: Get.size.width * 0.06,
+                        color: Color(0xFF078714),
+                      ),
                       onPressed: () {
                         try {
                           if (isLike.value) {
@@ -133,7 +154,10 @@ class PostDetailView extends GetView<CommunityController> {
                       Get.toNamed(AppRoute.editpost);
                     },
                     () {
-                      controller.deletePost(categoryId, controller.postDetail.value!.postId);
+                      controller.deletePost(
+                        categoryId,
+                        controller.postDetail.value!.postId,
+                      );
                     },
                     controller.postDetail.value!.title,
                     false,
@@ -158,21 +182,51 @@ class PostDetailView extends GetView<CommunityController> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          controller.postDetail.value!.title ?? '제목 없음',
-                                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.3),
+                                          controller.postDetail.value!.title ??
+                                              '제목 없음',
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                            height: 1.3,
+                                          ),
                                         ),
                                       ),
-                                      Text("좋아요: ${controller.postDetail.value!.likes}", style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                      Text(
+                                        "좋아요: ${controller.postDetail.value!.likes}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
                                       SizedBox(width: Get.size.width * 0.02),
                                       Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[100],
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.visibility, size: 14, color: Colors.grey[600]),
+                                            Icon(
+                                              Icons.visibility,
+                                              size: 14,
+                                              color: Colors.grey[600],
+                                            ),
                                             SizedBox(width: 4),
-                                            Text('${controller.postDetail.value!.views ?? 0}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                            Text(
+                                              '${controller.postDetail.value!.views ?? 0}',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -186,7 +240,9 @@ class PostDetailView extends GetView<CommunityController> {
                                     decoration: BoxDecoration(
                                       color: Colors.grey[50],
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.grey[200]!),
+                                      border: Border.all(
+                                        color: Colors.grey[200]!,
+                                      ),
                                     ),
                                     child: Row(
                                       children: [
@@ -194,20 +250,48 @@ class PostDetailView extends GetView<CommunityController> {
                                           radius: 20,
                                           backgroundColor: Colors.blue[100],
                                           child: Text(
-                                            (controller.postDetail.value!.authorName ?? '?')[0].toUpperCase(),
-                                            style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                            (controller
+                                                        .postDetail
+                                                        .value!
+                                                        .authorName ??
+                                                    '?')[0]
+                                                .toUpperCase(),
+                                            style: TextStyle(
+                                              color: Colors.blue[700],
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                controller.postDetail.value!.authorName ?? '익명',
-                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                                                controller
+                                                        .postDetail
+                                                        .value!
+                                                        .authorName ??
+                                                    '익명',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black87,
+                                                ),
                                               ),
-                                              Text(TimeUtils.getTimeAgo(controller.postDetail.value!.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                                              Text(
+                                                TimeUtils.getTimeAgo(
+                                                  controller
+                                                      .postDetail
+                                                      .value!
+                                                      .createdAt,
+                                                ),
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -222,9 +306,19 @@ class PostDetailView extends GetView<CommunityController> {
                                     decoration: BoxDecoration(
                                       color: Colors.grey[50],
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.grey[200]!),
+                                      border: Border.all(
+                                        color: Colors.grey[200]!,
+                                      ),
                                     ),
-                                    child: Text(controller.postDetail.value!.content ?? '내용이 없습니다.', style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.6)),
+                                    child: Text(
+                                      controller.postDetail.value!.content ??
+                                          '내용이 없습니다.',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                        height: 1.6,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: 24),
                                   Divider(thickness: 1),
@@ -232,14 +326,20 @@ class PostDetailView extends GetView<CommunityController> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       '댓글',
-                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ),
                                   // 댓글 섹션
                                   // 댓글 섹션
                                   Obx(() {
                                     if (controller.isLoadingComment.value) {
-                                      return Center(child: CircularProgressIndicator());
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
                                     }
 
                                     if (controller.comments.isEmpty) {
@@ -248,9 +348,18 @@ class PostDetailView extends GetView<CommunityController> {
                                           padding: EdgeInsets.all(32),
                                           child: Column(
                                             children: [
-                                              Icon(Icons.chat_bubble_outline, size: 48, color: Colors.grey[400]),
+                                              Icon(
+                                                Icons.chat_bubble_outline,
+                                                size: 48,
+                                                color: Colors.grey[400],
+                                              ),
                                               SizedBox(height: 8),
-                                              Text('댓글이 없습니다.', style: TextStyle(color: Colors.grey[600])),
+                                              Text(
+                                                '댓글이 없습니다.',
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -258,43 +367,99 @@ class PostDetailView extends GetView<CommunityController> {
                                     }
 
                                     return Column(
-                                      children: controller.parentComments.map((comment) {
-                                        final replies = controller.getReplies(comment.commentId);
-                                        final isExpanded = controller.isCommentExpanded(comment.commentId);
+                                      children: controller.parentComments.map((
+                                        comment,
+                                      ) {
+                                        final replies = controller.getReplies(
+                                          comment.commentId,
+                                        );
+                                        final isExpanded = controller
+                                            .isCommentExpanded(
+                                              comment.commentId,
+                                            );
 
                                         return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             // 최상위 댓글
-                                            buildCommentTile(context, controller, comment),
+                                            buildCommentTile(
+                                              context,
+                                              controller,
+                                              comment,
+                                            ),
 
                                             // 답글 개수 및 접기/펼치기 버튼
                                             if (replies.isNotEmpty)
                                               Padding(
-                                                padding: EdgeInsets.only(left: 20, top: 4, bottom: 8),
+                                                padding: EdgeInsets.only(
+                                                  left: 20,
+                                                  top: 4,
+                                                  bottom: 8,
+                                                ),
                                                 child: Row(
                                                   children: [
                                                     Text(
                                                       '답글 ${replies.length}개',
-                                                      style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w500),
+                                                      style: TextStyle(
+                                                        color: Colors.grey[600],
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                     ),
                                                     SizedBox(width: 8),
                                                     GestureDetector(
                                                       onTap: () {
-                                                        controller.toggleCommentExpand(comment.commentId);
+                                                        controller
+                                                            .toggleCommentExpand(
+                                                              comment.commentId,
+                                                            );
                                                       },
                                                       child: Container(
-                                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                        decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 8,
+                                                              vertical: 4,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color:
+                                                              Colors.grey[100],
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                        ),
                                                         child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
                                                           children: [
                                                             Text(
-                                                              isExpanded ? '접기' : '펼치기',
-                                                              style: TextStyle(color: Color(0xFF078714), fontSize: 12, fontWeight: FontWeight.w500),
+                                                              isExpanded
+                                                                  ? '접기'
+                                                                  : '펼치기',
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                  0xFF078714,
+                                                                ),
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
                                                             ),
                                                             SizedBox(width: 4),
-                                                            Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Color(0xFF078714), size: 16),
+                                                            Icon(
+                                                              isExpanded
+                                                                  ? Icons
+                                                                        .keyboard_arrow_up
+                                                                  : Icons
+                                                                        .keyboard_arrow_down,
+                                                              color: Color(
+                                                                0xFF078714,
+                                                              ),
+                                                              size: 16,
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -304,10 +469,25 @@ class PostDetailView extends GetView<CommunityController> {
                                               ),
 
                                             // 대댓글들 (펼쳐진 상태일 때만 표시)
-                                            if (replies.isNotEmpty && isExpanded)
+                                            if (replies.isNotEmpty &&
+                                                isExpanded)
                                               Container(
-                                                margin: EdgeInsets.only(left: 20),
-                                                child: Column(children: replies.map((reply) => buildCommentTile(context, controller, reply, isReply: true)).toList()),
+                                                margin: EdgeInsets.only(
+                                                  left: 20,
+                                                ),
+                                                child: Column(
+                                                  children: replies
+                                                      .map(
+                                                        (reply) =>
+                                                            buildCommentTile(
+                                                              context,
+                                                              controller,
+                                                              reply,
+                                                              isReply: true,
+                                                            ),
+                                                      )
+                                                      .toList(),
+                                                ),
                                               ),
 
                                             SizedBox(height: 12),
@@ -328,7 +508,14 @@ class PostDetailView extends GetView<CommunityController> {
                           padding: EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), spreadRadius: 1, blurRadius: 5, offset: Offset(0, -2))],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset: Offset(0, -2),
+                              ),
+                            ],
                           ),
                           child: SafeArea(
                             child: Column(
@@ -342,16 +529,26 @@ class PostDetailView extends GetView<CommunityController> {
                                       decoration: BoxDecoration(
                                         color: Colors.blue[50],
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.blue[200]!),
+                                        border: Border.all(
+                                          color: Colors.blue[200]!,
+                                        ),
                                       ),
                                       child: Row(
                                         children: [
-                                          Icon(Icons.reply, color: Colors.blue[600], size: 16),
+                                          Icon(
+                                            Icons.reply,
+                                            color: Colors.blue[600],
+                                            size: 16,
+                                          ),
                                           SizedBox(width: 8),
                                           Expanded(
                                             child: Text(
                                               '답글 작성 중...',
-                                              style: TextStyle(color: Colors.blue[600], fontSize: 14, fontWeight: FontWeight.w500),
+                                              style: TextStyle(
+                                                color: Colors.blue[600],
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                           IconButton(
@@ -359,7 +556,11 @@ class PostDetailView extends GetView<CommunityController> {
                                               controller.cancelReply();
                                               commentController.clear();
                                             },
-                                            icon: Icon(Icons.close, color: Colors.blue[600], size: 16),
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.blue[600],
+                                              size: 16,
+                                            ),
                                             constraints: BoxConstraints(),
                                             padding: EdgeInsets.zero,
                                           ),
@@ -377,9 +578,18 @@ class PostDetailView extends GetView<CommunityController> {
                                       child: TextFormField(
                                         controller: commentController,
                                         decoration: InputDecoration(
-                                          hintText: controller.isReplying.value ? '답글을 입력하세요...' : '댓글을 입력하세요...',
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                          hintText: controller.isReplying.value
+                                              ? '답글을 입력하세요...'
+                                              : '댓글을 입력하세요...',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
                                           filled: true,
                                           fillColor: Colors.grey[50],
                                         ),
@@ -388,10 +598,18 @@ class PostDetailView extends GetView<CommunityController> {
                                     SizedBox(width: 8),
                                     IconButton(
                                       onPressed: () {
-                                        if (commentController.text.trim().isEmpty) return;
+                                        if (commentController.text
+                                            .trim()
+                                            .isEmpty)
+                                          return;
 
                                         // 대댓글인지 일반 댓글인지 확인
-                                        String? parentCommentId = controller.isReplying.value ? controller.replyingToCommentId.value : null;
+                                        String? parentCommentId =
+                                            controller.isReplying.value
+                                            ? controller
+                                                  .replyingToCommentId
+                                                  .value
+                                            : null;
 
                                         controller.createComment(
                                           categoryId,
@@ -399,13 +617,19 @@ class PostDetailView extends GetView<CommunityController> {
                                           commentController.text,
                                           parentCommentId, // 대댓글이면 부모 댓글 ID 전달
                                         );
-                                        controller.getCommentCount(categoryId, postId);
+                                        controller.getCommentCount(
+                                          categoryId,
+                                          postId,
+                                        );
                                         controller.postCommentCounts.refresh();
 
                                         commentController.clear();
                                         controller.cancelReply(); // 대댓글 모드 종료
                                       },
-                                      icon: Icon(Icons.send, color: Color(0xFF078714)),
+                                      icon: Icon(
+                                        Icons.send,
+                                        color: Color(0xFF078714),
+                                      ),
                                     ),
                                   ],
                                 ),
