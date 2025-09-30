@@ -123,7 +123,6 @@ class ReservView extends GetView<ReservController> {
                               pickedDate.year, pickedDate.month, pickedDate.day,
                               pickedTime.hour, pickedTime.minute,
                             );
-                            // ⚠️ 값 포맷은 기존대로 ISO 문자열 유지 (디자인만 변경)
                             controller.startController.text = dt.toIso8601String();
                           }
                         }
@@ -158,6 +157,13 @@ class ReservView extends GetView<ReservController> {
                               pickedDate.year, pickedDate.month, pickedDate.day,
                               pickedTime.hour, pickedTime.minute,
                             );
+
+                            final startText = controller.startController.text.trim();
+                            final startDt = startText.isNotEmpty ? DateTime.tryParse(startText) : null;
+                            if (startDt != null && dt.isBefore(startDt)) {
+                              Get.snackbar('', '종료 시간이 시작 시간보다 빠릅니다.');
+                              return;
+                            }
                             controller.endController.text = dt.toIso8601String();
                           }
                         }

@@ -12,8 +12,10 @@ class ReviewDetailView extends GetView<ReviewDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('리뷰 전체보기'),
+        backgroundColor: Colors.white,
       ),
       body: Column(
         children: [
