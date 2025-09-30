@@ -11,8 +11,8 @@ class ChatMessage {
   final String text;
   final bool isMe;
   final DateTime time;
-  ChatMessage({required this.text, required this.isMe, DateTime? time})
-      : time = time ?? DateTime.now();
+
+  ChatMessage({required this.text, required this.isMe, DateTime? time}) : time = time ?? DateTime.now();
 }
 
 // ⬇️ 대화 메타
@@ -23,11 +23,7 @@ class ConversationMeta {
 
   ConversationMeta({required this.id, required this.title, required this.createdAt});
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'createdAt': createdAt.toIso8601String(),
-  };
+  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'createdAt': createdAt.toIso8601String()};
 
   factory ConversationMeta.fromJson(Map<String, dynamic> j) {
     return ConversationMeta(
@@ -51,6 +47,7 @@ class ChatbotController extends GetxController {
   String _conversationId = '';
   String? _pendingTitle;
   List<ConversationMeta> _convMetas = [];
+
   String get _metaKey => 'chatbot_conversations_meta_${uid.value}';
 
   @override
@@ -78,7 +75,7 @@ class ChatbotController extends GetxController {
 
   Future<void> _loadUserAndMetas() async {
     final prefs = await SharedPreferences.getInstance();
-    uid.value  = prefs.getString('uid')  ?? '';
+    uid.value = prefs.getString('uid') ?? '';
     name.value = prefs.getString('name') ?? '';
 
     final raw = prefs.getString(_metaKey);
@@ -112,22 +109,21 @@ class ChatbotController extends GetxController {
     isloading.value = true;
     try {
       final uri = Uri.parse('${ApiConstants.chatbotApiBaseUrl}/ask');
-      final resp = await http.post(
-        uri,
-        headers: const {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          "uid": uid.value,
-          "conversationId": _conversationId, // 새 대화면 "" 전달
-          "message": text,
-        }),
-      ).timeout(const Duration(seconds: 12));
+      final resp = await http
+          .post(
+            uri,
+            headers: const {'Content-Type': 'application/json; charset=utf-8', 'Accept': 'application/json'},
+            body: jsonEncode({
+              "uid": uid.value,
+              "conversationId": _conversationId, // 새 대화면 "" 전달
+              "message": text,
+            }),
+          )
+          .timeout(const Duration(seconds: 12));
 
       if (resp.statusCode == 200) {
         final data = resp.body.isEmpty ? {} : (jsonDecode(resp.body) as Map<String, dynamic>);
-        final reply    = (data['answer'] ?? '응답이 비었습니다.').toString();
+        final reply = (data['answer'] ?? '응답이 비었습니다.').toString();
         final newIdStr = (data['conversationId'] ?? '').toString();
 
         // 새 ID를 처음 받은 순간 메타 저장
@@ -138,11 +134,7 @@ class ChatbotController extends GetxController {
           final exists = _convMetas.any((m) => m.id == _conversationId);
           if (!exists) {
             final title = (_pendingTitle ?? '새 대화').trim();
-            _convMetas.insert(0, ConversationMeta(
-              id: _conversationId,
-              title: title,
-              createdAt: DateTime.now(),
-            ));
+            _convMetas.insert(0, ConversationMeta(id: _conversationId, title: title, createdAt: DateTime.now()));
             // 최대 100개까지만 보관(선택)
             if (_convMetas.length > 100) _convMetas = _convMetas.take(100).toList();
             await _saveMetas();
@@ -152,12 +144,10 @@ class ChatbotController extends GetxController {
         // 이후 응답 표시
         messages.add(ChatMessage(text: reply, isMe: false));
       } else {
-        Get.snackbar('요청 실패', '(${resp.statusCode}) ${resp.reasonPhrase ?? ''}',
-            snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 2));
+        Get.snackbar('요청 실패', '(${resp.statusCode}) ${resp.reasonPhrase ?? ''}', duration: const Duration(seconds: 2));
       }
     } catch (e) {
-      Get.snackbar('네트워크 오류', e.toString(),
-          snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 2));
+      Get.snackbar('네트워크 오류', e.toString(), duration: const Duration(seconds: 2));
     } finally {
       isloading.value = false;
       _pendingTitle = null; // 제목 후보 초기화
@@ -169,13 +159,11 @@ class ChatbotController extends GetxController {
   Future<List<ChatMessage>> fetchHistory(String conversationId) async {
     final uri = Uri.parse(
       '${ApiConstants.chatbotApiBaseUrl}/history'
-          '?uid=${Uri.encodeQueryComponent(uid.value)}'
-          '&conversationId=${Uri.encodeQueryComponent(conversationId)}',
+      '?uid=${Uri.encodeQueryComponent(uid.value)}'
+      '&conversationId=${Uri.encodeQueryComponent(conversationId)}',
     );
 
-    final resp = await http
-        .get(uri)
-        .timeout(const Duration(seconds: 12));
+    final resp = await http.get(uri).timeout(const Duration(seconds: 12));
 
     if (resp.statusCode == 200) {
       final list = (jsonDecode(resp.body) as List).cast<Map<String, dynamic>>();
@@ -219,29 +207,27 @@ class ChatbotController extends GetxController {
 
   // --- 히스토리 리스트로 이동 ---
   void openHistoryPage() {
-    Get.to(() => ChatHistoryView(
-      items: _convMetas,
-      onTap: (meta) {
-        Get.back();
-        _conversationId = meta.id;
-        loadHistoryAndShow(meta.id);
-      },
-      onDelete: (meta) async {
-        _convMetas.removeWhere((m) => m.id == meta.id);
-        await _saveMetas();
-        update();
-      },
-    ));
+    Get.to(
+      () => ChatHistoryView(
+        items: _convMetas,
+        onTap: (meta) {
+          Get.back();
+          _conversationId = meta.id;
+          loadHistoryAndShow(meta.id);
+        },
+        onDelete: (meta) async {
+          _convMetas.removeWhere((m) => m.id == meta.id);
+          await _saveMetas();
+          update();
+        },
+      ),
+    );
   }
 
   void _scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 50), () {
       if (!scrollCtrl.hasClients) return;
-      scrollCtrl.animateTo(
-        scrollCtrl.position.maxScrollExtent + 80,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-      );
+      scrollCtrl.animateTo(scrollCtrl.position.maxScrollExtent + 80, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
     });
   }
 

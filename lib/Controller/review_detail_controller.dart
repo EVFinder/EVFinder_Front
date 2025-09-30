@@ -73,10 +73,10 @@ class ReviewDetailController extends GetxController {
       print("리뷰 삭제 내용: ${utf8.decode(response.bodyBytes)}");
 
       if(response.statusCode == 200) {
-        Get.snackbar('', '리뷰가 삭제되었습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '리뷰가 삭제되었습니다.');
         loadReviews();
       } else {
-        Get.snackbar('', '리뷰 삭제를 실패하었습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('', '리뷰 삭제를 실패하었습니다.');
       }
     } finally {
       isLoading.value = false;
