@@ -23,6 +23,7 @@ class ProfileView extends GetView<ProfileController> {
           //   userName: ,
           //   email: ,
           // ),
+          SizedBox(height:Get.size.height * 0.03),
           Obx(() => ProfileCard(
               userName: controller.userName.value,
               email: controller.email.value
