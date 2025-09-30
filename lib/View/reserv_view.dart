@@ -179,7 +179,6 @@ class ReservView extends GetView<ReservController> {
                       child: ElevatedButton(
                         onPressed: () {
                           controller.reserv(context);
-                          Get.toNamed("/main");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _accent,
