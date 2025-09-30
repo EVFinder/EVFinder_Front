@@ -143,26 +143,30 @@ class ReservController extends GetxController {
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
       }
+
       if (response.statusCode == 200) {
+        Get.back();
         Get.snackbar('', successMessage);
-      }else if(_isOverlapError(response)){
+        contactController.clear();
+        startController.clear();
+        endController.clear();
+      }else if(response.statusCode == 500){
         Get.snackbar('', '이미 예약된 시간입니다.');
       }
+      // else if(_isOverlapError(response)){
+      //   Get.snackbar('', '이미 예약된 시간입니다.');
+      // }
       else {
         // 서버가 에러 메시지를 준다면 보여주기
         final msg = response.body.isNotEmpty ? response.body : '요청 실패';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('등록 실패(${response.statusCode}) : $msg')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('등록 실패(${response.statusCode}) : $msg')),
+        // );
       }
       print('Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
-    } finally {
-      contactController.clear();
-      startController.clear();
-      endController.clear();
     }
   }
 }
