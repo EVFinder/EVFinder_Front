@@ -133,6 +133,7 @@ class ReservController extends GetxController {
       String successMessage;
       if(isUpdate) {
         final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
+        print('수정 url : $url');
         response = await http.put(url, headers: headers, body: body);
         successMessage = '수정이 완료되었습니다.';
         if (Get.isRegistered<ReservUserController>()) {
@@ -140,6 +141,7 @@ class ReservController extends GetxController {
         }
       } else {
         final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}');
+        print('예약 url $url');
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
       }
