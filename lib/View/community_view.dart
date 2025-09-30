@@ -334,25 +334,18 @@ class CommunityView extends GetView<CommunityController> {
                       ),
                       builder: (context, snapshot) {
                         bool isLike = snapshot.data ?? false;
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          return GestureDetector(
-                            onTap: () {
-                              controller.fetchComment(controller.myPost[index].categoryId, controller.myPost[index].postId);
-                              Get.toNamed(
-                                AppRoute.postdetail,
-                                arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs},
-                              );
-                            },
-                            child: buildMyCommunityTile(
-                              context,
-                              controller.myPost[index],
-                              isLike, // ✅ isLike 전달
-                              controller,
-                            ),
-                          );
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
+                        return GestureDetector(
+                          onTap: () {
+                            controller.fetchComment(controller.myPost[index].categoryId, controller.myPost[index].postId);
+                            Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs});
+                          },
+                          child: buildMyCommunityTile(
+                            context,
+                            controller.myPost[index],
+                            isLike, // ✅ isLike 전달
+                            controller,
+                          ),
+                        );
                       },
                     ),
                   ),
