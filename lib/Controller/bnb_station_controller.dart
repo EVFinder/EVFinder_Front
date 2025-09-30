@@ -17,13 +17,11 @@ class BnbStationController extends GetxController {
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
-  ReviewDetailController reviewDetailController = Get.find<ReviewDetailController>();
 
   @override
   void onInit() {
     super.onInit();
     loadBnbCharge(lat: lat.value, lon: lon.value);
-    reviewDetailController.loadReviews();
   }
 
   @override
