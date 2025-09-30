@@ -19,7 +19,8 @@ class BnbStationView extends GetView<BnbStationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("공유 충전소 목록")),
+      backgroundColor: Color(0xFFF7F9FC),
+      appBar: AppBar(title: const Text("공유 충전소 목록"), backgroundColor: Color(0xFFF7F9FC),),
       // 1. Column을 사용하여 위젯들을 세로로 배치합니다.
       body: Column(
         children: [

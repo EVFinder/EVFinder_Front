@@ -38,33 +38,77 @@ class ReservUserView extends GetView<ReservUserController> {
             final endTimeString = reservation['endTime'];
             final String reserveId = reservation['id'];
 
-            if (startTimeString != null && endTimeString != null) {
-              final startTime = DateTime.parse(startTimeString).toLocal();
-              final endTime = DateTime.parse(endTimeString).toLocal();
+              DateTime? startTime;
+              DateTime? endTime;
+
+              if (startTimeString != null) {
+                startTime = DateTime.parse(startTimeString).toLocal();
+              }
+              if (endTimeString != null) {
+                endTime = DateTime.parse(endTimeString).toLocal();
+              }
+
+            if (startTime != null && endTime != null) {
 
               // 년-월-일 형식
-              dateText = DateFormat('yyyy-MM-dd').format(startTime);
+              final startdateText = DateFormat('yyyy-MM-dd').format(startTime);
+              final enddateText = DateFormat('yyyy-MM-dd').format(endTime);
 
+              dateText = (startdateText == enddateText)
+                  ? startdateText
+                  : '$startdateText-$enddateText';
               // 시간:분:초 형식
               final startTimePart = DateFormat('HH시 mm분').format(startTime);
               final endTimePart = DateFormat('HH시 mm분').format(endTime);
 
               timeText = '$startTimePart-$endTimePart';
             }
+            final now = DateTime.now().toLocal();
+            bool isExpired = false;
+            bool isLockEdit = false;
+
+            if(startTime != null) {
+              final start = DateTime(startTime.year, startTime.month, startTime.day);
+              final nowDate = DateTime(now.year, now.month, now.day);
+              if (start.isBefore(nowDate)) {
+                isExpired = true;
+              }
+            }
+            if(endTime != null && endTime.isBefore(now)) {
+              isExpired = true;
+            }
+            if(!isExpired && startTime != null) {
+              if(now.isAfter(startTime.subtract(const Duration(hours: 1)))){
+                isLockEdit = true;
+              }
+            }
+            final statusText = isExpired
+                ? '만료된 예약입니다.'
+                :(isLockEdit? '수정 불가능한 예약입니다' : '예약 확정');
+
+              final onCancel = (isExpired || isLockEdit)
+                  ? null
+                  : () {
+                controller.confirmDeleteReverse(reserveId);
+              };
+
+              final onUpdate = (isExpired || isLockEdit)
+                  ? null
+                  : () {
+                Get.toNamed(
+                  "/reserv",
+                  arguments: {'type': ReserveType.update, 'reservation': reservation},
+                );
+              };
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
               rating: (reservation['rating'] ?? 0.0) * 1.0,
-              statusText: '예약 확정',
+              statusText: statusText,
               dateText: dateText,
               timeText: timeText,
-              onCancel: () {
-                controller.confirmDeleteReverse(reserveId);
-              },
-              onUpdate: () {
-                print("수정 전달 데이터 $reservation");
-                Get.toNamed("/reserv", arguments : {'type': ReserveType.update, 'reservation': reservation});
-              },
+              onCancel: onCancel,
+              onUpdate: onUpdate,
             );
           });
       }),
