@@ -11,11 +11,6 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    // 화면이 빌드될 때마다 예약 데이터 새로고침
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadreservCharge();
-    });
-
     return SafeArea(
       child: Column(
         children: [
@@ -49,7 +44,10 @@ class ProfileView extends GetView<ProfileController> {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () => Get.toNamed("/reservUser"),
+                      onTap: () async{
+                        Get.toNamed("/reservUser");
+                        await controller.loadreservCharge();
+                      },
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(16),
