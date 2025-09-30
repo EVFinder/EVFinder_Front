@@ -89,7 +89,7 @@ class CommunityView extends GetView<CommunityController> {
           // 참여 중인 커뮤니티 슬라이더
           SliverToBoxAdapter(
             child: Container(
-              height: Get.size.height * 0.21,
+              height: Get.size.height * 0.24,
               padding: EdgeInsets.symmetric(vertical: Get.size.height * 0.02),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +122,7 @@ class CommunityView extends GetView<CommunityController> {
                     return Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.04),
+                        padding: EdgeInsets.symmetric(horizontal: Get.size.width * 0.01),
                         itemCount: controller.categoryCount.value,
                         itemBuilder: (context, index) => _buildCommunityItem(index),
                       ),
