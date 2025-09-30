@@ -213,18 +213,22 @@ class CommunityView extends GetView<CommunityController> {
                         future: controller.fetchLike(controller.categoryId.value, controller.post[index].postId),
                         builder: (context, snapshot) {
                           bool isLike = snapshot.data ?? false;
-                          return GestureDetector(
-                            onTap: () {
-                              controller.fetchComment(controller.categoryId.value, controller.post[index].postId);
-                              Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.post[index].postId, 'isLike': isLike.obs});
-                            },
-                            child: buildPostCard(
-                              controller.post[index],
-                              controller.categoryId.value,
-                              isLike, // ✅ isLike 전달
-                              controller,
-                            ),
-                          );
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            return GestureDetector(
+                              onTap: () {
+                                controller.fetchComment(controller.categoryId.value, controller.post[index].postId);
+                                Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.post[index].postId, 'isLike': isLike.obs});
+                              },
+                              child: buildPostCard(
+                                controller.post[index],
+                                controller.categoryId.value,
+                                isLike, // ✅ isLike 전달
+                                controller,
+                              ),
+                            );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
                         },
                       ),
                       childCount: controller.post.length,
@@ -330,19 +334,25 @@ class CommunityView extends GetView<CommunityController> {
                       ),
                       builder: (context, snapshot) {
                         bool isLike = snapshot.data ?? false;
-
-                        return GestureDetector(
-                          onTap: () {
-                            controller.fetchComment(controller.myPost[index].categoryId, controller.myPost[index].postId);
-                            Get.toNamed(AppRoute.postdetail, arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs});
-                          },
-                          child: buildMyCommunityTile(
-                            context,
-                            controller.myPost[index],
-                            isLike, // ✅ isLike 전달
-                            controller,
-                          ),
-                        );
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return GestureDetector(
+                            onTap: () {
+                              controller.fetchComment(controller.myPost[index].categoryId, controller.myPost[index].postId);
+                              Get.toNamed(
+                                AppRoute.postdetail,
+                                arguments: {'pId': controller.myPost[index].postId, 'cId': controller.myPost[index].categoryId, "isLike": isLike.obs},
+                              );
+                            },
+                            child: buildMyCommunityTile(
+                              context,
+                              controller.myPost[index],
+                              isLike, // ✅ isLike 전달
+                              controller,
+                            ),
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
                       },
                     ),
                   ),
