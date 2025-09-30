@@ -114,10 +114,11 @@ class PostDetailView extends GetView<CommunityController> {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-                onPressed: () {
+                onPressed: () async{
                   if(controller.isReplying.value) {
                     controller.isReplying.value = false;
                   }
+                  await controller.fetchPost(controller.categoryId.value);
                   // print(controller.isReplying.value);
                   Get.back();
                 },
