@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:evfinder_front/Controller/permission_controller.dart';
+import 'package:evfinder_front/Controller/review_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,11 +17,13 @@ class BnbStationController extends GetxController {
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
+  ReviewDetailController reviewDetailController = Get.find<ReviewDetailController>();
 
   @override
   void onInit() {
     super.onInit();
     loadBnbCharge(lat: lat.value, lon: lon.value);
+    reviewDetailController.loadReviews();
   }
 
   @override
