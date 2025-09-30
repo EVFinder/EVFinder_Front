@@ -21,7 +21,7 @@ class ChargeDetailController extends GetxController {
   void onInit() {
     super.onInit();
     _loadUid();
-    loadReview();
+
     final arguments = Get.arguments as Map<String, dynamic>?;
     if(arguments != null) {
       final stationData = arguments['station'] as Map<String, dynamic>?;
@@ -31,7 +31,9 @@ class ChargeDetailController extends GetxController {
         print("리뷰 페이지에 받아 온 정보 : $stationId");
       }
     }
-    loadReview();
+    if (stationId?.isNotEmpty == true) {
+      loadReview();
+    }
   }
 
   Future<void> _loadUid() async {

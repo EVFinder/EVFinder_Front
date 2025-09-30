@@ -7,17 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ReserveType {
-  create,
-  update,
-}
+// enum ReserveType {
+//   create,
+//   update,
+// }
 
 class ReservController extends GetxController {
   final contactController = TextEditingController();
   final startController = TextEditingController();
   final endController = TextEditingController();
 
-  var type = ReserveType.create;
+  // var type = ReserveType.create;
+
+  bool isUpdate = false;
 
   String? uid;
   String? shareId;
@@ -32,13 +34,49 @@ class ReservController extends GetxController {
     selectMode();
   }
 
-  void selectMode() {
-    final arguments = Get.arguments as Map<String, dynamic>?;
-    if(arguments != null) {
-      type = arguments['type'] ?? ReserveType.create;
+  void _resetState() {
+    isUpdate = false;
+    reserveId = null;
+    shareId = null;
+    ownerUid = null;
 
-      if(type == ReserveType.update) { //수정 모드인 경우
-        final reservationData = arguments['reservation'] as Map<String, dynamic>;
+    contactController.clear();
+    startController.clear();
+    endController.clear();
+  }
+
+  void selectMode() {
+    _resetState();
+    isUpdate = false;
+    reserveId = null;
+    shareId = null;
+    ownerUid = null;
+
+
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    isUpdate = (arguments?['isUpdate'] == true) || (arguments?['reservation'] != null);
+    if(arguments != null) {
+      //   type = arguments['type'] ?? ReserveType.create;
+      //
+      //   if(type == ReserveType.update) { //수정 모드인 경우
+      //     final reservationData = arguments['reservation'] as Map<String, dynamic>;
+      //     reserveId = reservationData['id']?.toString();
+      //     shareId = reservationData['shareId']?.toString();
+      //     ownerUid = reservationData['ownerUid']?.toString();
+      //
+      //     contactController.text = reservationData['userPNumber'] ?? '';
+      //     startController.text = reservationData['startTime'] ?? '';
+      //     endController.text = reservationData['endTime'] ?? '';
+      //   } else {
+      //     shareId = arguments['id']?.toString();
+      //     ownerUid = arguments['ownerUid']?.toString();
+      //   }
+      //
+      // }
+      if (isUpdate) {
+        print('수정 모드');
+        final reservationData = arguments['reservation'] as Map<String,
+            dynamic>;
         reserveId = reservationData['id']?.toString();
         shareId = reservationData['shareId']?.toString();
         ownerUid = reservationData['ownerUid']?.toString();
@@ -47,20 +85,13 @@ class ReservController extends GetxController {
         startController.text = reservationData['startTime'] ?? '';
         endController.text = reservationData['endTime'] ?? '';
       } else {
+        print('예약 모드');
         shareId = arguments['id']?.toString();
         ownerUid = arguments['ownerUid']?.toString();
       }
-
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    contactController.dispose();
-    startController.dispose();
-    endController.dispose();
-  }
   Future<void> _loadUidandUsername() async {
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
@@ -100,7 +131,7 @@ class ReservController extends GetxController {
     try {
       http.Response response;
       String successMessage;
-      if(type == ReserveType.update) {
+      if(isUpdate) {
         final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
         response = await http.put(url, headers: headers, body: body);
         successMessage = '수정이 완료되었습니다.';
@@ -113,10 +144,14 @@ class ReservController extends GetxController {
         successMessage = '예약이 완료되었습니다.';
       }
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(successMessage)),
-        );
-      }else {
+        Get.snackbar('', successMessage);
+        contactController.clear();
+        startController.clear();
+        endController.clear();
+      }else if(_isOverlapError(response)){
+        Get.snackbar('', '이미 예약된 시간입니다.');
+      }
+      else {
         // 서버가 에러 메시지를 준다면 보여주기
         final msg = response.body.isNotEmpty ? response.body : '요청 실패';
         ScaffoldMessenger.of(context).showSnackBar(
@@ -128,5 +163,15 @@ class ReservController extends GetxController {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
     }
+  }
+}
+bool _isOverlapError(http.Response resp) {
+  try {
+    final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
+    final text = '${data['message'] ?? ''} ${data['error'] ?? ''} ${data['trace'] ?? ''}';
+    return text.contains('이미 예약된 시간') || text.contains('겹칩니다');
+  } catch (_) {
+    final raw = utf8.decode(resp.bodyBytes);
+    return raw.contains('이미 예약된 시간') || raw.contains('겹칩니다');
   }
 }
