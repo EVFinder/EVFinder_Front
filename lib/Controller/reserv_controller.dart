@@ -7,17 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-// enum ReserveType {
-//   create,
-//   update,
-// }
-
 class ReservController extends GetxController {
   final contactController = TextEditingController();
   final startController = TextEditingController();
   final endController = TextEditingController();
-
-  // var type = ReserveType.create;
 
   bool isUpdate = false;
 
@@ -27,11 +20,14 @@ class ReservController extends GetxController {
   String? userName;
   String? reserveId;
 
+  Map<String, dynamic>? _lastArgs;
+
   @override
   void onInit() {
     super.onInit();
     _loadUidandUsername();
-    selectMode();
+    applyArgs(Get.arguments as Map<String, dynamic>?);
+    // selectMode();
   }
 
   void _resetState() {
@@ -45,38 +41,23 @@ class ReservController extends GetxController {
     endController.clear();
   }
 
-  void selectMode() {
+  // void selectMode() {
+  void applyArgs(Map<String, dynamic>? args) {
+    if (_isSameArgs(args)) return;
+
+    _lastArgs = args;
     _resetState();
-    isUpdate = false;
-    reserveId = null;
-    shareId = null;
-    ownerUid = null;
 
 
-    final arguments = Get.arguments as Map<String, dynamic>?;
-    isUpdate = (arguments?['isUpdate'] == true) || (arguments?['reservation'] != null);
-    if(arguments != null) {
-      //   type = arguments['type'] ?? ReserveType.create;
-      //
-      //   if(type == ReserveType.update) { //수정 모드인 경우
-      //     final reservationData = arguments['reservation'] as Map<String, dynamic>;
-      //     reserveId = reservationData['id']?.toString();
-      //     shareId = reservationData['shareId']?.toString();
-      //     ownerUid = reservationData['ownerUid']?.toString();
-      //
-      //     contactController.text = reservationData['userPNumber'] ?? '';
-      //     startController.text = reservationData['startTime'] ?? '';
-      //     endController.text = reservationData['endTime'] ?? '';
-      //   } else {
-      //     shareId = arguments['id']?.toString();
-      //     ownerUid = arguments['ownerUid']?.toString();
-      //   }
-      //
-      // }
+    // final arguments = Get.arguments as Map<String, dynamic>?;
+    // isUpdate = (arguments?['isUpdate'] == true) || (arguments?['reservation'] != null);
+    final a = args;
+    isUpdate = (a?['isUpdate'] == true) || (a?['reservation'] != null);
+
       if (isUpdate) {
         print('수정 모드');
-        final reservationData = arguments['reservation'] as Map<String,
-            dynamic>;
+        final reservationData = Map<String, dynamic>.from(a!['reservation'] as Map);
+        // arguments['reservation'] as Map<String, dynamic>;
         reserveId = reservationData['id']?.toString();
         shareId = reservationData['shareId']?.toString();
         ownerUid = reservationData['ownerUid']?.toString();
@@ -84,13 +65,29 @@ class ReservController extends GetxController {
         contactController.text = reservationData['userPNumber'] ?? '';
         startController.text = reservationData['startTime'] ?? '';
         endController.text = reservationData['endTime'] ?? '';
+        print('수정 reserveId $reserveId');
+        print('수정shareId $shareId');
+        print('수정 ownerUid $ownerUid');
       } else {
         print('예약 모드');
-        shareId = arguments['id']?.toString();
-        ownerUid = arguments['ownerUid']?.toString();
+        shareId  = a?['id']?.toString();
+        ownerUid = a?['ownerUid']?.toString();
+        // shareId = arguments['id']?.toString();
+        // ownerUid = arguments['ownerUid']?.toString();
+        print('예약 shareId $shareId');
+        print('예약 ownerUid $ownerUid');
       }
-    }
   }
+
+  bool _isSameArgs(Map<String, dynamic>? next) {
+    if (_lastArgs == null && next == null) return true;
+    if (_lastArgs == null || next == null) return false;
+    final a = _lastArgs!;
+    final aKey = (a['reservation']?['id']) ?? a['id'];
+    final bKey = (next['reservation']?['id']) ?? next['id'];
+    return aKey?.toString() == bKey?.toString();
+  }
+
 
   Future<void> _loadUidandUsername() async {
     final prefs = await SharedPreferences.getInstance();
@@ -144,6 +141,9 @@ class ReservController extends GetxController {
         print('예약 url $url');
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
+        if (Get.isRegistered<ReservUserController>()) {
+          Get.find<ReservUserController>().loadreservCharge();
+        }
       }
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
