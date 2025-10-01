@@ -28,7 +28,6 @@ class ProfileController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    loadreservCharge(); // 추가: 화면이 준비될 때마다 예약 데이터 다시 로드
   }
 
   Future<void> loadUidAndreserv() async {
@@ -36,8 +35,6 @@ class ProfileController extends GetxController {
     uid.value = prefs.getString('uid') ?? '';
     userName.value = prefs.getString('name') ?? '';
     email.value = prefs.getString('email') ?? '';
-
-    await loadreservCharge();
   }
 
   Future<void> loadreservCharge() async {
