@@ -490,7 +490,11 @@ class CommunityController extends GetxController with GetSingleTickerProviderSta
 
   // 카테고리 선택 메서드
   void selectCategory(CommunityCategory category) {
-    selectedCategory.value = category;
+    if (category.name == "공지사항" && !isAdmin.value) {
+      Get.snackbar('오류', '공지사항은 관리자만 작성할 수 있습니다');
+    } else {
+      selectedCategory.value = category;
+    }
   }
 
   // 카테고리 초기화
