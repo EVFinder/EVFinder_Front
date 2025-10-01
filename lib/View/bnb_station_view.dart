@@ -20,7 +20,7 @@ class BnbStationView extends GetView<BnbStationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF7F9FC),
-      appBar: AppBar(title: const Text("공유 충전소 목록"), backgroundColor: Color(0xFFF7F9FC),),
+      appBar: AppBar(automaticallyImplyLeading: false, title: const Text("공유 충전소 목록"), backgroundColor: Color(0xFFF7F9FC)),
       // 1. Column을 사용하여 위젯들을 세로로 배치합니다.
       body: Column(
         children: [
@@ -30,10 +30,10 @@ class BnbStationView extends GetView<BnbStationController> {
             onTap: () async {
               final result = await Get.to(() => const SearchChargerView(searchType: SearchType.bnb));
               if (result != null && result is SearchChargers) {
-                final lat = double.parse(result.y);
-                final lon = double.parse(result.x);
+                controller.searchLat.value = double.parse(result.y);
+                controller.searchLon.value = double.parse(result.x);
 
-                controller.loadBnbCharge(lat: lat, lon: lon);
+                controller.loadBnbCharge(lat: controller.searchLat.value, lon: controller.searchLon.value);
               }
             },
           ),
