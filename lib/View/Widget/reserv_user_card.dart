@@ -24,15 +24,12 @@ class ReservUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final statusColor = statusText == '예약 확정'
-      ? const Color(0xFF10B981)
-      : const Color(0xFFEF4444);
+    final statusColor = statusText == '예약 확정' ? const Color(0xFF10B981) : const Color(0xFFEF4444);
 
     const textDark = Color(0xFF0F172A);
-    const textSub  = Color(0xFF64748B);
-    const star     = Color(0xFFF59E0B);
-    const panelBg  = Color(0xFFF7F9FC);
+    const textSub = Color(0xFF64748B);
+    const star = Color(0xFFF59E0B);
+    const panelBg = Color(0xFFF7F9FC);
 
     return Card(
       elevation: 0,
@@ -41,13 +38,7 @@ class ReservUserCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.04),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(.04), blurRadius: 16, offset: const Offset(0, 6))],
           color: Colors.white,
         ),
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
@@ -57,8 +48,7 @@ class ReservUserCard extends StatelessWidget {
             // 제목
             Text(
               stationName,
-              style: const TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w800, color: textDark),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: textDark),
             ),
             const SizedBox(height: 8),
 
@@ -99,10 +89,7 @@ class ReservUserCard extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-              decoration: BoxDecoration(
-                color: panelBg,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: panelBg, borderRadius: BorderRadius.circular(16)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -115,10 +102,7 @@ class ReservUserCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    dateText,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.2),
-                  ),
+                  Text(dateText, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.2)),
                   const SizedBox(height: 16),
 
                   // 시간
@@ -130,50 +114,111 @@ class ReservUserCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    timeText,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.2),
-                  ),
+                  Text(timeText, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.2)),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
             // 버튼들
+            // onUpdate != null || onCancel != null
+            //     ? Row(
+            //         children: [
+            //           // 예약 수정(그린 아웃라인)
+            //           Expanded(
+            //             child: OutlinedButton.icon(
+            //               onPressed: onUpdate,
+            //               icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
+            //               label: const Text(
+            //                 '예약 수정',
+            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+            //               ),
+            //               style: OutlinedButton.styleFrom(
+            //                 side: const BorderSide(color: Color(0xFF10B981)),
+            //                 padding: const EdgeInsets.symmetric(vertical: 14),
+            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            //               ),
+            //             ),
+            //           ),
+            //           const SizedBox(width: 12),
+            //           // 취소(레드 아웃라인)
+            //           Expanded(
+            //             child: OutlinedButton.icon(
+            //               onPressed: onCancel,
+            //               icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+            //               label: const Text(
+            //                 '취소',
+            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+            //               ),
+            //               style: OutlinedButton.styleFrom(
+            //                 side: const BorderSide(color: Color(0xFFEF4444)),
+            //                 padding: const EdgeInsets.symmetric(vertical: 14),
+            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            //                 foregroundColor: const Color(0xFFEF4444),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       )
+            //     : Row(
+            //         children: [
+            //           Expanded(
+            //             child: OutlinedButton.icon(
+            //               onPressed: () {
+            //                 Get.toNamed("/reviewWrite");
+            //               },
+            //               icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
+            //               label: const Text(
+            //                 '리뷰 작성',
+            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
+            //               ),
+            //               style: OutlinedButton.styleFrom(
+            //                 side: const BorderSide(color: Color(0xFF425df5)),
+            //                 padding: const EdgeInsets.symmetric(vertical: 14),
+            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
             Row(
               children: [
-                if(onUpdate != null || onCancel != null)
                 // 예약 수정(그린 아웃라인)
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: onUpdate,
-                    icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
-                    label: const Text('예약 수정',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981))),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF10B981)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                if (onUpdate != null || onCancel != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onUpdate,
+                      icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
+                      label: const Text(
+                        '예약 수정',
+                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(width: 12),
                 // 취소(레드 아웃라인)
-                if(onUpdate != null || onCancel != null)
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: onCancel,
-                    icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
-                    label: const Text('취소',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444))),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFEF4444)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      foregroundColor: const Color(0xFFEF4444),
+                if (onUpdate != null || onCancel != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+                      label: const Text(
+                        '취소',
+                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFEF4444)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        foregroundColor: const Color(0xFFEF4444),
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ],
@@ -185,6 +230,7 @@ class ReservUserCard extends StatelessWidget {
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.text, required this.color});
+
   final String text;
   final Color color;
 
@@ -192,14 +238,10 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: color.withOpacity(.12), borderRadius: BorderRadius.circular(999)),
       child: Text(
         text,
-        style: TextStyle(
-            color: color, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: .2),
+        style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: .2),
       ),
     );
   }

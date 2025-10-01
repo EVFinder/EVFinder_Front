@@ -8,14 +8,13 @@ import '../Controller/reserv_user_controller.dart';
 
 class ReservUserView extends GetView<ReservUserController> {
   const ReservUserView({super.key});
+
   static String route = "/reservUser";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("예약 관리"),
-      ),
+      appBar: AppBar(title: const Text("예약 관리")),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -26,11 +25,11 @@ class ReservUserView extends GetView<ReservUserController> {
         }
 
         return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            itemCount: controller.reserveStation.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final reservation = controller.reserveStation[index];
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          itemCount: controller.reserveStation.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final reservation = controller.reserveStation[index];
             String dateText = '-';
             String timeText = '-';
 
@@ -38,25 +37,22 @@ class ReservUserView extends GetView<ReservUserController> {
             final endTimeString = reservation['endTime'];
             final String reserveId = reservation['id'];
 
-              DateTime? startTime;
-              DateTime? endTime;
+            DateTime? startTime;
+            DateTime? endTime;
 
-              if (startTimeString != null) {
-                startTime = DateTime.parse(startTimeString).toLocal();
-              }
-              if (endTimeString != null) {
-                endTime = DateTime.parse(endTimeString).toLocal();
-              }
+            if (startTimeString != null) {
+              startTime = DateTime.parse(startTimeString).toLocal();
+            }
+            if (endTimeString != null) {
+              endTime = DateTime.parse(endTimeString).toLocal();
+            }
 
             if (startTime != null && endTime != null) {
-
               // 년-월-일 형식
               final startdateText = DateFormat('yyyy-MM-dd').format(startTime);
               final enddateText = DateFormat('yyyy-MM-dd').format(endTime);
 
-              dateText = (startdateText == enddateText)
-                  ? startdateText
-                  : '$startdateText-$enddateText';
+              dateText = (startdateText == enddateText) ? startdateText : '$startdateText-$enddateText';
               // 시간:분:초 형식
               final startTimePart = DateFormat('HH시 mm분').format(startTime);
               final endTimePart = DateFormat('HH시 mm분').format(endTime);
@@ -67,39 +63,34 @@ class ReservUserView extends GetView<ReservUserController> {
             bool isExpired = false;
             bool isLockEdit = false;
 
-            if(startTime != null) {
+            if (startTime != null) {
               final start = DateTime(startTime.year, startTime.month, startTime.day);
               final nowDate = DateTime(now.year, now.month, now.day);
               if (start.isBefore(nowDate)) {
                 isExpired = true;
               }
             }
-            if(endTime != null && endTime.isBefore(now)) {
+            if (endTime != null && endTime.isBefore(now)) {
               isExpired = true;
             }
-            if(!isExpired && startTime != null) {
-              if(now.isAfter(startTime.subtract(const Duration(hours: 1)))){
+            if (!isExpired && startTime != null) {
+              if (now.isAfter(startTime.subtract(const Duration(hours: 1)))) {
                 isLockEdit = true;
               }
             }
-            final statusText = isExpired
-                ? '만료된 예약입니다.'
-                :(isLockEdit? '수정 불가능한 예약입니다' : '예약 확정');
+            final statusText = isExpired ? '만료된 예약입니다.' : (isLockEdit ? '수정 불가능한 예약입니다' : '예약 확정');
 
-              final onCancel = (isExpired || isLockEdit)
-                  ? null
-                  : () {
-                controller.confirmDeleteReverse(reserveId);
-              };
+            final onCancel = (isExpired || isLockEdit)
+                ? null
+                : () {
+                    controller.confirmDeleteReverse(reserveId);
+                  };
 
-              final onUpdate = (isExpired || isLockEdit)
-                  ? null
-                  : () {
-                Get.toNamed(
-                  "/reserv",
-                  arguments: {'reservation': reservation, 'isUpdate': true},
-                );
-              };
+            final onUpdate = (isExpired || isLockEdit)
+                ? null
+                : () {
+                    Get.toNamed("/reserv", arguments: {'reservation': reservation, 'isUpdate': true});
+                  };
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
@@ -110,7 +101,8 @@ class ReservUserView extends GetView<ReservUserController> {
               onCancel: onCancel,
               onUpdate: onUpdate,
             );
-          });
+          },
+        );
       }),
     );
   }
