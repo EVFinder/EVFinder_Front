@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:evfinder_front/Controller/permission_controller.dart';
 import 'package:evfinder_front/Controller/review_detail_controller.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../Constants/api_constants.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,13 +15,14 @@ class BnbStationController extends GetxController {
   Rx<Position?> userPosition = Rx<Position?>(null);
   RxDouble lat = 37.5665.obs;
   RxDouble lon = 126.9780.obs;
-  RxDouble searchLat = 37.5665.obs;
-  RxDouble searchLon = 126.9780.obs;
+  // RxDouble searchLat = 37.5665.obs;
+  // RxDouble searchLon = 126.9780.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadBnbCharge(lat: lat.value, lon: lon.value);
+    initLocation();
+    // loadBnbCharge(lat: lat.value, lon: lon.value);
   }
 
   @override
@@ -40,6 +39,8 @@ class BnbStationController extends GetxController {
       print('위치 로드 성공: ${lat.value}, ${lon.value}');
     } catch (e) {
       print('위치 로드 실패: $e');
+    } finally {
+      await loadBnbCharge(lat: lat.value, lon: lon.value);
     }
   }
 

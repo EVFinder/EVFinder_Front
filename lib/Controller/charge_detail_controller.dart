@@ -56,13 +56,12 @@ class ChargeDetailController extends GetxController {
       print('상태 변경 내용: ${response.body}');
 
       if (response.statusCode == 200) {
-        bnbStationController.loadBnbCharge(lat: bnbStationController.searchLat.value, lon: bnbStationController.searchLon.value);
+        bnbStationController.loadBnbCharge(lat: bnbStationController.lat.value, lon: bnbStationController.lon.value);
         return true;
       } else {
         throw Exception(
           'Failed to update status. Server responded with ${response.statusCode}',
         );
-        return false;
       }
     } catch (e) {
       print("Error in statChange: $e");
