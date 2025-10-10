@@ -29,7 +29,7 @@ class ReviewWriteView extends GetView<ReviewWriteController> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: ElevatedButton(
-            onPressed: () => controller.Review(context),
+            onPressed: () => controller.ReviewWrite(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF10B981),
               foregroundColor: Colors.white,
