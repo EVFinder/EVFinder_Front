@@ -1,4 +1,6 @@
 import 'package:evfinder_front/Controller/charge_detail_controller.dart';
+import 'package:evfinder_front/Controller/reserv_controller.dart';
+import 'package:evfinder_front/Controller/review_write_controller.dart';
 import 'package:evfinder_front/View/Widget/host_card.dart';
 import 'package:evfinder_front/View/Widget/review_card.dart';
 import 'package:evfinder_front/View/reserv_view.dart';
@@ -107,7 +109,11 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                 child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
               )
                   : ElevatedButton(
-                onPressed: () => Get.toNamed('/reserv', arguments: station),
+                onPressed: () {
+                  Get.toNamed('/reserv', arguments:{'station':station});
+                  ReservController recontroller = Get.find<ReservController>();
+                  recontroller.selectMode(); //selectMode 실행
+                },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF10B981),
                     foregroundColor: Colors.white,
@@ -161,15 +167,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
             ),
             const SizedBox(height: 16),
 
-            // 리뷰
-            // _SectionCard(
-            //   title: '리뷰 (3)',
-            //   child: ReviewCard(userName: '길동홍', rating: 3, content: '조음', createdAt: '2021-08-23'),
-            //
-            // ),
             Obx(
               () => _SectionCard(
-                // title: '리뷰 (${controller.bnbReview.length})',
                 title: '리뷰',
                 child: Column(
                   children: [
@@ -225,6 +224,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                           },
                           onEdit: () {
                             Get.toNamed("/reviewWrite", arguments: {'review': review});
+                            ReviewWriteController reviewcontroller = Get.find<ReviewWriteController>();
+                            reviewcontroller.handleArguments();
                           },
                         ),
                       );
@@ -246,22 +247,22 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                     // ),
                     Row(
                       children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Get.toNamed("/reviewWrite", arguments: {'station': station});
-                            },
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFF374151),
-                              side: BorderSide(color: Colors.grey.shade300),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                            child: const Text('리뷰 작성'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
+                        // Expanded(
+                        //   child: OutlinedButton( //리뷰 작성 버튼 예약 확인 페이지로 이동
+                        //     onPressed: () {
+                        //       Get.toNamed("/reviewWrite", arguments: {'station': station});
+                        //     },
+                        //     style: OutlinedButton.styleFrom(
+                        //       backgroundColor: Colors.white,
+                        //       foregroundColor: const Color(0xFF374151),
+                        //       side: BorderSide(color: Colors.grey.shade300),
+                        //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        //       padding: const EdgeInsets.symmetric(vertical: 12),
+                        //     ),
+                        //     child: const Text('리뷰 작성'),
+                        //   ),
+                        // ),
+                        // const SizedBox(width: 10),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {

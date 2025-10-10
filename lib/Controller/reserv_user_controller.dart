@@ -9,6 +9,7 @@ import '../Constants/api_constants.dart';
 class ReservUserController extends GetxController {
   RxBool isLoading = false.obs;
   final reserveStation = <Map<String, dynamic>>[].obs;
+  final userReview = <Map<String, dynamic>>[].obs;
   final uid = ''.obs;
   final ratings = <String, double>{}.obs;
 
@@ -22,6 +23,7 @@ class ReservUserController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     uid.value = prefs.getString('uid') ?? '';
     await loadreservCharge();
+    Review();
   }
 
   Future<void> loadreservCharge() async {
@@ -47,6 +49,7 @@ class ReservUserController extends GetxController {
           },
         ),
       );
+      print('reserveStation : $reserveStation');
     } finally {
       isLoading.value = false;
     }
@@ -150,5 +153,44 @@ class ReservUserController extends GetxController {
         deleteReserv(reserveId);
       },
     );
+  }
+  Future <void> Review() async {
+    try {
+      isLoading.value = true;
+      final review = await fetchReview(uid.value);
+      userReview.assignAll(
+        review.map(
+              (e) =>
+          {
+            // "reviewId": e['reviewId']?.toString() ?? '알 수 없음',
+            "id": e['id']?.toString() ?? '알 수 없음', //shareId
+            // "name": e['name']?.toString() ?? '알 수 없음',
+            // "uid": e['uid']?.toString() ?? '알 수 없음',
+            // "userName": e['userName']?.toString() ?? '알 수 없음',
+            // "rating": e['rating'] ?? 0,
+            // "content": e['content']?.toString() ?? '알 수 없음',
+            // "createdAt":  e['createdAt']?.toString() ?? '알 수 없음',
+            // "updatedAt":  e['updatedAt']?.toString() ?? '알 수 없음',
+          },
+        ),
+      );
+      print('userReview : $userReview');
+    }finally {
+      isLoading.value = false;
+    }
+  }
+  static Future<List<Map<String, dynamic>>> fetchReview(String uid) async {
+    final url = Uri.parse('${ApiConstants.reviewBaseUrl}/list/user/${uid}');
+    final response = await http.get(url);
+
+    print('내가 쓴 리뷰 url : $url');
+    print('내가 쓴 리뷰 코드: ${response.statusCode}');
+    print('내가 쓴 리뷰 내용: ${response.body}');
+    if (response.statusCode == 200) {
+      final List<dynamic> json = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(json);
+    } else{
+      throw Exception('Failed to fetch userReview');
+    }
   }
 }
