@@ -11,7 +11,9 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Scaffold(
+      backgroundColor: Color(0xFFF7F9FC),
+        body: SafeArea(
       child: Column(
         children: [
           // const ProfileCard(
@@ -225,6 +227,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ],
       ),
+        )
     );
   }
 }

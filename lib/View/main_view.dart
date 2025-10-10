@@ -29,6 +29,7 @@ class MainView extends GetView<MainController> {
         // null,
         //Navigation Bar
         bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
           shape: CircularNotchedRectangle(),
           child: Container(
             height: 10,

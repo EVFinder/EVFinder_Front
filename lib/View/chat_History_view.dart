@@ -20,7 +20,8 @@ class ChatHistoryView extends StatelessWidget {
     final fmt = DateFormat('yyyy.MM.dd');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('채팅 기록')),
+      backgroundColor: Color(0xFFF7F9FC),
+      appBar: AppBar(title: const Text('채팅 기록'), backgroundColor: Colors.white,),
       body: items.isEmpty
           ? const Center(child: Text('저장된 대화가 없습니다.'))
           : ListView.separated(
