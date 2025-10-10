@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:evfinder_front/View/Widget/reserv_host_card.dart';
 import 'package:evfinder_front/View/Widget/reserv_user_card.dart';
 import 'package:intl/intl.dart';
 import '../Controller/reserv_controller.dart';
@@ -14,7 +13,8 @@ class ReservUserView extends GetView<ReservUserController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("예약 관리")),
+      backgroundColor: Color(0xFFF7F9FC),
+      appBar: AppBar(title: const Text("예약 관리"), backgroundColor: Colors.white),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -33,9 +33,12 @@ class ReservUserView extends GetView<ReservUserController> {
             String dateText = '-';
             String timeText = '-';
 
+            final shareId = reservation['shareId'];
             final startTimeString = reservation['startTime'];
             final endTimeString = reservation['endTime'];
             final String reserveId = reservation['id'];
+            // final MyReview = controller.userReview.contains(shareId);
+            final MyReview = controller.userReview.any((e) => e['id'] == shareId);
 
             DateTime? startTime;
             DateTime? endTime;
@@ -89,8 +92,25 @@ class ReservUserView extends GetView<ReservUserController> {
             final onUpdate = (isExpired || isLockEdit)
                 ? null
                 : () {
-                    Get.toNamed("/reserv", arguments: {'reservation': reservation, 'isUpdate': true});
+                    Get.toNamed("/reserv", arguments: {'reservation': reservation});
+                    ReservController recontroller = Get.find<ReservController>();
+                    recontroller.selectMode();
                   };
+            final onWriteReview = MyReview
+                ? null
+                : () async {
+                    final ok = await Get.toNamed(
+                      "/reviewWrite",
+                      arguments: {'reservation': reservation},
+                    );
+
+                    // 작성 성공 시 Set에 추가해서 즉시 숨김
+                    if (ok == true) {
+                      controller.userReview.add({"id": shareId});
+                      // controller.userReview.refresh(); RxList는 add로 반응
+                    }
+                  };
+
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
@@ -100,6 +120,10 @@ class ReservUserView extends GetView<ReservUserController> {
               timeText: timeText,
               onCancel: onCancel,
               onUpdate: onUpdate,
+              onWriteReview: onWriteReview,
+              //     () {
+              //   Get.toNamed("/reviewWrite", arguments: {'reservation': reservation});
+              // }
             );
           },
         );

@@ -20,14 +20,10 @@ class ReservController extends GetxController {
   String? userName;
   String? reserveId;
 
-  Map<String, dynamic>? _lastArgs;
-
   @override
   void onInit() {
     super.onInit();
     _loadUidandUsername();
-    applyArgs(Get.arguments as Map<String, dynamic>?);
-    // selectMode();
   }
 
   void _resetState() {
@@ -41,23 +37,14 @@ class ReservController extends GetxController {
     endController.clear();
   }
 
-  // void selectMode() {
-  void applyArgs(Map<String, dynamic>? args) {
-    if (_isSameArgs(args)) return;
-
-    _lastArgs = args;
-    _resetState();
-
-
-    // final arguments = Get.arguments as Map<String, dynamic>?;
-    // isUpdate = (arguments?['isUpdate'] == true) || (arguments?['reservation'] != null);
-    final a = args;
-    isUpdate = (a?['isUpdate'] == true) || (a?['reservation'] != null);
-
-      if (isUpdate) {
-        print('수정 모드');
-        final reservationData = Map<String, dynamic>.from(a!['reservation'] as Map);
-        // arguments['reservation'] as Map<String, dynamic>;
+  void selectMode() {
+    print('select Mode 실행');
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    if(arguments != null) {
+      if(arguments.containsKey('reservation')) {
+        isUpdate = true;
+        final reservationData = arguments['reservation'] as Map<String, dynamic>;
+        print('수정 모드 전달 : $reservationData');
         reserveId = reservationData['id']?.toString();
         shareId = reservationData['shareId']?.toString();
         ownerUid = reservationData['ownerUid']?.toString();
@@ -65,28 +52,19 @@ class ReservController extends GetxController {
         contactController.text = reservationData['userPNumber'] ?? '';
         startController.text = reservationData['startTime'] ?? '';
         endController.text = reservationData['endTime'] ?? '';
-        print('수정 reserveId $reserveId');
-        print('수정shareId $shareId');
-        print('수정 ownerUid $ownerUid');
-      } else {
+        print('예약 수정 모드');
+      }else if(arguments.containsKey('station')) {
+        isUpdate = false;
+        final reserv = arguments['station'] as Map<String, dynamic>;
+        shareId = reserv['id']?.toString();
+        ownerUid = reserv['ownerUid']?.toString();
         print('예약 모드');
-        shareId  = a?['id']?.toString();
-        ownerUid = a?['ownerUid']?.toString();
-        // shareId = arguments['id']?.toString();
-        // ownerUid = arguments['ownerUid']?.toString();
-        print('예약 shareId $shareId');
-        print('예약 ownerUid $ownerUid');
       }
+    }
+    // _resetState(); 입력 창 초기화
+
   }
 
-  bool _isSameArgs(Map<String, dynamic>? next) {
-    if (_lastArgs == null && next == null) return true;
-    if (_lastArgs == null || next == null) return false;
-    final a = _lastArgs!;
-    final aKey = (a['reservation']?['id']) ?? a['id'];
-    final bKey = (next['reservation']?['id']) ?? next['id'];
-    return aKey?.toString() == bKey?.toString();
-  }
 
 
   Future<void> _loadUidandUsername() async {
@@ -123,7 +101,6 @@ class ReservController extends GetxController {
       'userPNumber': userPNumber,
       'startTime': startUtc,
       'endTime': endUtc,
-      'lat': 37.25
     });
     try {
       http.Response response;
@@ -147,11 +124,10 @@ class ReservController extends GetxController {
       }
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
-        contactController.clear();
-        startController.clear();
-        endController.clear();
+        _resetState();
       }else if(_isOverlapError(response)){
         Get.snackbar('', '이미 예약된 시간입니다.');
+        _resetState();
       }
       else {
         // 서버가 에러 메시지를 준다면 보여주기
