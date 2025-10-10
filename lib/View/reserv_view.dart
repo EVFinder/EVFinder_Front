@@ -51,9 +51,6 @@ class ReservView extends GetView<ReservController> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<ReservController>().applyArgs(Get.arguments as Map<String, dynamic>?);
-    });
     return Scaffold(
       backgroundColor: _panelBg,
       appBar: AppBar(

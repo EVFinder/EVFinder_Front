@@ -12,6 +12,7 @@ import 'charge_detail_controller.dart';
 class ReviewWriteController extends GetxController {
   final rating = 0.obs; //별점 저장
   RxBool isLoading = false.obs;
+  // final userReview = <Map<String, dynamic>>[].obs;
   final contentController = TextEditingController();
   final uid = ''.obs;
 
@@ -20,6 +21,7 @@ class ReviewWriteController extends GetxController {
   String? reviewId;
 
   bool isUpdateMode = false;
+  bool isWrite = false; //리뷰 쓴 적 있는지 확인
 
   @override
   void onInit() {
@@ -36,6 +38,7 @@ class ReviewWriteController extends GetxController {
 
   void handleArguments() {
     final arguments = Get.arguments as Map<String, dynamic>?;
+    print('handelArguments 실행');
     if (arguments != null) {
 
       if (arguments.containsKey('review')) {
@@ -47,10 +50,10 @@ class ReviewWriteController extends GetxController {
         rating.value = reviewData['rating'] ?? 0;
         contentController.text = reviewData['content'] ?? '';
         print('수정 모드임');
-      } else if (arguments.containsKey('station')) {
+      } else if (arguments.containsKey('reservation')) {
         isUpdateMode = false;
-        final stationData = arguments['station'] as Map<String, dynamic>;
-        shareId = stationData['id']?.toString();
+        final stationData = arguments['reservation'] as Map<String, dynamic>;
+        shareId = stationData['shareId']?.toString();
         stationName = stationData['stationName']?.toString();
         print('작성 모드임');
       }
@@ -66,7 +69,7 @@ class ReviewWriteController extends GetxController {
     rating.value = newRating;
   }
 
-  Future <void> Review(BuildContext context) async {
+  Future <void> ReviewWrite(BuildContext context) async {
     if (rating.value == 0) {
       Get.snackbar('알림', '별점을 선택해주세요.');
       return;
@@ -126,4 +129,39 @@ class ReviewWriteController extends GetxController {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
     }
   }
+//   Future <void> Review() async {
+//     try {
+//       isLoading.value = true;
+//       final review = await fetchReview(uid.value);
+//       userReview.assignAll(
+//         review.map(
+//             (e) =>
+//                 {
+//                   // "reviewId": e['reviewId']?.toString() ?? '알 수 없음',
+//                   "id": e['id']?.toString() ?? '알 수 없음', //shareId
+//                   // "name": e['name']?.toString() ?? '알 수 없음',
+//                   // "uid": e['uid']?.toString() ?? '알 수 없음',
+//                   // "userName": e['userName']?.toString() ?? '알 수 없음',
+//                   // "rating": e['rating'] ?? 0,
+//                   // "content": e['content']?.toString() ?? '알 수 없음',
+//                   // "createdAt":  e['createdAt']?.toString() ?? '알 수 없음',
+//                   // "updatedAt":  e['updatedAt']?.toString() ?? '알 수 없음',
+//                 },
+//         ),
+//       );
+//     }finally {
+//       isLoading.value = false;
+//     }
+// }
+// static Future<List<Map<String, dynamic>>> fetchReview(String uid) async {
+//     final url = Uri.parse('${ApiConstants.reviewBaseUrl}/list/user/${uid}');
+//     final response = await http.get(url);
+//
+//     if (response.statusCode == 200) {
+//       final List<dynamic> json = jsonDecode(response.body);
+//       return List<Map<String, dynamic>>.from(json);
+//     } else{
+//       throw Exception('Failed to fetch userReview');
+//     }
+// }
 }

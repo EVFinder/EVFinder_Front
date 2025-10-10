@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import '../../Controller/review_write_controller.dart';
 
 class ReservUserCard extends StatelessWidget {
   const ReservUserCard({
@@ -11,6 +14,7 @@ class ReservUserCard extends StatelessWidget {
     required this.timeText,        // 예: 19시 31분 - 23시 31분
     this.onCancel,
     this.onUpdate,
+    this.onWriteReview,
   });
 
   final String stationName;
@@ -21,6 +25,7 @@ class ReservUserCard extends StatelessWidget {
   final String timeText;
   final VoidCallback? onCancel;
   final VoidCallback? onUpdate;
+  final VoidCallback? onWriteReview;
 
   @override
   Widget build(BuildContext context) {
@@ -120,107 +125,112 @@ class ReservUserCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // 버튼들
-            // onUpdate != null || onCancel != null
-            //     ? Row(
-            //         children: [
-            //           // 예약 수정(그린 아웃라인)
-            //           Expanded(
-            //             child: OutlinedButton.icon(
-            //               onPressed: onUpdate,
-            //               icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
-            //               label: const Text(
-            //                 '예약 수정',
-            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-            //               ),
-            //               style: OutlinedButton.styleFrom(
-            //                 side: const BorderSide(color: Color(0xFF10B981)),
-            //                 padding: const EdgeInsets.symmetric(vertical: 14),
-            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            //               ),
-            //             ),
+            //버튼들
+            onUpdate != null || onCancel != null
+                ? Row(
+                    children: [
+                      // 예약 수정(그린 아웃라인)
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: onUpdate,
+                          icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
+                          label: const Text(
+                            '예약 수정',
+                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF10B981)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // 취소(레드 아웃라인)
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: onCancel,
+                          icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+                          label: const Text(
+                            '취소',
+                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFEF4444)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            foregroundColor: const Color(0xFFEF4444),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : (onWriteReview != null)
+                  ? Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: onWriteReview,
+                          //     () {
+                          //   Get.toNamed("/reviewWrite");
+                          //   ReviewWriteController reviewcontroller = Get.find<ReviewWriteController>();
+                          //   reviewcontroller.handleArguments();
+                          // },
+                          icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
+                          label: const Text(
+                            '리뷰 작성',
+                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF425df5)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(), //숨김
+            // Row(
+            //   children: [
+            //     // 예약 수정(그린 아웃라인)
+            //     if (onUpdate != null || onCancel != null)
+            //       Expanded(
+            //         child: OutlinedButton.icon(
+            //           onPressed: onUpdate,
+            //           icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
+            //           label: const Text(
+            //             '예약 수정',
+            //             style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
             //           ),
-            //           const SizedBox(width: 12),
-            //           // 취소(레드 아웃라인)
-            //           Expanded(
-            //             child: OutlinedButton.icon(
-            //               onPressed: onCancel,
-            //               icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
-            //               label: const Text(
-            //                 '취소',
-            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
-            //               ),
-            //               style: OutlinedButton.styleFrom(
-            //                 side: const BorderSide(color: Color(0xFFEF4444)),
-            //                 padding: const EdgeInsets.symmetric(vertical: 14),
-            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            //                 foregroundColor: const Color(0xFFEF4444),
-            //               ),
-            //             ),
+            //           style: OutlinedButton.styleFrom(
+            //             side: const BorderSide(color: Color(0xFF10B981)),
+            //             padding: const EdgeInsets.symmetric(vertical: 14),
+            //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             //           ),
-            //         ],
-            //       )
-            //     : Row(
-            //         children: [
-            //           Expanded(
-            //             child: OutlinedButton.icon(
-            //               onPressed: () {
-            //                 Get.toNamed("/reviewWrite");
-            //               },
-            //               icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
-            //               label: const Text(
-            //                 '리뷰 작성',
-            //                 style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
-            //               ),
-            //               style: OutlinedButton.styleFrom(
-            //                 side: const BorderSide(color: Color(0xFF425df5)),
-            //                 padding: const EdgeInsets.symmetric(vertical: 14),
-            //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            //               ),
-            //             ),
-            //           ),
-            //         ],
+            //         ),
             //       ),
-            Row(
-              children: [
-                // 예약 수정(그린 아웃라인)
-                if (onUpdate != null || onCancel != null)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onUpdate,
-                      icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
-                      label: const Text(
-                        '예약 수정',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 12),
-                // 취소(레드 아웃라인)
-                if (onUpdate != null || onCancel != null)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onCancel,
-                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
-                      label: const Text(
-                        '취소',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFEF4444)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        foregroundColor: const Color(0xFFEF4444),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            //     const SizedBox(width: 12),
+            //     // 취소(레드 아웃라인)
+            //     if (onUpdate != null || onCancel != null)
+            //       Expanded(
+            //         child: OutlinedButton.icon(
+            //           onPressed: onCancel,
+            //           icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+            //           label: const Text(
+            //             '취소',
+            //             style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+            //           ),
+            //           style: OutlinedButton.styleFrom(
+            //             side: const BorderSide(color: Color(0xFFEF4444)),
+            //             padding: const EdgeInsets.symmetric(vertical: 14),
+            //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            //             foregroundColor: const Color(0xFFEF4444),
+            //           ),
+            //         ),
+            //       ),
+            //   ],
+            // ),
           ],
         ),
       ),
