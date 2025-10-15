@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "798822824658-2v4vfqj9qgvvsb9os8dt0ip39fum32l6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.evfinder_front",
+            "certificate_hash": "c5791bd8adfc0ba2dccdeda21f28900e5ae99871"
+          }
+        },
+        {
           "client_id": "798822824658-eukc0nt9scg7jd75u0ofhfq0afqo79qf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -45,6 +53,13 @@
             {
               "client_id": "798822824658-5cg1dfu4s36n0m0tahhf3e4h8b9ahqhq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "798822824658-ldgr9ng7ic73lsf182tdvos79vvhhqsi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.evfinderFront"
+              }
             }
           ]
         }

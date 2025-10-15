@@ -12,9 +12,11 @@ class ReservUserCard extends StatelessWidget {
     required this.statusText,      // 예: 예약 확정
     required this.dateText,        // 예: 2025. 09. 26.
     required this.timeText,        // 예: 19시 31분 - 23시 31분
-    this.onCancel,
-    this.onUpdate,
-    this.onWriteReview,
+    this.onCancel, //예약 취소
+    this.onUpdate, //예약 수정
+    this.onWriteReview, //리뷰 작성
+    this.onPay,
+    this.onPayCancel,
   });
 
   final String stationName;
@@ -26,6 +28,8 @@ class ReservUserCard extends StatelessWidget {
   final VoidCallback? onCancel;
   final VoidCallback? onUpdate;
   final VoidCallback? onWriteReview;
+  final VoidCallback? onPay;
+  final VoidCallback? onPayCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -165,32 +169,93 @@ class ReservUserCard extends StatelessWidget {
                       ),
                     ],
                   )
-                : (onWriteReview != null)
-                  ? Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: onWriteReview,
-                          //     () {
-                          //   Get.toNamed("/reviewWrite");
-                          //   ReviewWriteController reviewcontroller = Get.find<ReviewWriteController>();
-                          //   reviewcontroller.handleArguments();
-                          // },
-                          icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
-                          label: const Text(
-                            '리뷰 작성',
-                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF425df5)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          ),
-                        ),
+                : Row(
+                children: [
+                  (onPay != null)
+                  ? Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onPay,
+                      icon: const Icon(Icons.receipt_long_outlined, size: 20, color: Color(0xFF10B981)),
+                      label: const Text(
+                        '결제하기',
+                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
                       ),
-                    ],
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
                   )
-                : const SizedBox.shrink(), //숨김
+              : Expanded( //이용 시간 지날 경우 숨겨야 함
+                    child: OutlinedButton.icon(
+                      onPressed: onPayCancel,
+                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+                      label: const Text(
+                        '결제 취소',
+                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFEF4444)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        foregroundColor: const Color(0xFFEF4444),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  (onWriteReview != null)
+                  ?  Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: onWriteReview,
+                              //     () {
+                              //   Get.toNamed("/reviewWrite");
+                              //   ReviewWriteController reviewcontroller = Get.find<ReviewWriteController>();
+                              //   reviewcontroller.handleArguments();
+                              // },
+                              icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
+                              label: const Text(
+                                '리뷰 작성',
+                                style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF425df5)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                            ),
+                          )
+                        :const SizedBox.shrink(),
+                        ],
+                      )
+                  ],
+            )
+                // : (onWriteReview != null)
+                //   ? Row(
+                //     children: [
+                //       Expanded(
+                //         child: OutlinedButton.icon(
+                //           onPressed: onWriteReview,
+                //           //     () {
+                //           //   Get.toNamed("/reviewWrite");
+                //           //   ReviewWriteController reviewcontroller = Get.find<ReviewWriteController>();
+                //           //   reviewcontroller.handleArguments();
+                //           // },
+                //           icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF425df5)),
+                //           label: const Text(
+                //             '리뷰 작성',
+                //             style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF425df5)),
+                //           ),
+                //           style: OutlinedButton.styleFrom(
+                //             side: const BorderSide(color: Color(0xFF425df5)),
+                //             padding: const EdgeInsets.symmetric(vertical: 14),
+                //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   )
+                // : const SizedBox.shrink(), //숨김
             // Row(
             //   children: [
             //     // 예약 수정(그린 아웃라인)
@@ -231,10 +296,8 @@ class ReservUserCard extends StatelessWidget {
             //       ),
             //   ],
             // ),
-          ],
         ),
-      ),
-    );
+      );
   }
 }
 

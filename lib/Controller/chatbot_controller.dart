@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../View/chat_History_view.dart'; // 날짜 포맷용
+import '../View/chat_History_view.dart';
 
 class ChatMessage {
   final String text;
