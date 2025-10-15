@@ -26,5 +26,6 @@ class AppRoute {
   static final managecategory = ManageCategoryView.route;
   static final chatbot = ChatbotView.route;
   static final find = FindPasswordView.route;
+  static final paymentHistory = PaymentHistoryView.route;
   static final splash = '/';
 }

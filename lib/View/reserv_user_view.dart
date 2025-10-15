@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:evfinder_front/View/Widget/reserv_user_card.dart';
 import 'package:intl/intl.dart';
 import '../Controller/reserv_controller.dart';
 import '../Controller/reserv_user_controller.dart';
+import 'package:collection/collection.dart';
+
 
 class ReservUserView extends GetView<ReservUserController> {
   const ReservUserView({super.key});
@@ -39,6 +42,19 @@ class ReservUserView extends GetView<ReservUserController> {
             final String reserveId = reservation['id'];
             // final MyReview = controller.userReview.contains(shareId);
             final MyReview = controller.userReview.any((e) => e['id'] == shareId);
+            final isPaid = controller.userPay.any((e) => e['status'] != 'SUCCESS'? false : (e['reserveId'] == reservation['id'] ? true : false));
+            final String? tid = controller.userPay
+                .where((e) => e['reserveId'] == reservation['id'])
+                .map((e) => (e['tid'] ?? e['paymentId'])?.toString())
+                .firstWhereOrNull((v) => v?.isNotEmpty == true);
+
+            // final rid = (reservation['id'] ?? '').toString();
+            // final isPaid = controller.userPay.any((e) {
+            //   final status = (e['status'] ?? '').toString().toUpperCase().trim();
+            //   final paidRid = (e['reserveId'] ?? '').toString();
+            //   return status == 'SUCCESS' && paidRid == rid;
+            // });
+
 
             DateTime? startTime;
             DateTime? endTime;
@@ -111,6 +127,11 @@ class ReservUserView extends GetView<ReservUserController> {
                     }
                   };
 
+            final onPay = isPaid
+                ? null
+                : () {
+              controller.kakaopay(reservation: reservation);
+            };
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
@@ -120,7 +141,11 @@ class ReservUserView extends GetView<ReservUserController> {
               timeText: timeText,
               onCancel: onCancel,
               onUpdate: onUpdate,
+              onPay: onPay,
+                  // () => controller.kakaopay(reservation: reservation),
               onWriteReview: onWriteReview,
+              onPayCancel: (tid == null) ? null : () => controller.cancelPayment(tid: tid),
+                  // () => controller.cancelPayment(tid: tid),
               //     () {
               //   Get.toNamed("/reviewWrite", arguments: {'reservation': reservation});
               // }
