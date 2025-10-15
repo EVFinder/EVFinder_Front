@@ -1,17 +1,22 @@
+import 'package:evfinder_front/View/Widget/reserv_timechip_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/reserv_controller.dart';
+import 'package:table_calendar/table_calendar.dart';
+
+import 'Widget/reserv_calendar_widget.dart';
 
 class ReservView extends GetView<ReservController> {
   const ReservView({super.key});
+
   static String route = "/reserv";
 
   // 스타일
   static const _textDark = Color(0xFF0F172A);
-  static const _textSub  = Color(0xFF6B7280);
-  static const _border   = Color(0xFFE5E7EB);
-  static const _panelBg  = Color(0xFFF7F9FC);
-  static const _accent   = Color(0xFF10B981);
+  static const _textSub = Color(0xFF6B7280);
+  static const _border = Color(0xFFE5E7EB);
+  static const _panelBg = Color(0xFFF7F9FC);
+  static const _accent = Color(0xFF10B981);
 
   InputDecoration _decoration(String hint, {Widget? prefix, Widget? suffix}) {
     return InputDecoration(
@@ -29,9 +34,7 @@ class ReservView extends GetView<ReservController> {
       ),
       filled: true,
       fillColor: Colors.white,
-      prefixIcon: prefix == null
-          ? null
-          : Padding(padding: const EdgeInsets.only(left: 10, right: 6), child: prefix),
+      prefixIcon: prefix == null ? null : Padding(padding: const EdgeInsets.only(left: 10, right: 6), child: prefix),
       prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
       suffixIcon: suffix,
     );
@@ -42,24 +45,29 @@ class ReservView extends GetView<ReservController> {
       children: [
         Icon(icon, size: 18, color: _textSub),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textDark)),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textDark),
+        ),
         if (required)
-          const Text(' *', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w700)),
+          const Text(
+            ' *',
+            style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w700),
+          ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final RxBool isStartTimeVisible = false.obs;
+    final RxBool isEndTimeVisible = false.obs;
+
     return Scaffold(
       backgroundColor: _panelBg,
-      appBar: AppBar(
-        title: const Text("충전소 예약"),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: _textDark,
-      ),
+      appBar: AppBar(title: const Text("충전소 예약"), elevation: 0, backgroundColor: Colors.white, foregroundColor: _textDark),
       body: SingleChildScrollView(
+        // 전체를 감싸는 하나의 스크롤뷰
         padding: const EdgeInsets.all(16),
         child: Center(
           child: ConstrainedBox(
@@ -79,10 +87,7 @@ class ReservView extends GetView<ReservController> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: _textDark),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      "예약 정보를 입력해주세요.",
-                      style: TextStyle(fontSize: 13, color: _textSub),
-                    ),
+                    const Text("예약 정보를 입력해주세요.", style: TextStyle(fontSize: 13, color: _textSub)),
                     const SizedBox(height: 18),
 
                     // 연락처
@@ -91,8 +96,7 @@ class ReservView extends GetView<ReservController> {
                     TextFormField(
                       controller: controller.contactController,
                       keyboardType: TextInputType.phone,
-                      decoration: _decoration("예: 010-1234-5678",
-                          prefix: const Icon(Icons.call_rounded, size: 18, color: _textSub)),
+                      decoration: _decoration("예: 010-1234-5678", prefix: const Icon(Icons.call_rounded, size: 18, color: _textSub)),
                     ),
 
                     const SizedBox(height: 18),
@@ -100,33 +104,46 @@ class ReservView extends GetView<ReservController> {
                     // 시작 시간
                     _label(Icons.play_circle_fill_rounded, '시작 시간', required: true),
                     const SizedBox(height: 8),
-                    TextFormField(
-                      controller: controller.startController,
-                      readOnly: true,
-                      decoration: _decoration("시작 시간을 선택하세요",
-                          prefix: const Icon(Icons.access_time_rounded, size: 18, color: _textSub),
-                          suffix: const Icon(Icons.keyboard_arrow_down_rounded)),
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2101),
-                        );
-                        if (pickedDate != null) {
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-                          );
-                          if (pickedTime != null) {
-                            final dt = DateTime(
-                              pickedDate.year, pickedDate.month, pickedDate.day,
-                              pickedTime.hour, pickedTime.minute,
-                            );
-                            controller.startController.text = dt.toIso8601String();
-                          }
-                        }
-                      },
+                    Column(
+                      children: [
+                        TextFormField(
+                          controller: controller.startController,
+                          readOnly: true,
+                          decoration: _decoration(
+                            "시작 시간을 선택하세요",
+                            prefix: const Icon(Icons.access_time_rounded, size: 18, color: _textSub),
+                            suffix: Obx(
+                              () => AnimatedRotation(
+                                turns: isStartTimeVisible.value ? 0.5 : 0,
+                                duration: const Duration(milliseconds: 300),
+                                child: const Icon(Icons.keyboard_arrow_down_rounded),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            isStartTimeVisible.toggle();
+                            if (isEndTimeVisible.value) {
+                              isEndTimeVisible.value = false;
+                            }
+                          },
+                        ),
+
+                        GetBuilder<ReservController>(
+                          builder: (controller) => ReservCalendarWidget(
+                            isVisible: isStartTimeVisible,
+                            controller: controller.startController,
+                            selectedDate: controller.selectedStartDate,
+                            borderColor: Colors.grey.shade300,
+                            accentColor: _accent,
+                            onDateSelected: (date) {
+                              controller.selectStartDate(date);
+                            },
+                            onDateTimeSelected: () {
+                              print('시작 시간이 선택되었습니다: ${controller.startController.text}');
+                            },
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 16),
@@ -134,40 +151,46 @@ class ReservView extends GetView<ReservController> {
                     // 종료 시간
                     _label(Icons.stop_circle_rounded, '종료 시간', required: true),
                     const SizedBox(height: 8),
-                    TextFormField(
-                      controller: controller.endController,
-                      readOnly: true,
-                      decoration: _decoration("종료 시간을 선택하세요",
-                          prefix: const Icon(Icons.access_time_filled_rounded, size: 18, color: _textSub),
-                          suffix: const Icon(Icons.keyboard_arrow_down_rounded)),
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2101),
-                        );
-                        if (pickedDate != null) {
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-                          );
-                          if (pickedTime != null) {
-                            final dt = DateTime(
-                              pickedDate.year, pickedDate.month, pickedDate.day,
-                              pickedTime.hour, pickedTime.minute,
-                            );
-
-                            final startText = controller.startController.text.trim();
-                            final startDt = startText.isNotEmpty ? DateTime.tryParse(startText) : null;
-                            if (startDt != null && dt.isBefore(startDt)) {
-                              Get.snackbar('', '종료 시간이 시작 시간보다 빠릅니다.');
-                              return;
+                    Column(
+                      children: [
+                        TextFormField(
+                          controller: controller.endController,
+                          readOnly: true,
+                          decoration: _decoration(
+                            "종료 시간을 선택하세요",
+                            prefix: const Icon(Icons.access_time_filled_rounded, size: 18, color: _textSub),
+                            suffix: Obx(
+                              () => AnimatedRotation(
+                                turns: isEndTimeVisible.value ? 0.5 : 0,
+                                duration: const Duration(milliseconds: 300),
+                                child: const Icon(Icons.keyboard_arrow_down_rounded),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            isEndTimeVisible.toggle();
+                            if (isStartTimeVisible.value) {
+                              isStartTimeVisible.value = false;
                             }
-                            controller.endController.text = dt.toIso8601String();
-                          }
-                        }
-                      },
+                          },
+                        ),
+
+                        GetBuilder<ReservController>(
+                          builder: (controller) => ReservCalendarWidget(
+                            isVisible: isEndTimeVisible,
+                            controller: controller.endController,
+                            selectedDate: controller.selectedEndDate,
+                            borderColor: Colors.grey.shade300,
+                            accentColor: _accent,
+                            onDateSelected: (date) {
+                              controller.selectEndDate(date);
+                            },
+                            onDateTimeSelected: () {
+                              print('종료 시간이 선택되었습니다: ${controller.endController.text}');
+                            },
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 22),
@@ -179,7 +202,6 @@ class ReservView extends GetView<ReservController> {
                       child: ElevatedButton(
                         onPressed: () {
                           controller.reserv(context);
-                          Get.toNamed("/main");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _accent,
@@ -201,5 +223,3 @@ class ReservView extends GetView<ReservController> {
     );
   }
 }
-
-
