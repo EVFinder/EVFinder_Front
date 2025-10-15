@@ -186,7 +186,10 @@ class ReservView extends GetView<ReservController> {
                               controller.selectEndDate(date);
                             },
                             onDateTimeSelected: () {
-                              print('종료 시간이 선택되었습니다: ${controller.endController.text}');
+                              // Controller의 검증 메서드 사용
+                              if (controller.validateEndTime()) {
+                                print('종료 시간이 선택되었습니다: ${controller.endController.text}');
+                              }
                             },
                           ),
                         ),
