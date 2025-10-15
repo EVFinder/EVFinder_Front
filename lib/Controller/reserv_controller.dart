@@ -118,9 +118,9 @@ class ReservController extends GetxController {
         print('예약 url $url');
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
-        if (Get.isRegistered<ReservUserController>()) {
-          Get.find<ReservUserController>().loadreservCharge();
-        }
+        // if (Get.isRegistered<ReservUserController>()) {
+        //   Get.find<ReservUserController>().loadreservCharge();
+        // }
       }
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
@@ -146,7 +146,7 @@ class ReservController extends GetxController {
 bool _isOverlapError(http.Response resp) {
   try {
     final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
-    final text = '${data['message'] ?? ''} ${data['error'] ?? ''} ${data['trace'] ?? ''}';
+    final text = '${data['error'] ?? ''} ${data['status'] ?? ''} ';
     return text.contains('이미 예약된 시간') || text.contains('겹칩니다');
   } catch (_) {
     final raw = utf8.decode(resp.bodyBytes);
