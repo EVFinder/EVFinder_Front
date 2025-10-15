@@ -17,6 +17,8 @@ class LoginController extends GetxController {
 
   Future<void> success(BuildContext context, String jwt) async {
     Get.snackbar('성공', '로그인 성공');
+    emailController.clear();
+    passwordController.clear();
     // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공")));
     await Get.offAndToNamed(AppRoute.main);
   }
