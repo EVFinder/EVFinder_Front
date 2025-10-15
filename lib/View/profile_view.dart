@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/payment_history_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/profile_controller.dart';
@@ -11,7 +12,9 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Scaffold(
+      backgroundColor: Color(0xFFF7F9FC),
+        body: SafeArea(
       child: Column(
         children: [
           // const ProfileCard(
@@ -86,6 +89,55 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
                 ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () async{
+                          Get.toNamed("/paymentHistory"); //결제 내역 확인 페이지로 이동하도록
+                          if (Get.isRegistered<PaymentHistoryController>()) {
+                            // Get.find<PaymentHistoryController>().loadreservCharge();
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAF8),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE7EBE5)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF0F172A).withOpacity(0.04),
+                                blurRadius: 10, offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44, height: 44,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3B82F6).withOpacity(0.12),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.receipt_long_outlined,
+                                    size: 22, color: Color(0xFF3B82F6)),
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Text('결제 내역 확인',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                              const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Material(
@@ -225,6 +277,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ],
       ),
+        )
     );
   }
 }

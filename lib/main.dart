@@ -9,6 +9,7 @@ import 'package:evfinder_front/Controller/find_password_controller.dart';
 import 'package:evfinder_front/Controller/login_controller.dart';
 import 'package:evfinder_front/Controller/main_controller.dart';
 import 'package:evfinder_front/Controller/map_controller.dart';
+import 'package:evfinder_front/Controller/payment_history_controller.dart';
 import 'package:evfinder_front/Controller/register_charge_controller.dart';
 import 'package:evfinder_front/Controller/reservManagement_controller.dart';
 import 'package:evfinder_front/Controller/reserv_controller.dart';
@@ -90,6 +91,7 @@ class MyApp extends StatelessWidget {
         Get.lazyPut(() => ChatbotController(), fenix: true);
         Get.lazyPut(() => ChangePasswordController(), fenix: true);
         Get.lazyPut(() => FindPasswordController(), fenix: true);
+        Get.lazyPut(() => PaymentHistoryController(), fenix: true);
         // Get.put(AuthController());
         // Get.lazyPut(() => ProfileController(), fenix: true);
       }),
