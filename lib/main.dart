@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:evfinder_front/Controller/addCharge_controller.dart';
 import 'package:evfinder_front/Controller/bnb_station_controller.dart';
 import 'package:evfinder_front/Controller/changePassword_controller.dart';
@@ -21,19 +23,60 @@ import 'package:evfinder_front/Controller/setting_controller.dart';
 import 'package:evfinder_front/Controller/host_controller.dart';
 import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Controller/camera_controller.dart';
 import 'Controller/permission_controller.dart';
 import 'Controller/profile_controller.dart';
+import 'PushNotification.dart';
 import 'Util/Route/app_page.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'firebase_options.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message)
+async {
+  if(message.notification != null) {
+    print("Notification Received!");
+  }
+}
+Future<void> setupInteractedMessage() async {
+  RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+  if (initialMessage != null) {
+    _handleMessage(initialMessage);
+  }
+  FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+}
+void _handleMessage(RemoteMessage message) {
+  Future.delayed(const Duration(seconds: 1), () {
+    navigatorKey.currentState!.pushNamed("/message", arguments: message);
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); // Firebase 초기화
+  PushNotification.init();
+  PushNotification.localNotiInit();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    String payloadData = jsonEncode(message.data);
+    print('Got a message in foreground');
+    if(message.notification != null) {
+      PushNotification.showSimpleNotification(
+        title: message.notification!.title!,
+        body: message.notification!.body!,
+        payload: payloadData);
+    }
+  });
+  setupInteractedMessage();
+
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',

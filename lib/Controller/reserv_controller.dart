@@ -128,7 +128,10 @@ class ReservController extends GetxController {
       }
     }
     // _resetState(); 입력 창 초기화
+
   }
+
+
 
   Future<void> _loadUidandUsername() async {
     final prefs = await SharedPreferences.getInstance();
@@ -179,6 +182,9 @@ class ReservController extends GetxController {
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
         Get.toNamed("/main");
+        // if (Get.isRegistered<ReservUserController>()) {
+        //   Get.find<ReservUserController>().loadreservCharge();
+        // }
       }
 
       if (response.statusCode == 200) {
@@ -198,7 +204,6 @@ class ReservController extends GetxController {
     }
   }
 }
-
 bool _isOverlapError(http.Response resp) {
   try {
     final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
