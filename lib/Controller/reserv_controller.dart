@@ -22,8 +22,6 @@ class ReservController extends GetxController {
   String? userName;
   String? reserveId;
 
-  Rx<Map<String, dynamic>?> reserveAvailableDate = Rx<Map<String, dynamic>?>(null);
-
   @override
   void onInit() {
     super.onInit();
@@ -126,7 +124,6 @@ class ReservController extends GetxController {
         final reserv = arguments['station'] as Map<String, dynamic>;
         shareId = reserv['id']?.toString();
         ownerUid = reserv['ownerUid']?.toString();
-        await _loadReservedAvailableDates();
         print('예약 모드');
       }
     }
@@ -137,25 +134,6 @@ class ReservController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
     userName = prefs.getString('name');
-  }
-
-  Future<void> _loadReservedAvailableDates() async {
-    print("_loadReservedAvailableDates 실행");
-    ChargeDetailController cController = Get.find<ChargeDetailController>();
-    if (ownerUid != null && shareId != null) {
-      reserveAvailableDate.value = await cController.fetchReserveDate(ownerUid!, shareId!); //예약된 날짜 가져오기
-    } else {
-      reserveAvailableDate.value = null;
-    }
-    print(reserveAvailableDate.value);
-  }
-
-  // 날짜가 비활성화되어야 하는지 확인하는 함수
-  bool isDayDisabled(DateTime day) {
-    if (reserveAvailableDate.value?["disabledDates"] == null) return false;
-    // disabledDates 체크
-    final dayString = "${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}";
-    return reserveAvailableDate.value?["disabledDates"].contains(dayString);
   }
 
   Future<void> reserv(BuildContext context) async {
