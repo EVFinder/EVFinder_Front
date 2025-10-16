@@ -47,9 +47,7 @@ class ChargeDetailController extends GetxController {
   Future<bool> statChange(String shareId, String status) async {
     isLoading.value = true;
     try {
-      final url = Uri.parse(
-        '${ApiConstants.chargerbnbApiUrl}/${uid.value}/${shareId}/status?status=${status}',
-      );
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/${uid.value}/${shareId}/status?status=${status}');
       final response = await http.patch(url);
       print('Uid $uid');
       print('상태 변경 코드: ${response.statusCode}');
@@ -59,9 +57,7 @@ class ChargeDetailController extends GetxController {
         bnbStationController.loadBnbCharge(lat: bnbStationController.lat.value, lon: bnbStationController.lon.value);
         return true;
       } else {
-        throw Exception(
-          'Failed to update status. Server responded with ${response.statusCode}',
-        );
+        throw Exception('Failed to update status. Server responded with ${response.statusCode}');
       }
     } catch (e) {
       print("Error in statChange: $e");
@@ -97,8 +93,7 @@ class ChargeDetailController extends GetxController {
   }
 
   Future<List<Map<String, dynamic>>> fetchReview() async {
-    var urlString =
-        '${ApiConstants.reviewBaseUrl}/list/station/$stationId?orderBy=createdAt&limit=3';
+    var urlString = '${ApiConstants.reviewBaseUrl}/list/station/$stationId?orderBy=createdAt&limit=3';
 
     final url = Uri.parse(urlString);
     print("stationId : $stationId");
@@ -120,9 +115,7 @@ class ChargeDetailController extends GetxController {
     try {
       isLoading.value = true;
 
-      final url = Uri.parse(
-        '${ApiConstants.reviewBaseUrl}/delete/${uid.value}/$reviewId',
-      );
+      final url = Uri.parse('${ApiConstants.reviewBaseUrl}/delete/${uid.value}/$reviewId');
       final response = await http.delete(url);
 
       print("리뷰 삭제 응답 코드: ${response.statusCode}");
@@ -136,6 +129,29 @@ class ChargeDetailController extends GetxController {
       }
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchReserveDate(String uid, String shareId) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      http.Response response;
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/availability');
+      response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print("fetchReserveDate success");
+        // JSON 문자열을 Map으로 파싱
+        final Map<String, dynamic> data = json.decode(response.body);
+        // print(data);
+        return data;
+      }
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      return null;
+    } catch (e) {
+      print("fetchReserveDate error: $e");
+      return null;
     }
   }
 }

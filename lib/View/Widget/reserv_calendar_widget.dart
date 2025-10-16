@@ -1,3 +1,4 @@
+import 'package:evfinder_front/Controller/reserv_controller.dart';
 import 'package:evfinder_front/View/Widget/reserv_timechip_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,6 +26,7 @@ class ReservCalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ReservController reservController = Get.find<ReservController>();
     return Obx(
       () => AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),
@@ -32,13 +34,11 @@ class ReservCalendarWidget extends StatelessWidget {
         firstChild: const SizedBox.shrink(),
         secondChild: Container(
           width: double.infinity,
-          // constraints와 SingleChildScrollView 제거
           decoration: BoxDecoration(
             border: Border.all(color: borderColor),
             borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
           ),
           child: Column(
-            // SingleChildScrollView 제거
             children: [
               // 캘린더
               TableCalendar(
@@ -51,9 +51,20 @@ class ReservCalendarWidget extends StatelessWidget {
                   outsideDaysVisible: false,
                   selectedDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
                   todayDecoration: BoxDecoration(color: accentColor.withOpacity(0.3), shape: BoxShape.circle),
+                  // 비활성화된 날짜 스타일
+                  disabledDecoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
+                  disabledTextStyle: TextStyle(color: Colors.grey.shade400),
                 ),
+                // 비활성화할 날짜 지정
+                enabledDayPredicate: (day) {
+                  final result = !reservController.isDayDisabled(day);
+                  return result;
+                },
                 onDaySelected: (selectedDay, focusedDay) {
-                  onDateSelected?.call(selectedDay);
+                  // 비활성화된 날짜가 아닐 때만 선택 가능
+                  if (!reservController.isDayDisabled(selectedDay)) {
+                    onDateSelected?.call(selectedDay);
+                  }
                 },
                 selectedDayPredicate: (day) {
                   return selectedDate != null && isSameDay(selectedDate, day);

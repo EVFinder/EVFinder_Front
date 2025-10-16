@@ -38,8 +38,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // isHost가 true일 때만 버튼을 보여줍니다.
 
+            // isHost가 true일 때만 버튼을 보여줍니다.
             Obx(() {
               final isOwner = controller.uid.value == ownerUid;
               if (!isOwner) return const SizedBox.shrink();
@@ -56,14 +56,20 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                           TextButton(
                             onPressed: () async {
                               final ok = await controller.statChange(station['id'], "available");
-                              if (ok) { Get.back(); Get.back(result: true); }
+                              if (ok) {
+                                Get.back();
+                                Get.back(result: true);
+                              }
                             },
                             child: const Text('사용 가능'),
                           ),
                           TextButton(
                             onPressed: () async {
                               final ok = await controller.statChange(station['id'], "unavailable");
-                              if (ok) { Get.back(); Get.back(result: true); }
+                              if (ok) {
+                                Get.back();
+                                Get.back(result: true);
+                              }
                             },
                             child: const Text('불가능'),
                           ),
@@ -101,25 +107,28 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
               width: double.infinity,
               child: isOwner
                   ? ElevatedButton(
-                onPressed: () => Get.toNamed('/management', arguments: station),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0XFFFF3B82F6),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-              )
+                      onPressed: () => Get.toNamed('/management', arguments: station),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFFFF3B82F6),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                    )
                   : ElevatedButton(
-                onPressed: () {
-                  Get.toNamed('/reserv', arguments:{'station':station});
-                  ReservController recontroller = Get.find<ReservController>();
-                  recontroller.selectMode(); //selectMode 실행
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0XFF10B981),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-              ),
+                      onPressed: () async {
+                        Get.toNamed('/reserv', arguments: {'station': station});
+                        ReservController recontroller = Get.find<ReservController>();
+                        // recontroller.reserveAvailableDate.value = await controller.fetchReserveDate(station['ownerUid'], station['id']); //예약된 날짜 가져오기
+                        recontroller.selectMode(); //selectMode 실행
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFF10B981),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                    ),
             );
           }),
         ),
