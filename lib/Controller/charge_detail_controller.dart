@@ -13,6 +13,7 @@ class ChargeDetailController extends GetxController {
   final uid = ''.obs;
   String? stationId;
   BnbStationController bnbStationController = Get.find<BnbStationController>();
+  Rx<Map<String, dynamic>?> reserveAvailableDate = Rx<Map<String, dynamic>?>(null);
 
   @override
   void dispose() {
@@ -144,6 +145,7 @@ class ChargeDetailController extends GetxController {
         // JSON 문자열을 Map으로 파싱
         final Map<String, dynamic> data = json.decode(response.body);
         // print(data);
+        reserveAvailableDate.value = data;
         return data;
       }
       print('Status Code: ${response.statusCode}');
@@ -153,5 +155,31 @@ class ChargeDetailController extends GetxController {
       print("fetchReserveDate error: $e");
       return null;
     }
+  }
+
+  Future<void> loadReservedAvailableDates(String? ownerUid, String? shareId) async {
+    print("_loadReservedAvailableDates 실행");
+    ChargeDetailController cController = Get.find<ChargeDetailController>();
+    if (ownerUid != null && shareId != null) {
+      reserveAvailableDate.value = await cController.fetchReserveDate(ownerUid, shareId); //예약된 날짜 가져오기
+    } else {
+      reserveAvailableDate.value = null;
+    }
+  }
+
+  // 날짜가 비활성화되어야 하는지 확인하는 함수
+  bool isDayDisabled(DateTime day) {
+    if (reserveAvailableDate.value?["disabledDates"] == null) return false;
+    // disabledDates 체크
+    final dayString = "${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}";
+    return reserveAvailableDate.value?["disabledDates"].contains(dayString);
+  }
+
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
+
+  void selectStartDate(DateTime date) {
+    selectedStartDate = date;
+    update(); // GetX 상태 업데이트
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../Controller/charge_detail_controller.dart';
+
 class ReservCalendarWidget extends StatelessWidget {
   final RxBool isVisible;
   final TextEditingController controller;
@@ -26,7 +28,7 @@ class ReservCalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ReservController reservController = Get.find<ReservController>();
+    ChargeDetailController chargeController = Get.find<ChargeDetailController>();
     return Obx(
       () => AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),
@@ -57,12 +59,12 @@ class ReservCalendarWidget extends StatelessWidget {
                 ),
                 // 비활성화할 날짜 지정
                 enabledDayPredicate: (day) {
-                  final result = !reservController.isDayDisabled(day);
+                  final result = !chargeController.isDayDisabled(day);
                   return result;
                 },
                 onDaySelected: (selectedDay, focusedDay) {
                   // 비활성화된 날짜가 아닐 때만 선택 가능
-                  if (!reservController.isDayDisabled(selectedDay)) {
+                  if (!chargeController.isDayDisabled(selectedDay)) {
                     onDateSelected?.call(selectedDay);
                   }
                 },
