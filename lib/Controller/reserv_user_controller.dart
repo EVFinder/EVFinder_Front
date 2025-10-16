@@ -381,6 +381,7 @@ class ReservUserController extends GetxController {
       isLoading.value = false;
     }
   }
+
   Future<void> cancelPayment({required String tid}) async {
     try {
       final url = Uri.parse('${ApiConstants.payApiBaseUrl}/cancel?uid=${uid.value}&tid=${tid}');

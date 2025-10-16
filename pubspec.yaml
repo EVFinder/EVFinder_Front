@@ -25,7 +25,9 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.3.2
   app_links: ^6.4.1
-  table_calendar: ^3.2.0
+  firebase_messaging: ^14.9.4
+  googleapis_auth: ^2.0.0
+  flutter_local_notifications: ^19.4.2
 
 dev_dependencies:
   flutter_test:
