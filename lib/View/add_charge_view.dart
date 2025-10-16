@@ -2,6 +2,7 @@ import 'package:evfinder_front/View/Widget/add_charge_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/addCharge_controller.dart';
+import '../Controller/charge_detail_controller.dart';
 
 class AddChargeView extends GetView<AddChargeController> {
   const AddChargeView({super.key});
@@ -68,6 +69,9 @@ class AddChargeView extends GetView<AddChargeController> {
                     stationAddress: station['address'],
                     chargerStat: statusText,
                     onTap: () async {
+                      print(station['ownerUid']);
+                      print(station['id']);
+                      Get.find<ChargeDetailController>().loadReservedAvailableDates(station['ownerUid'], station['id']);
                       final changed = await Get.toNamed('/detail', arguments: {'station': station});
                       if (changed == true) {
                         controller.loadHostCharge();
