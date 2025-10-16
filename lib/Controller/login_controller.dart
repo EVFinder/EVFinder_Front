@@ -13,6 +13,7 @@ class LoginController extends GetxController {
   RxBool isLoading = false.obs;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   // final uid = ''.obs;
 
   // final UserModel _model = UserModel();
