@@ -36,6 +36,8 @@ class LoginController extends GetxController {
     //     print('token 성고옹');
     //   }
     // }
+    emailController.clear();
+    passwordController.clear();
     // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공")));
     await Get.offAndToNamed(AppRoute.main);
   }
