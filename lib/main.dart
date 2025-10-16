@@ -108,6 +108,7 @@ class MyApp extends StatelessWidget {
       // permissionController.dispose();
     });
     return GetMaterialApp(
+      locale: const Locale("ko", "KR"),
       theme: ThemeData(fontFamily: 'neo'),
       debugShowCheckedModeBanner: false,
       initialBinding: BindingsBuilder(() {
