@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class ChargeDetailView extends GetView<ChargeDetailController> {
   const ChargeDetailView({super.key});
@@ -22,6 +23,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
     print('$station');
     print('station uid : $ownerUid');
     print('컨트롤러 uid :${controller.uid.value}');
+    final accentColor = const Color(0xFF10B981);
+    late DateTime? selectedDate;
 
     return Scaffold(
       backgroundColor: Color(0xFFF7F9FC),
@@ -38,8 +41,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // isHost가 true일 때만 버튼을 보여줍니다.
 
+            // isHost가 true일 때만 버튼을 보여줍니다.
             Obx(() {
               final isOwner = controller.uid.value == ownerUid;
               if (!isOwner) return const SizedBox.shrink();
@@ -50,30 +53,75 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                   onPressed: () {
                     Get.dialog(
                       AlertDialog(
-                        title: const Text('충전소 상태 변경'),
-                        content: const Text('충전소의 상태를 선택해주세요.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              final ok = await controller.statChange(station['id'], "available");
-                              if (ok) { Get.back(); Get.back(result: true); }
+                        title: const Text("날짜 선택"),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          // height: Get.size.height * 0.5,
+                          child: TableCalendar(
+                            firstDay: DateTime.utc(2010, 10, 16),
+                            lastDay: DateTime.utc(2030, 3, 14),
+                            focusedDay: DateTime.now(),
+                            calendarFormat: CalendarFormat.month,
+                            headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
+                            calendarStyle: CalendarStyle(
+                              outsideDaysVisible: false,
+                              selectedDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                              todayDecoration: BoxDecoration(color: accentColor.withOpacity(0.3), shape: BoxShape.circle),
+                              // 비활성화된 날짜 스타일
+                              disabledDecoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
+                              disabledTextStyle: TextStyle(color: Colors.grey.shade400),
+                            ),
+                            // 비활성화할 날짜 지정
+                            enabledDayPredicate: (day) {
+                              final result = !controller.isDayDisabled(day);
+                              return result;
                             },
-                            child: const Text('사용 가능'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              final ok = await controller.statChange(station['id'], "unavailable");
-                              if (ok) { Get.back(); Get.back(result: true); }
+                            onDaySelected: (selectedDay, focusedDay) {
+                              // 비활성화된 날짜가 아닐 때만 선택 가능
+                              if (!controller.isDayDisabled(selectedDay)) {
+                                controller.selectedStartDate = selectedDay;
+                              }
                             },
-                            child: const Text('불가능'),
+                            // selectedDayPredicate: (day) {
+                            //   return selectedDate != null && isSameDay(selectedDate, day);
+                            // },
                           ),
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: const Text('취소', style: TextStyle(color: Colors.grey)),
-                          ),
-                        ],
+                        ),
                       ),
                     );
+
+                    // Get.dialog(
+                    //   AlertDialog(
+                    //     title: const Text('충전소 상태 변경'),
+                    //     content: const Text('충전소의 상태를 선택해주세요.'),
+                    //     actions: [
+                    //       TextButton(
+                    //         onPressed: () async {
+                    //           final ok = await controller.statChange(station['id'], "available");
+                    //           if (ok) {
+                    //             Get.back();
+                    //             Get.back(result: true);
+                    //           }
+                    //         },
+                    //         child: const Text('사용 가능'),
+                    //       ),
+                    //       TextButton(
+                    //         onPressed: () async {
+                    //           final ok = await controller.statChange(station['id'], "unavailable");
+                    //           if (ok) {
+                    //             Get.back();
+                    //             Get.back(result: true);
+                    //           }
+                    //         },
+                    //         child: const Text('불가능'),
+                    //       ),
+                    //       TextButton(
+                    //         onPressed: () => Get.back(),
+                    //         child: const Text('취소', style: TextStyle(color: Colors.grey)),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade50,
@@ -101,25 +149,27 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
               width: double.infinity,
               child: isOwner
                   ? ElevatedButton(
-                onPressed: () => Get.toNamed('/management', arguments: station),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0XFFFF3B82F6),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-              )
+                      onPressed: () => Get.toNamed('/management', arguments: station),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFFFF3B82F6),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('예약자 조회', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                    )
                   : ElevatedButton(
-                onPressed: () {
-                  Get.toNamed('/reserv', arguments:{'station':station});
-                  ReservController recontroller = Get.find<ReservController>();
-                  recontroller.selectMode(); //selectMode 실행
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0XFF10B981),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-              ),
+                      onPressed: () async {
+                        Get.toNamed('/reserv', arguments: {'station': station});
+                        ReservController recontroller = Get.find<ReservController>();
+                        recontroller.selectMode(); //selectMode 실행
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFF10B981),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('예약하기', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                    ),
             );
           }),
         ),

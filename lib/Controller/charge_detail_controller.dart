@@ -13,6 +13,7 @@ class ChargeDetailController extends GetxController {
   final uid = ''.obs;
   String? stationId;
   BnbStationController bnbStationController = Get.find<BnbStationController>();
+  Rx<Map<String, dynamic>?> reserveAvailableDate = Rx<Map<String, dynamic>?>(null);
 
   @override
   void dispose() {
@@ -47,9 +48,7 @@ class ChargeDetailController extends GetxController {
   Future<bool> statChange(String shareId, String status) async {
     isLoading.value = true;
     try {
-      final url = Uri.parse(
-        '${ApiConstants.chargerbnbApiUrl}/${uid.value}/${shareId}/status?status=${status}',
-      );
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/${uid.value}/${shareId}/status?status=${status}');
       final response = await http.patch(url);
       print('Uid $uid');
       print('상태 변경 코드: ${response.statusCode}');
@@ -59,9 +58,7 @@ class ChargeDetailController extends GetxController {
         bnbStationController.loadBnbCharge(lat: bnbStationController.lat.value, lon: bnbStationController.lon.value);
         return true;
       } else {
-        throw Exception(
-          'Failed to update status. Server responded with ${response.statusCode}',
-        );
+        throw Exception('Failed to update status. Server responded with ${response.statusCode}');
       }
     } catch (e) {
       print("Error in statChange: $e");
@@ -97,8 +94,7 @@ class ChargeDetailController extends GetxController {
   }
 
   Future<List<Map<String, dynamic>>> fetchReview() async {
-    var urlString =
-        '${ApiConstants.reviewBaseUrl}/list/station/$stationId?orderBy=createdAt&limit=3';
+    var urlString = '${ApiConstants.reviewBaseUrl}/list/station/$stationId?orderBy=createdAt&limit=3';
 
     final url = Uri.parse(urlString);
     print("stationId : $stationId");
@@ -120,9 +116,7 @@ class ChargeDetailController extends GetxController {
     try {
       isLoading.value = true;
 
-      final url = Uri.parse(
-        '${ApiConstants.reviewBaseUrl}/delete/${uid.value}/$reviewId',
-      );
+      final url = Uri.parse('${ApiConstants.reviewBaseUrl}/delete/${uid.value}/$reviewId');
       final response = await http.delete(url);
 
       print("리뷰 삭제 응답 코드: ${response.statusCode}");
@@ -137,5 +131,55 @@ class ChargeDetailController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<Map<String, dynamic>?> fetchReserveDate(String uid, String shareId) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      http.Response response;
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/availability');
+      response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print("fetchReserveDate success");
+        // JSON 문자열을 Map으로 파싱
+        final Map<String, dynamic> data = json.decode(response.body);
+        // print(data);
+        reserveAvailableDate.value = data;
+        return data;
+      }
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      return null;
+    } catch (e) {
+      print("fetchReserveDate error: $e");
+      return null;
+    }
+  }
+
+  Future<void> loadReservedAvailableDates(String? ownerUid, String? shareId) async {
+    print("_loadReservedAvailableDates 실행");
+    ChargeDetailController cController = Get.find<ChargeDetailController>();
+    if (ownerUid != null && shareId != null) {
+      reserveAvailableDate.value = await cController.fetchReserveDate(ownerUid, shareId); //예약된 날짜 가져오기
+    } else {
+      reserveAvailableDate.value = null;
+    }
+  }
+
+  // 날짜가 비활성화되어야 하는지 확인하는 함수
+  bool isDayDisabled(DateTime day) {
+    if (reserveAvailableDate.value?["disabledDates"] == null) return false;
+    // disabledDates 체크
+    final dayString = "${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}";
+    return reserveAvailableDate.value?["disabledDates"].contains(dayString);
+  }
+
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
+
+  void selectStartDate(DateTime date) {
+    selectedStartDate = date;
+    update(); // GetX 상태 업데이트
   }
 }

@@ -9,6 +9,7 @@ import 'package:evfinder_front/View/search_charger_view.dart';
 import 'package:evfinder_front/Model/ev_charger.dart';
 import 'package:evfinder_front/View/Widget/search_appbar_widget.dart';
 
+import '../Controller/charge_detail_controller.dart';
 import '../Model/search_chargers.dart';
 
 class BnbStationView extends GetView<BnbStationController> {
@@ -67,7 +68,10 @@ class BnbStationView extends GetView<BnbStationController> {
                         chargerType: station['chargerType'],
                         pricePerHour: station['pricePerHour'],
                         power: station['power'],
-                        onTap: () => Get.toNamed('/detail', arguments: {'station': station}),
+                        onTap: () {
+                          Get.toNamed('/detail', arguments: {'station': station});
+                          Get.find<ChargeDetailController>().loadReservedAvailableDates(station['ownerUid'], station['id']);
+                        },
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(),
