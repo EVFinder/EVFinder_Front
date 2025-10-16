@@ -49,6 +49,7 @@ class MapController extends GetxController {
 
   // 초기화 메서드
   Future<void> initializeLocation() async {
+    print('🔥 initializeLocation 시작');
     cameraMoved.value = false;
     isInitialLoad.value = true;
 
@@ -58,27 +59,46 @@ class MapController extends GetxController {
       lat.value = position!.latitude;
       lon.value = position.longitude;
 
-      // 🔥 처음 실행시에만 현재 위치로 카메라 위치 설정
-      if (!hasSetInitialPosition.value) {
-        currentCameraLat.value = position.latitude;
-        currentCameraLng.value = position.longitude;
-        hasSetInitialPosition.value = true;
-      }
+      // 🔥 항상 현재 위치로 카메라 위치 설정
+      currentCameraLat.value = position.latitude;
+      currentCameraLng.value = position.longitude;
+      hasSetInitialPosition.value = true;
+
+      print('🔥 위치 설정 완료: ${position.latitude}, ${position.longitude}');
     } catch (e) {
-      print('위치 가져오기 실패: $e');
+      print('🔥 위치 가져오기 실패: $e');
+      // 기본 위치 사용
+      print('🔥 기본 위치 사용: ${currentCameraLat.value}, ${currentCameraLng.value}');
     } finally {
       isLocationLoaded.value = true;
+      print('🔥 initializeLocation 완료');
     }
   }
 
   // 맵 준비 완료 처리
   Future<void> onMapReady(BuildContext context, NaverMapController mapController) async {
+    print('🔥 onMapReady 시작');
     nMapController = mapController;
 
-    await fetchMyChargers(context, null);
+    // 🔥 현재 카메라 위치를 실제 사용자 위치로 설정
+    if (userPosition.value != null) {
+      currentCameraLat.value = userPosition.value!.latitude;
+      currentCameraLng.value = userPosition.value!.longitude;
+      print('🔥 사용자 위치로 카메라 위치 설정: ${currentCameraLat.value}, ${currentCameraLng.value}');
+    }
+
+    try {
+      await fetchMyChargers(context, null);
+      print('🔥 초기 충전소 검색 성공');
+    } catch (e) {
+      print('🔥 초기 충전소 검색 실패: $e');
+      // 초기 로딩 실패해도 맵은 준비됨
+    }
+
     isMapReady.value = true;
     isInitialLoad.value = false;
     cameraMoved.value = false;
+    print('🔥 onMapReady 완료');
   }
 
   // 카메라 이동 완료 처리
@@ -108,13 +128,15 @@ class MapController extends GetxController {
   bool get shouldShowRefreshButton => isMapReady.value && cameraMoved.value && !isInitialLoad.value;
 
   // fetchMyChargers 메서드
-  Future<void> fetchMyChargers(BuildContext? context, SearchChargers? result) async {
+  Future<void> fetchMyChargers(BuildContext context, SearchChargers? result) async {
     try {
+      print('🔥 fetchMyChargers 시작');
       await clearAllMarkers();
 
       double targetLat, targetLon;
 
       if (result != null) {
+        print('🔥 검색 결과로 이동: ${result.y}, ${result.x}');
         targetLat = double.parse(result.y);
         targetLon = double.parse(result.x);
 
@@ -128,16 +150,58 @@ class MapController extends GetxController {
         // 🔥 현재 저장된 카메라 위치 사용
         targetLat = currentCameraLat.value;
         targetLon = currentCameraLng.value;
+        print('🔥 현재 카메라 위치 사용: $targetLat, $targetLon');
       }
 
-      weather.value = await fetchWeather(targetLat, targetLon);
-      await fetchChargers(targetLat, targetLon);
+      print('🔥 검색 위치: $targetLat, $targetLon');
 
-      if (context != null) {
-        await loadMarkers(context, chargers);
+      // 🔥 날씨와 충전소 검색을 분리해서 처리
+      try {
+        print('🔥 날씨 정보 가져오기 시작...');
+        weather.value = await fetchWeather(targetLat, targetLon);
+        print('🔥 날씨 정보 가져오기 성공');
+      } catch (e) {
+        print('🔥 날씨 정보 가져오기 실패: $e');
+        // 날씨 실패해도 충전소는 계속 검색
       }
+
+      try {
+        print('🔥 충전소 검색 시작...');
+        await fetchChargers(targetLat, targetLon);
+        print('🔥 충전소 검색 성공: ${chargers.length}개');
+      } catch (e) {
+        print('🔥 충전소 검색 실패: $e');
+        throw e; // 충전소 검색 실패는 전체 실패로 처리
+      }
+
+      try {
+        if (context != null && chargers.isNotEmpty) {
+          print('🔥 마커 로딩 시작...');
+          await loadMarkers(context, chargers);
+          print('🔥 마커 로딩 성공');
+        } else if (chargers.isEmpty) {
+          print('🔥 검색된 충전소가 없음');
+        }
+      } catch (e) {
+        print('🔥 마커 로딩 실패: $e');
+        // 마커 로딩 실패해도 데이터는 있으므로 에러 던지지 않음
+      }
+
+      print('🔥 fetchMyChargers 완료');
     } catch (e) {
-      print('fetchMyChargers 실패: $e');
+      print('🔥 fetchMyChargers 전체 실패: $e');
+
+      // 🔥 사용자에게 구체적인 에러 메시지 표시
+      String errorMessage = '충전소 검색에 실패했습니다.';
+      if (e.toString().contains('네트워크')) {
+        errorMessage = '네트워크 연결을 확인해주세요.';
+      } else if (e.toString().contains('시간')) {
+        errorMessage = '요청 시간이 초과되었습니다.';
+      }
+
+      Get.snackbar('검색 실패', errorMessage, duration: Duration(seconds: 3), backgroundColor: Colors.red.withOpacity(0.8), colorText: Colors.white);
+
+      throw e; // 에러를 다시 던져서 호출하는 곳에서도 알 수 있게 함
     }
   }
 
@@ -146,8 +210,8 @@ class MapController extends GetxController {
     try {
       cameraMoved.value = false;
 
-      final center = await getCurrentMapCenter();
-      await fetchChargersByLocation(context, center.latitude, center.longitude);
+      // final center = await getCurrentMapCenter();
+      await fetchChargersByLocation(context, currentCameraLat.value, currentCameraLng.value);
 
       // 🔥 새로고침시 카메라 위치 업데이트
       final cameraPosition = await nMapController.getCameraPosition();
@@ -164,10 +228,20 @@ class MapController extends GetxController {
 
   // 나머지 메서드들은 동일...
   Future<void> fetchChargers(double lat, double lon) async {
-    List<EvCharger> resultChargers = await EvChargerService.fetchNearbyChargers(lat, lon);
-    chargers.value = resultChargers;
-    chargers.refresh();
-    update();
+    print('🔥 fetchChargers 호출: $lat, $lon');
+    try {
+      List<EvCharger> resultChargers = await EvChargerService.fetchNearbyChargers(lat, lon);
+      print('🔥 API에서 받은 충전소 개수: ${resultChargers.length}');
+
+      chargers.value = resultChargers;
+      chargers.refresh();
+      update();
+
+      print('🔥 충전소 데이터 업데이트 완료');
+    } catch (e) {
+      print('🔥 fetchChargers 에러: $e');
+      throw e;
+    }
   }
 
   Future<void> loadMarkers(BuildContext context, List<EvCharger> chargers) async {

@@ -118,6 +118,7 @@ class ReservController extends GetxController {
         print('예약 url $url');
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
+        Get.toNamed("/main");
         // if (Get.isRegistered<ReservUserController>()) {
         //   Get.find<ReservUserController>().loadreservCharge();
         // }
