@@ -59,6 +59,6 @@ class AppPages {
     GetPage(name: AppRoute.managecategory, page: () => ManageCategoryView()),
     GetPage(name: AppRoute.chatbot, page: () => const ChatbotView()),
     GetPage(name: AppRoute.find, page: () => const FindPasswordView()),
-    GetPage(name: AppRoute.paymentHistory, page: () => const PaymentHistoryView())
+    GetPage(name: AppRoute.paymentHistory, page: () => const PaymentHistoryView()),
   ];
 }
