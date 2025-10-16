@@ -18,20 +18,23 @@ class PaymentHistoryView extends GetView<PaymentHistoryController> {
       backgroundColor: Color(0xFFF7F9FC),
       appBar: AppBar(title: const Text("결제 내역"), backgroundColor: Colors.white),
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        final visible = controller.payHistory
+            .where((pay) {
+          final s = (pay['status'] ?? '').toString().toUpperCase();
+          return s == 'SUCCESS' || s == 'CANCELLED';
+        })
+            .toList();
 
-        if (controller.payHistory.isEmpty) {
-          return const Center(child: Text("예약 내역이 없습니다."));
+        if (visible.isEmpty) {
+          return const Center(child: Text("결제 내역이 없습니다."));
         }
 
         return ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: controller.payHistory.length,
+          itemCount: visible.length,
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
-            final pay = controller.payHistory[index];
+            final pay = visible[index];
 
             final itemName = pay['itemName'];
             final amount = pay['amount'];
@@ -40,7 +43,7 @@ class PaymentHistoryView extends GetView<PaymentHistoryController> {
             final cancelledAt = pay['cancelledAt'].toString(); //취소 시간
             final tid = pay['paymentId'];
 
-            String? picked = status == 'SUCCESS' ? approvedAt : (status == 'CANCELLED' ? cancelledAt : null);
+            String? picked = status == 'SUCCESS' ? approvedAt : cancelledAt;
 
             final createdAt = (() {
               if (picked == null || picked.isEmpty || picked == 'null') {
