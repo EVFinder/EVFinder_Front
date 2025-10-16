@@ -191,6 +191,7 @@ class ReservView extends GetView<ReservController> {
                                 print('종료 시간이 선택되었습니다: ${controller.endController.text}');
                               }
                             },
+                            // disabledDates: ['2025-10-21'],
                           ),
                         ),
                       ],

@@ -82,7 +82,11 @@ class _TimeSelectionWidgetState extends State<ReservTimechipWidget> {
   }
 
   Widget _buildTimeGrid(List<String> times) {
-    return Wrap(spacing: 8, runSpacing: 8, children: times.map((time) => _buildTimeButton(time)).toList());
+    return Wrap(
+      spacing: 12, // 가로 간격
+      runSpacing: 12, // 세로 간격
+      children: times.map((time) => _buildTimeButton(time)).toList(),
+    );
   }
 
   Widget _buildTimeButton(String time) {
@@ -98,8 +102,8 @@ class _TimeSelectionWidgetState extends State<ReservTimechipWidget> {
         }
       },
       child: Container(
-        width: 70,
-        height: 40,
+        width: 90, // 너비 증가
+        height: 45, // 높이 증가
         decoration: BoxDecoration(
           color: isSelected ? Color(0xFF10B981) : Colors.transparent,
           border: Border.all(color: Colors.grey.shade300, width: 1),
