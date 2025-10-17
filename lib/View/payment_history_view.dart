@@ -71,7 +71,6 @@ class PaymentHistoryView extends GetView<PaymentHistoryController> {
                 createdAt: createdAt,
                 amount: amount,
                 status: status,
-                onCancelTap: () => controller.cancelPayment(tid: tid),
             );
           },
         );
