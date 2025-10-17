@@ -21,9 +21,9 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
     final station = args['station'] as Map<String, dynamic>;
     final ownerUid = station['ownerUid']?.toString();
     final shareId = station['id']?.toString();
-    print('$station');
-    print('station uid : $ownerUid');
-    print('컨트롤러 uid :${controller.uid.value}');
+    // print('$station');
+    // print('station uid : $ownerUid');
+    // print('컨트롤러 uid :${controller.uid.value}');
     final accentColor = const Color(0xFF10B981);
     DateTime? selectedDate;
 
@@ -54,105 +54,345 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                   onPressed: () async {
                     Get.dialog(
                       AlertDialog(
-                        title: const Text("비활성화/활성화 날짜 선택", style: TextStyle(fontSize: 20)),
-                        content: SizedBox(
-                          width: double.maxFinite,
-                          child: Column(
-                            children: [
-                              Obx(
-                                () => TableCalendar<dynamic>(
-                                  firstDay: DateTime.utc(2010, 10, 16),
-                                  lastDay: DateTime.utc(2030, 3, 14),
-                                  focusedDay: controller.focusedDay.value,
-                                  calendarFormat: CalendarFormat.month,
-                                  headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
-                                  calendarStyle: CalendarStyle(
-                                    outsideDaysVisible: false,
-                                    selectedDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
-                                    // 범위 하이라이트
-                                    rangeHighlightColor: accentColor.withOpacity(0.2),
-                                    rangeStartDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
-                                    rangeEndDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
-                                    withinRangeDecoration: BoxDecoration(color: accentColor.withOpacity(0.1)),
-                                    todayDecoration: BoxDecoration(color: accentColor.withOpacity(0.3), shape: BoxShape.circle),
-                                    disabledDecoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
-                                    disabledTextStyle: TextStyle(color: Colors.grey.shade400),
-                                  ),
-                                  enabledDayPredicate: (day) {
-                                    return !controller.isDayDisabled(day);
-                                  },
-                                  onDaySelected: (selectedDay, focusedDay) {
-                                    if (controller.isDayDisabled(selectedDay)) return;
-
-                                    if (controller.selectedStartDate.value == null) {
-                                      // 첫 번째 클릭: 시작일 설정
-                                      controller.selectStartDate(selectedDay);
-                                    } else if (controller.selectedEndDate.value == null) {
-                                      // 두 번째 클릭: 종료일 설정
-                                      if (selectedDay.isAfter(controller.selectedStartDate.value!)) {
-                                        controller.selectEndDate(selectedDay);
-                                      } else {
-                                        // 시작일보다 이전 날짜를 선택한 경우, 새로운 시작일로 설정
-                                        controller.clearDateRange();
-                                        controller.selectStartDate(selectedDay);
-                                      }
-                                    } else {
-                                      // 이미 범위가 선택된 상태: 새로운 시작일로 초기화
-                                      controller.clearDateRange();
-                                      controller.selectStartDate(selectedDay);
-                                    }
-
-                                    controller.focusedDay.value = focusedDay;
-                                  },
-                                  // 범위 표시
-                                  rangeStartDay: controller.selectedStartDate.value,
-                                  rangeEndDay: controller.selectedEndDate.value,
-                                  selectedDayPredicate: (day) {
-                                    return false; // 개별 선택 표시 비활성화 (범위 표시 사용)
-                                  },
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text("*", style: TextStyle(color: Colors.red, fontSize: 12)),
-                                  Text("과거의 날짜는 비활성화가 불가능합니다.", style: TextStyle(color: Colors.red, fontSize: 12)),
-                                ],
-                              ),
-                              Text(controller.reserveAvailableDate.value!['disabledDates']?.toString() ?? '로딩 중...'),
-                            ],
-                          ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        title: Row(
+                          children: [
+                            Icon(Icons.settings, color: accentColor, size: 24),
+                            const SizedBox(width: 8),
+                            const Text('충전소 상태 변경', style: TextStyle(fontWeight: FontWeight.w700)),
+                          ],
                         ),
-
+                        content: const Text('충전소의 상태를 선택해주세요.', style: TextStyle(color: Color(0xFF6B7280))),
                         actions: [
-                          TextButton(
-                            onPressed: () {
-                              Get.back();
-                              controller.clearDateRange();
-                            },
-                            child: const Text('취소', style: TextStyle(color: Colors.grey)),
+                          Container(
+                            decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(8)),
+                            child: TextButton(
+                              onPressed: () async {
+                                Get.dialog(
+                                  AlertDialog(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.check_circle, color: accentColor, size: 24),
+                                        const SizedBox(width: 8),
+                                        const Text("활성화 관리", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                                      ],
+                                    ),
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Obx(
+                                            () => Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(color: Colors.grey.shade200),
+                                              ),
+                                              child: TableCalendar<dynamic>(
+                                                firstDay: DateTime.utc(2010, 10, 16),
+                                                lastDay: DateTime.utc(2030, 3, 14),
+                                                focusedDay: controller.focusedDay.value,
+                                                calendarFormat: CalendarFormat.month,
+                                                headerStyle: HeaderStyle(
+                                                  formatButtonVisible: false,
+                                                  titleCentered: true,
+                                                  titleTextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                                                  leftChevronIcon: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                                                    child: const Icon(Icons.chevron_left, color: Color(0xFF374151)),
+                                                  ),
+                                                  rightChevronIcon: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                                                    child: const Icon(Icons.chevron_right, color: Color(0xFF374151)),
+                                                  ),
+                                                ),
+                                                calendarStyle: CalendarStyle(
+                                                  outsideDaysVisible: false,
+                                                  selectedDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  // 범위 하이라이트
+                                                  rangeHighlightColor: accentColor.withOpacity(0.2),
+                                                  rangeStartDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  rangeEndDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  withinRangeDecoration: BoxDecoration(color: accentColor.withOpacity(0.1)),
+                                                  todayDecoration: BoxDecoration(
+                                                    color: accentColor.withOpacity(0.3),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(color: accentColor, width: 2),
+                                                  ),
+                                                  disabledDecoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
+                                                  disabledTextStyle: TextStyle(color: Colors.grey.shade400),
+                                                ),
+                                                enabledDayPredicate: (day) {
+                                                  return controller.isDayDisabled(day);
+                                                },
+                                                onDaySelected: (selectedDay, focusedDay) {
+                                                  if (!controller.isDayDisabled(selectedDay)) return;
+
+                                                  if (controller.selectedStartDate.value == null) {
+                                                    // 첫 번째 클릭: 시작일 설정
+                                                    controller.selectStartDate(selectedDay);
+                                                  } else if (controller.selectedEndDate.value == null) {
+                                                    // 두 번째 클릭: 종료일 설정
+                                                    if (selectedDay.isAfter(controller.selectedStartDate.value!)) {
+                                                      controller.selectEndDate(selectedDay);
+                                                    } else {
+                                                      // 시작일보다 이전 날짜를 선택한 경우, 새로운 시작일로 설정
+                                                      controller.clearDateRange();
+                                                      controller.selectStartDate(selectedDay);
+                                                    }
+                                                  } else {
+                                                    // 이미 범위가 선택된 상태: 새로운 시작일로 초기화
+                                                    controller.clearDateRange();
+                                                    controller.selectStartDate(selectedDay);
+                                                  }
+
+                                                  controller.focusedDay.value = focusedDay;
+                                                },
+                                                // 범위 표시
+                                                rangeStartDay: controller.selectedStartDate.value,
+                                                rangeEndDay: controller.selectedEndDate.value,
+                                                selectedDayPredicate: (day) {
+                                                  return false; // 개별 선택 표시 비활성화 (범위 표시 사용)
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      Container(
+                                        decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(8)),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            if (controller.selectedStartDate.value != null) {
+                                              // 선택된 날짜로 다음 단계 진행
+                                              if (ownerUid != null && shareId != null) {
+                                                print(controller.getSelectedDateRange());
+                                                bool success = await controller.deleteDisabledDates(ownerUid, shareId, controller.getSelectedDateRange());
+                                                if (success) {
+                                                  Get.back();
+                                                  Get.back();
+                                                  controller.clearDateRange();
+                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  Get.snackbar('성공', '활성화 되었습니다.');
+                                                } else {
+                                                  Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
+                                                }
+                                              }
+                                            } else {
+                                              Get.snackbar('알림', '날짜를 선택해주세요.');
+                                            }
+                                          },
+                                          child: const Text(
+                                            '활성화',
+                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Get.back();
+                                          controller.clearDateRange();
+                                        },
+                                        child: const Text(
+                                          '취소',
+                                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                '활성화',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                            child: TextButton(
+                              onPressed: () async {
+                                Get.dialog(
+                                  AlertDialog(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.block, color: Colors.red, size: 24),
+                                        const SizedBox(width: 8),
+                                        const Text("비활성화 날짜 선택", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                                      ],
+                                    ),
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Obx(
+                                            () => Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(color: Colors.grey.shade200),
+                                              ),
+                                              child: TableCalendar<dynamic>(
+                                                firstDay: DateTime.utc(2010, 10, 16),
+                                                lastDay: DateTime.utc(2030, 3, 14),
+                                                focusedDay: controller.focusedDay.value,
+                                                calendarFormat: CalendarFormat.month,
+                                                headerStyle: HeaderStyle(
+                                                  formatButtonVisible: false,
+                                                  titleCentered: true,
+                                                  titleTextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                                                  leftChevronIcon: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                                                    child: const Icon(Icons.chevron_left, color: Color(0xFF374151)),
+                                                  ),
+                                                  rightChevronIcon: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                                                    child: const Icon(Icons.chevron_right, color: Color(0xFF374151)),
+                                                  ),
+                                                ),
+                                                calendarStyle: CalendarStyle(
+                                                  outsideDaysVisible: false,
+                                                  selectedDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  // 범위 하이라이트
+                                                  rangeHighlightColor: accentColor.withOpacity(0.2),
+                                                  rangeStartDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  rangeEndDecoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                                                  withinRangeDecoration: BoxDecoration(color: accentColor.withOpacity(0.1)),
+                                                  todayDecoration: BoxDecoration(
+                                                    color: accentColor.withOpacity(0.3),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(color: accentColor, width: 2),
+                                                  ),
+                                                  disabledDecoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
+                                                  disabledTextStyle: TextStyle(color: Colors.grey.shade400),
+                                                ),
+                                                enabledDayPredicate: (day) {
+                                                  return !controller.isDayDisabled(day);
+                                                },
+                                                onDaySelected: (selectedDay, focusedDay) {
+                                                  if (controller.isDayDisabled(selectedDay)) return;
+
+                                                  if (controller.selectedStartDate.value == null) {
+                                                    // 첫 번째 클릭: 시작일 설정
+                                                    controller.selectStartDate(selectedDay);
+                                                  } else if (controller.selectedEndDate.value == null) {
+                                                    // 두 번째 클릭: 종료일 설정
+                                                    if (selectedDay.isAfter(controller.selectedStartDate.value!)) {
+                                                      controller.selectEndDate(selectedDay);
+                                                    } else {
+                                                      // 시작일보다 이전 날짜를 선택한 경우, 새로운 시작일로 설정
+                                                      controller.clearDateRange();
+                                                      controller.selectStartDate(selectedDay);
+                                                    }
+                                                  } else {
+                                                    // 이미 범위가 선택된 상태: 새로운 시작일로 초기화
+                                                    controller.clearDateRange();
+                                                    controller.selectStartDate(selectedDay);
+                                                  }
+
+                                                  controller.focusedDay.value = focusedDay;
+                                                },
+                                                // 범위 표시
+                                                rangeStartDay: controller.selectedStartDate.value,
+                                                rangeEndDay: controller.selectedEndDate.value,
+                                                selectedDayPredicate: (day) {
+                                                  return false; // 개별 선택 표시 비활성화 (범위 표시 사용)
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.shade50,
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(color: Colors.red.shade200),
+                                            ),
+                                            child: const Row(
+                                              children: [
+                                                Icon(Icons.info, color: Colors.red, size: 16),
+                                                SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    "과거의 날짜는 비활성화가 불가능합니다.",
+                                                    style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.w500),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      Container(
+                                        decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            if (controller.selectedStartDate.value != null) {
+                                              // 선택된 날짜로 다음 단계 진행
+                                              if (ownerUid != null && shareId != null) {
+                                                print(controller.getSelectedDateRange());
+                                                bool success = await controller.addDisabledDates(ownerUid, shareId, controller.getSelectedDateRange());
+                                                if (success) {
+                                                  Get.back();
+                                                  Get.back();
+                                                  controller.clearDateRange();
+                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  Get.snackbar('성공', '해당 날짜가 비활성화 되었습니다.');
+                                                } else {
+                                                  Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
+                                                }
+                                              }
+                                              // _proceedWithReservation(controller.selectedStartDate.value!);
+                                            } else {
+                                              Get.snackbar('알림', '날짜를 선택해주세요.');
+                                            }
+                                          },
+                                          child: const Text(
+                                            '비활성화',
+                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Get.back();
+                                          controller.clearDateRange();
+                                        },
+                                        child: const Text(
+                                          '취소',
+                                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                '비활성화',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                            ),
                           ),
                           TextButton(
-                            onPressed: () async {
-                              if (controller.selectedStartDate.value != null) {
-                                // 선택된 날짜로 다음 단계 진행
-                                if (ownerUid != null && shareId != null) {
-                                  print(controller.getSelectedDateRange());
-                                  bool success = await controller.addDisabledDates(ownerUid, shareId, controller.getSelectedDateRange());
-                                  if (success) {
-                                    Get.back();
-                                    controller.clearDateRange();
-                                    controller.fetchReserveDate(ownerUid, shareId);
-                                    Get.snackbar('성공', '해당 날짜가 비활성화 되었습니다.');
-                                  } else {
-                                    Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
-                                  }
-                                }
-                                // _proceedWithReservation(controller.selectedStartDate.value!);
-                              } else {
-                                Get.snackbar('알림', '날짜를 선택해주세요.');
-                              }
-                            },
-                            child: const Text('활성/비활성'),
+                            onPressed: () => Get.back(),
+                            child: const Text(
+                              '취소',
+                              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ],
                       ),
@@ -294,16 +534,35 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                           onDelete: () {
                             Get.dialog(
                               AlertDialog(
-                                title: const Text('리뷰 삭제'),
-                                content: const Text('정말로 이 리뷰를 삭제하시겠습니까?'),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                title: Row(
+                                  children: [
+                                    const Icon(Icons.delete_outline, color: Colors.red, size: 24),
+                                    const SizedBox(width: 8),
+                                    const Text('리뷰 삭제', style: TextStyle(fontWeight: FontWeight.w700)),
+                                  ],
+                                ),
+                                content: const Text('정말로 이 리뷰를 삭제하시겠습니까?', style: TextStyle(color: Color(0xFF6B7280))),
                                 actions: [
-                                  TextButton(onPressed: () => Get.back(), child: const Text('취소')),
                                   TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                      controller.deleteReview(reviewId);
-                                    },
-                                    child: const Text('삭제', style: TextStyle(color: Colors.red)),
+                                    onPressed: () => Get.back(),
+                                    child: const Text(
+                                      '취소',
+                                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Get.back();
+                                        controller.deleteReview(reviewId);
+                                      },
+                                      child: const Text(
+                                        '삭제',
+                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -319,37 +578,8 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                     }).toList(),
 
                     const SizedBox(height: 16),
-
-                    //리뷰 수정을 위한 주석
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.end,
-                    //   children: [
-                    //     TextButton(
-                    //       child: Text("더보기 >"),
-                    //       onPressed: () {
-                    //         Get.toNamed("reviewDetail", arguments: station);
-                    //       },
-                    //     ),
-                    //   ],
-                    // ),
                     Row(
                       children: [
-                        // Expanded(
-                        //   child: OutlinedButton( //리뷰 작성 버튼 예약 확인 페이지로 이동
-                        //     onPressed: () {
-                        //       Get.toNamed("/reviewWrite", arguments: {'station': station});
-                        //     },
-                        //     style: OutlinedButton.styleFrom(
-                        //       backgroundColor: Colors.white,
-                        //       foregroundColor: const Color(0xFF374151),
-                        //       side: BorderSide(color: Colors.grey.shade300),
-                        //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        //       padding: const EdgeInsets.symmetric(vertical: 12),
-                        //     ),
-                        //     child: const Text('리뷰 작성'),
-                        //   ),
-                        // ),
-                        // const SizedBox(width: 10),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
@@ -421,11 +651,4 @@ class _SectionCard extends StatelessWidget {
       ),
     );
   }
-}
-
-// 예약 진행 함수 (별도로 구현 필요)
-void _proceedWithReservation(DateTime selectedDate) {
-  // 예약 로직 구현
-  print('선택된 날짜: $selectedDate');
-  // 다음 단계로 진행
 }

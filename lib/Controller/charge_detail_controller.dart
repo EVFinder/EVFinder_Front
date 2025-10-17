@@ -185,6 +185,30 @@ class ChargeDetailController extends GetxController {
     }
   }
 
+  Future<bool> deleteDisabledDates(String uid, String shareId, List<String> dates) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/disabledDates');
+      // JSON 배열로 인코딩해서 전송
+      final response = await http.delete(
+        url,
+        headers: headers,
+        body: jsonEncode(dates), // 이게 핵심!
+      );
+
+      if (response.statusCode == 200) {
+        print("addDisabledDates success");
+        return true;
+      }
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      return false;
+    } catch (e) {
+      print("addDisabledDates error: $e");
+      return false;
+    }
+  }
+
   Future<void> loadReservedAvailableDates(String? ownerUid, String? shareId) async {
     print("_loadReservedAvailableDates 실행");
     if (ownerUid != null && shareId != null) {
@@ -242,13 +266,13 @@ class ChargeDetailController extends GetxController {
   // 선택된 범위 내 모든 날짜 가져오기
 
   List<String> getSelectedDateRange() {
-    if (selectedStartDate.value == null || selectedEndDate.value == null) {
+    if (selectedStartDate.value == null) {
       return [];
     }
 
     List<String> dates = [];
     DateTime current = selectedStartDate.value!;
-    DateTime endDate = selectedEndDate.value!;
+    DateTime endDate = selectedEndDate.value ?? selectedStartDate.value!; // 종료일이 없으면 시작일과 같게
 
     // 날짜만 비교 (시간 무시)
     while (current.isBefore(endDate.add(const Duration(days: 1)))) {
