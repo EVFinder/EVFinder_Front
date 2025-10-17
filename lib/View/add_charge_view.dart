@@ -71,7 +71,7 @@ class AddChargeView extends GetView<AddChargeController> {
                     onTap: () async {
                       print(station['ownerUid']);
                       print(station['id']);
-                      Get.find<ChargeDetailController>().loadReservedAvailableDates(station['ownerUid'], station['id']);
+                      Get.find<ChargeDetailController>().loadDisabledDates(station['ownerUid'], station['id']);
                       final changed = await Get.toNamed('/detail', arguments: {'station': station});
                       if (changed == true) {
                         controller.loadHostCharge();

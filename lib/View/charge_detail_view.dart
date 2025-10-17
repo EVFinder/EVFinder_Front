@@ -179,7 +179,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                                   Get.back();
                                                   Get.back();
                                                   controller.clearDateRange();
-                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  controller.fetchDisableDates(ownerUid, shareId);
                                                   Get.snackbar('성공', '활성화 되었습니다.');
                                                 } else {
                                                   Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
@@ -356,7 +356,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                                   Get.back();
                                                   Get.back();
                                                   controller.clearDateRange();
-                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  controller.fetchDisableDates(ownerUid, shareId);
                                                   Get.snackbar('성공', '해당 날짜가 비활성화 되었습니다.');
                                                 } else {
                                                   Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');

@@ -137,7 +137,7 @@ class ChargeDetailController extends GetxController {
     }
   }
 
-  Future<Map<String, dynamic>?> fetchReserveDate(String uid, String shareId) async {
+  Future<Map<String, dynamic>?> fetchDisableDates(String uid, String shareId) async {
     final headers = {'Content-Type': 'application/json'};
     try {
       http.Response response;
@@ -152,8 +152,8 @@ class ChargeDetailController extends GetxController {
         reserveAvailableDate.value = data;
         return data;
       }
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('fetchDisableDates Status Code: ${response.statusCode}');
+      print('fetchDisableDates Response Body: ${response.body}');
       return null;
     } catch (e) {
       print("fetchReserveDate error: $e");
@@ -176,8 +176,8 @@ class ChargeDetailController extends GetxController {
         print("addDisabledDates success");
         return true;
       }
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('addDisabledDates Status Code: ${response.statusCode}');
+      print('addDisabledDates Response Body: ${response.body}');
       return false;
     } catch (e) {
       print("addDisabledDates error: $e");
@@ -197,24 +197,24 @@ class ChargeDetailController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        print("addDisabledDates success");
+        print("deleteDisabledDates success");
         return true;
       }
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('deleteDisabledDates Status Code: ${response.statusCode}');
+      print('deleteDisabledDates Response Body: ${response.body}');
       return false;
     } catch (e) {
-      print("addDisabledDates error: $e");
+      print("deleteDisabledDates error: $e");
       return false;
     }
   }
 
-  Future<void> loadReservedAvailableDates(String? ownerUid, String? shareId) async {
-    print("_loadReservedAvailableDates 실행");
+  Future<void> loadDisabledDates(String? ownerUid, String? shareId) async {
+    print("loadDisabledDates 실행");
     if (ownerUid != null && shareId != null) {
       isLoading.value = true;
       try {
-        reserveAvailableDate.value = await fetchReserveDate(ownerUid, shareId);
+        reserveAvailableDate.value = await fetchDisableDates(ownerUid, shareId);
       } finally {
         isLoading.value = false;
       }
