@@ -23,13 +23,10 @@ class ReservUserController extends GetxController {
     super.onInit();
     appLinks = AppLinks();
     loadUidAndreserv();
-    handleInitialLink();
-    startPayLinkListener();
   }
 
   @override
   void onClose() {
-    stopPayLinkListener();
     super.onClose();
   }
 
@@ -164,7 +161,7 @@ class ReservUserController extends GetxController {
     }
   }
 
-  void confirmDeleteReverse(String reserveId) {
+  void confirmDeleteReverse(String reserveId,{String? tid}) {
     Get.defaultDialog(
       title: '예약 취소',
       middleText: '정말로 취소하시겠어요? 이 작업은 되돌릴 수 없습니다.',
@@ -173,7 +170,12 @@ class ReservUserController extends GetxController {
       confirmTextColor: const Color(0xFF0F172A),
       onConfirm: () {
         Get.back();
-        deleteReserv(reserveId);
+        // deleteReserv(reserveId);
+        if (tid == null || tid.isEmpty) {
+          Get.snackbar('', '결제 정보가 없어 예약을 취소할 수 없습니다.');
+          return;
+        }
+        cancelPayment(reserveId: reserveId, tid: tid);
       },
     );
   }
@@ -256,134 +258,10 @@ class ReservUserController extends GetxController {
     }
   }
 
-  late String lastTid;
-  late String lastOrderId;
 
-  StreamSubscription<Uri>? linkSub;
-
-  Future <void> kakaopay({required Map<String, dynamic> reservation}) async {
+  Future<void> cancelPayment({required String reserveId, required String tid}) async {
     try {
       isLoading.value = true;
-      final response = await http.post(
-        Uri.parse('${ApiConstants.payApiBaseUrl}/request'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "uid": uid.value,
-          "itemName": reservation['stationName'],
-          "amount": reservation['pricePerHour'],
-          "reserveId": reservation['id']
-        }),
-      );
-      print("kakao 서버 응답 코드: ${response.statusCode}");
-      print("kakao 서버 응답 내용: ${utf8.decode(response.bodyBytes)}");
-
-      if (response.statusCode != 200) {
-        Get.snackbar('결제 요청 실패', '서버 응답 코드: ${response.statusCode}');
-        return;
-      }
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-
-      lastTid = data['tid'];
-      lastOrderId = data['orderId'];
-
-      final String webUrl = data['next_redirect_mobile_url'];
-      final String? scheme = Platform.isAndroid
-          ? data['android_app_scheme']
-          : data['ios_app_scheme'];
-
-      if (scheme != null && scheme.isNotEmpty) {
-        final appUri = Uri.parse(scheme);
-        if (await canLaunchUrl(appUri)) {
-          if (await launchUrl(appUri, mode: LaunchMode.externalApplication))
-            return;
-        }
-      }
-
-      await launchUrl(
-        Uri.parse(webUrl),
-        mode: LaunchMode.inAppBrowserView,
-        webViewConfiguration: const WebViewConfiguration(
-          enableJavaScript: true,
-          enableDomStorage: true,
-        ),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void startPayLinkListener() {
-    linkSub?.cancel();
-    linkSub = appLinks.uriLinkStream.listen(
-            (uri) => handlePayUri(uri),
-        onError: (e) =>Get.snackbar('링크 오류', e.toString()),
-    );
-  }
-
-  void stopPayLinkListener() {
-    linkSub?.cancel();
-    linkSub = null;
-  }
-
-  Future<void> handleInitialLink() async {
-    try {
-      final initial = await appLinks.getInitialLink();
-      if (initial != null) {
-        handlePayUri(initial);
-      }
-    } catch (e) {
-      Get.snackbar('초기 링크 오류', e.toString());
-    }
-  }
-
-  void handlePayUri(Uri uri) {
-    final ok = uri.scheme == 'evfinder' && uri.host == 'kakaopay';
-    if (!ok) return;
-
-    final status = uri.queryParameters['status'];
-    final orderId = uri.queryParameters['orderId'];
-    final pgToken = uri.queryParameters['pg_token'];
-
-    if (status == 'success' && pgToken != null && orderId != null) {
-      approvePayment(pgToken: pgToken, orderId: orderId);
-    }
-    // else if (status == 'cancel') {
-    //   Get.snackbar('', '사용자가 결제를 취소했어요.');
-    // } else if (status == 'fail') {
-    //   Get.snackbar('', '결제가 실패했어요.');
-    // }
-  }
-
-  Future<void> approvePayment(
-      {required String pgToken, required String orderId}) async {
-    try {
-      isLoading.value = true;
-
-      final response = await http.post(
-        Uri.parse('${ApiConstants.payApiBaseUrl}/approve'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "pg_token": pgToken,
-          "tid": lastTid,
-          "uid": uid.value,
-          "orderId": lastOrderId,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        Get.snackbar('결제 완료', '충전권 결제가 완료되었습니다.');
-      } else {
-        Get.snackbar('승인 실패', '서버 응답 코드: ${response.statusCode}');
-      }
-    } catch (e) {
-      Get.snackbar('승인 오류', e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> cancelPayment({required String tid}) async {
-    try {
       final url = Uri.parse('${ApiConstants.payApiBaseUrl}/cancel?uid=${uid.value}&tid=${tid}');
       final response = await http.get(url);
       print("결제 취소 코드: ${response.statusCode}");
@@ -391,6 +269,7 @@ class ReservUserController extends GetxController {
       if (response.statusCode == 200) {
         payStatus;
         Get.snackbar('', '결제가 취소되었습니다.');
+        deleteReserv(reserveId);
       } else{
         throw Exception('Failed to fetch customer');
       }
