@@ -285,7 +285,6 @@ class ReservController extends GetxController {
           "reserveId": reserveId //id는 예약 응답
         }),
       );
-      paymentReserveId = null;
       print("kakao 서버 응답 코드: ${response.statusCode}");
       print("kakao 서버 응답 내용: ${utf8.decode(response.bodyBytes)}");
 
@@ -394,6 +393,7 @@ class ReservController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.snackbar('결제 완료', '충전권 결제가 완료되었습니다.');
+        paymentReserveId = null;
         Get.toNamed("/main");
       }
     } catch (e) {
