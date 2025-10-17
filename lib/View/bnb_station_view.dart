@@ -70,7 +70,8 @@ class BnbStationView extends GetView<BnbStationController> {
                         power: station['power'],
                         onTap: () {
                           Get.toNamed('/detail', arguments: {'station': station});
-                          Get.find<ChargeDetailController>().loadReservedAvailableDates(station['ownerUid'], station['id']);
+                          Get.find<ChargeDetailController>().loadDisabledDates(station['ownerUid'], station['id']);
+                          Get.find<ChargeDetailController>().fetchReservedTimeSlots(station['id']);
                         },
                       );
                     },
