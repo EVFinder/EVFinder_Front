@@ -278,8 +278,14 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                                   disabledTextStyle: TextStyle(color: Colors.grey.shade400),
                                                 ),
                                                 enabledDayPredicate: (day) {
-                                                  return !controller.isDayDisabled(day);
+                                                  DateTime today = DateTime.now();
+                                                  DateTime todayStart = DateTime(today.year, today.month, today.day);
+                                                  DateTime dayStart = DateTime(day.year, day.month, day.day);
+
+                                                  // 오늘 이전 날짜이거나 비활성화된 날짜면 false
+                                                  return !dayStart.isBefore(todayStart) && !controller.isDayDisabled(day);
                                                 },
+
                                                 onDaySelected: (selectedDay, focusedDay) {
                                                   if (controller.isDayDisabled(selectedDay)) return;
 
