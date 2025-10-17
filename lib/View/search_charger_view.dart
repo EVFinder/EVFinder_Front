@@ -8,15 +8,17 @@ import 'Widget/listtile_chargerinfo_widget.dart';
 
 class SearchChargerView extends GetView<SearchChargerController> {
   final SearchType searchType;
-  const SearchChargerView({ //searchtype도 전달 받음+
+
+  const SearchChargerView({
+    //searchtype도 전달 받음+
     super.key,
     required this.searchType,
-});
+  });
 
   @override
   Widget build(BuildContext context) {
-
-    WidgetsBinding.instance.addPostFrameCallback((_) { //컨트롤러로 타입 전달
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //컨트롤러로 타입 전달
       controller.setSearchType(searchType);
     });
 
@@ -78,8 +80,8 @@ class SearchChargerView extends GetView<SearchChargerController> {
               // ),
             ),
             Obx(
-                  () => SizedBox(
-                height: MediaQuery.of(context).size.height * 0.85,
+              () => SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
                 child: ListView.separated(
                   itemCount: controller.activeList.length,
                   // primary: false,
