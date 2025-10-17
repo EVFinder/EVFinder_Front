@@ -241,15 +241,40 @@ class ReservController extends GetxController {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
     }
   }
+
+  Future<void> deleteReserv(String? reserveId) async {
+    if (reserveId == null || reserveId.isEmpty || reserveId == '알 수 없음') {
+      Get.snackbar('', '예약 정보가 올바르지 않습니다.');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final url = Uri.parse(
+          '${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        print('결제 안 해서 예약 취소 함');
+        Get.snackbar('', '결제 시간이 지나 예약이 취소되었습니다.');
+        // loadreservCharge();
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   //결제
   String? lastTid;
   String? lastOrderId;
+  String? paymentReserveId;
 
   StreamSubscription<Uri>? linkSub;
 
   Future <void> kakaopay({required String reserveId, required int amount}) async {
     try {
       isLoading.value = true;
+      paymentReserveId = reserveId;
       final response = await http.post(
         Uri.parse('${ApiConstants.payApiBaseUrl}/request'),
         headers: {'Content-Type': 'application/json'},
@@ -260,11 +285,13 @@ class ReservController extends GetxController {
           "reserveId": reserveId //id는 예약 응답
         }),
       );
+      paymentReserveId = null;
       print("kakao 서버 응답 코드: ${response.statusCode}");
       print("kakao 서버 응답 내용: ${utf8.decode(response.bodyBytes)}");
 
       if (response.statusCode != 200) {
         Get.snackbar('결제 요청 실패', '서버 응답 코드: ${response.statusCode}');
+        await deleteReserv(reserveId);
         //예약 취소 추가해야함
         return;
       }
@@ -296,6 +323,12 @@ class ReservController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+      Future.delayed(const Duration(seconds: 60), () {
+        if (paymentReserveId != null) {
+          deleteReserv(paymentReserveId!);
+          paymentReserveId = null;
+        }
+      });
     }
   }
 
@@ -336,8 +369,10 @@ class ReservController extends GetxController {
     }
     // else if (status == 'cancel') {
     //   Get.snackbar('', '사용자가 결제를 취소했어요.');
+    //   deleteReserv(paymentReserveId);
     // } else if (status == 'fail') {
     //   Get.snackbar('', '결제가 실패했어요.');
+    //   deleteReserv(paymentReserveId);
     // }
   }
 
