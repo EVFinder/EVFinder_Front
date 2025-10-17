@@ -49,3 +49,7 @@ app.*.map.json
 
 # assets
 assets/
+
+# Notification
+lib/PushNotification.dart
+lib/firebase_options.dart
