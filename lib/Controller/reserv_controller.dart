@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:evfinder_front/Constants/api_constants.dart';
 import 'package:evfinder_front/Controller/reserv_user_controller.dart';
@@ -6,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_links/app_links.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'charge_detail_controller.dart';
 
@@ -13,6 +17,9 @@ class ReservController extends GetxController {
   final contactController = TextEditingController();
   final startController = TextEditingController();
   final endController = TextEditingController();
+  late final AppLinks appLinks;
+  RxBool isLoading = false.obs;
+  Map<String, dynamic>? reservdata;
 
   bool isUpdate = false;
 
@@ -25,7 +32,16 @@ class ReservController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    appLinks = AppLinks();
     _loadUidandUsername();
+    handleInitialLink();
+    startPayLinkListener();
+  }
+
+  @override
+  void onClose() {
+    stopPayLinkListener();
+    super.onClose();
   }
 
   void _resetState() {
@@ -121,9 +137,9 @@ class ReservController extends GetxController {
         print('예약 수정 모드');
       } else if (arguments.containsKey('station')) {
         isUpdate = false;
-        final reserv = arguments['station'] as Map<String, dynamic>;
-        shareId = reserv['id']?.toString();
-        ownerUid = reserv['ownerUid']?.toString();
+        reservdata = arguments['station'] as Map<String, dynamic>;
+        shareId = reservdata?['id']?.toString();
+        ownerUid = reservdata?['ownerUid']?.toString();
         print('예약 모드');
       }
     }
@@ -155,6 +171,7 @@ class ReservController extends GetxController {
     final startDateTime = parseDateTime(startTimeText);
     final endDateTime = parseDateTime(endTimeText);
 
+
     if (startDateTime == null || endDateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('시간 형식이 올바르지 않습니다.')));
       return;
@@ -162,6 +179,11 @@ class ReservController extends GetxController {
 
     final startUtc = startDateTime.toUtc().toIso8601String();
     final endUtc = endDateTime.toUtc().toIso8601String();
+
+    final Duration diff = endDateTime.toUtc().difference(startDateTime.toUtc());
+    final int useHours = diff.inHours;
+    final int price = (reservdata?['pricePerHour'] as num?)?.toInt() ?? 0;
+    final int total = price * useHours;
 
     final body = jsonEncode({'shareId': shareId, "ownerUid": ownerUid, 'userName': userName, 'userPNumber': userPNumber, 'startTime': startUtc, 'endTime': endUtc});
 
@@ -181,7 +203,7 @@ class ReservController extends GetxController {
         print('예약 url $url');
         response = await http.post(url, headers: headers, body: body);
         successMessage = '예약이 완료되었습니다.';
-        Get.toNamed("/main");
+        // Get.toNamed("/main");
         // if (Get.isRegistered<ReservUserController>()) {
         //   Get.find<ReservUserController>().loadreservCharge();
         // }
@@ -189,6 +211,22 @@ class ReservController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
+        if(!isUpdate) {
+          Map<String, dynamic> respJson = {};
+          try {
+            respJson = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+          } catch (_) {}
+          final created = (respJson['data'] is Map)
+              ? (respJson['data'] as Map<String, dynamic>)
+              : respJson;
+
+          final createdReservationId = created['reserveId'].toString();
+
+          if(createdReservationId.isEmpty) {
+            Get.snackbar('', '예약 id를 찾을 수 없습니다.');
+          }
+          kakaopay(reserveId: createdReservationId, amount: total);
+        }
         _resetState();
       } else if (_isOverlapError(response)) {
         Get.snackbar('', '이미 예약된 시간입니다.');
@@ -203,7 +241,133 @@ class ReservController extends GetxController {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패: ${e.toString()}')));
     }
   }
-}
+  //결제
+  String? lastTid;
+  String? lastOrderId;
+
+  StreamSubscription<Uri>? linkSub;
+
+  Future <void> kakaopay({required String reserveId, required int amount}) async {
+    try {
+      isLoading.value = true;
+      final response = await http.post(
+        Uri.parse('${ApiConstants.payApiBaseUrl}/request'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "uid": uid,
+          "itemName": reservdata?['stationName'],
+          "amount": amount,
+          "reserveId": reserveId //id는 예약 응답
+        }),
+      );
+      print("kakao 서버 응답 코드: ${response.statusCode}");
+      print("kakao 서버 응답 내용: ${utf8.decode(response.bodyBytes)}");
+
+      if (response.statusCode != 200) {
+        Get.snackbar('결제 요청 실패', '서버 응답 코드: ${response.statusCode}');
+        //예약 취소 추가해야함
+        return;
+      }
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      lastTid = data['tid'];
+      lastOrderId = data['orderId'];
+
+      final String webUrl = data['next_redirect_mobile_url'];
+      final String? scheme = Platform.isAndroid
+          ? data['android_app_scheme']
+          : data['ios_app_scheme'];
+
+      if (scheme != null && scheme.isNotEmpty) {
+        final appUri = Uri.parse(scheme);
+        if (await canLaunchUrl(appUri)) {
+          if (await launchUrl(appUri, mode: LaunchMode.externalApplication))
+            return;
+        }
+      }
+
+      await launchUrl(
+        Uri.parse(webUrl),
+        mode: LaunchMode.inAppBrowserView,
+        webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: true,
+          enableDomStorage: true,
+        ),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void startPayLinkListener() {
+    linkSub?.cancel();
+    linkSub = appLinks.uriLinkStream.listen(
+          (uri) => handlePayUri(uri),
+      onError: (e) =>Get.snackbar('링크 오류', e.toString()),
+    );
+  }
+
+  void stopPayLinkListener() {
+    linkSub?.cancel();
+    linkSub = null;
+  }
+
+  Future<void> handleInitialLink() async {
+    try {
+      final initial = await appLinks.getInitialLink();
+      if (initial != null) {
+        handlePayUri(initial);
+      }
+    } catch (e) {
+      Get.snackbar('초기 링크 오류', e.toString());
+    }
+  }
+
+  void handlePayUri(Uri uri) {
+    final ok = uri.scheme == 'evfinder' && uri.host == 'kakaopay';
+    if (!ok) return;
+
+    final status = uri.queryParameters['status'];
+    final orderId = uri.queryParameters['orderId'];
+    final pgToken = uri.queryParameters['pg_token'];
+
+    if (status == 'success' && pgToken != null && orderId != null) {
+      approvePayment(pgToken: pgToken, orderId: orderId);
+    }
+    // else if (status == 'cancel') {
+    //   Get.snackbar('', '사용자가 결제를 취소했어요.');
+    // } else if (status == 'fail') {
+    //   Get.snackbar('', '결제가 실패했어요.');
+    // }
+  }
+
+  Future<void> approvePayment(
+      {required String pgToken, required String orderId}) async {
+    try {
+      isLoading.value = true;
+
+      final response = await http.post(
+        Uri.parse('${ApiConstants.payApiBaseUrl}/approve'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "pg_token": pgToken,
+          "tid": lastTid,
+          "uid": uid,
+          "orderId": lastOrderId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar('결제 완료', '충전권 결제가 완료되었습니다.');
+        Get.toNamed("/main");
+      }
+    } catch (e) {
+      Get.snackbar('승인 오류', e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+
+  }
 bool _isOverlapError(http.Response resp) {
   try {
     final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
@@ -213,4 +377,4 @@ bool _isOverlapError(http.Response resp) {
     final raw = utf8.decode(resp.bodyBytes);
     return raw.contains('이미 예약된 시간') || raw.contains('겹칩니다');
   }
-}
+}}

@@ -58,10 +58,63 @@ class ReservView extends GetView<ReservController> {
     );
   }
 
+  Widget _payMethodTile({
+    required String id,
+    required String title,
+    required bool selected,
+    required VoidCallback onTap,
+    String? subtitle,
+    bool tall = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: EdgeInsets.all(tall ? 18 : 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: selected ? _accent : _border, width: selected ? 1.6 : 1),
+          boxShadow: selected
+              ? [BoxShadow(color: _accent.withOpacity(0.08), blurRadius: 8, offset: const Offset(0, 2))]
+              : null,
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _textDark)),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: const TextStyle(fontSize: 12, color: _textSub)),
+                  ],
+                ],
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: selected ? _accent : _border, width: selected ? 6 : 1.4),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final RxBool isStartTimeVisible = false.obs;
     final RxBool isEndTimeVisible = false.obs;
+    final RxString payMethod = 'kakao'.obs;
 
     return Scaffold(
       backgroundColor: _panelBg,
@@ -198,6 +251,45 @@ class ReservView extends GetView<ReservController> {
                     ),
 
                     const SizedBox(height: 22),
+                    const SizedBox(height: 16),
+                    _label(Icons.payments_rounded, '결제 수단 선택'),
+                    const SizedBox(height: 10),
+
+                    Obx(() => Column(
+                      children: [
+                        _payMethodTile(
+                          id: 'kakao',
+                          title: '카카오페이',
+                          selected: payMethod.value == 'kakao',
+                          onTap: () => payMethod.value = 'kakao',
+                        ),
+                        const SizedBox(height: 10),
+                        _payMethodTile(
+                          id: 'naver',
+                          title: '네이버페이',
+                          selected: payMethod.value == 'naver',
+                          onTap: () => payMethod.value = 'naver',
+                        ),
+                        const SizedBox(height: 10),
+                        _payMethodTile(
+                          id: 'toss',
+                          title: '토스페이',
+                          selected: payMethod.value == 'toss',
+                          onTap: () => payMethod.value = 'toss',
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _payMethodTile(
+                          id: 'card',
+                          title: '카드 추가',
+                          subtitle: '신용카드 또는 체크카드를 등록해주세요',
+                          selected: payMethod.value == 'card',
+                          onTap: () => payMethod.value = 'card',
+                          tall: true,
+                        ),
+                      ],
+                    )),
 
                     // 예약 버튼
                     SizedBox(
