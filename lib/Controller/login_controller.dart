@@ -14,29 +14,29 @@ class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // final uid = ''.obs;
+  final uid = ''.obs;
 
   // final UserModel _model = UserModel();
 
   Future<void> success(BuildContext context, String jwt) async {
     Get.snackbar('성공', '로그인 성공');
-    // String? _fcmToken = await FirebaseMessaging.instance.getToken();
-    // final prefs = await SharedPreferences.getInstance();
-    // uid.value = prefs.getString('uid') ?? '';
-    // print("fcmToken : $_fcmToken");
-    // print('token uinddd : $uid');
-    // if(_fcmToken != null && _fcmToken.isNotEmpty) {
-    //   final res = await http.post(
-    //     Uri.parse('${ApiConstants.baseUrl}/fcm/updateToken'),
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: jsonEncode({'uid': uid.value, 'token': _fcmToken}),
-    //   );
-    //   print("token 서버 응답 코드: ${res.statusCode}");
-    //   print("token 서버 응답 내용: ${utf8.decode(res.bodyBytes)}");
-    //   if(res.statusCode == 200) {
-    //     print('token 성고옹');
-    //   }
-    // }
+    String? _fcmToken = await FirebaseMessaging.instance.getToken();
+    final prefs = await SharedPreferences.getInstance();
+    uid.value = prefs.getString('uid') ?? '';
+    print("fcmToken : $_fcmToken");
+    print('token uinddd : $uid');
+    if(_fcmToken != null && _fcmToken.isNotEmpty) {
+      final res = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/fcm/updateToken'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'uid': uid.value, 'token': _fcmToken}),
+      );
+      print("token 서버 응답 코드: ${res.statusCode}");
+      print("token 서버 응답 내용: ${utf8.decode(res.bodyBytes)}");
+      if(res.statusCode == 200) {
+        print('token 성고옹');
+      }
+    }
     emailController.clear();
     passwordController.clear();
     // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공")));
