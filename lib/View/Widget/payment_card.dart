@@ -8,16 +8,14 @@ class PaymentCard extends StatelessWidget {
     required this.createdAt,   // 결제/요청 시각
     required this.amount,      // 3000
     required this.status,      // 'SUCCESS' | 'CANCELLED'
-    this.onCancelTap,
-    this.onTap,
+    // this.onCancelTap,
   });
 
   final String title;
   final DateTime createdAt;
   final int amount;
   final String status;
-  final VoidCallback? onCancelTap;
-  final VoidCallback? onTap;
+  // final VoidCallback? onCancelTap;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,6 @@ class PaymentCard extends StatelessWidget {
     final timeStr  = DateFormat('HH:mm').format(createdAt);
 
     return InkWell(
-      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         padding: const EdgeInsets.all(16),
@@ -98,23 +95,23 @@ class PaymentCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // 하단 액션
-            if (isSuccess)
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: onCancelTap,
-                  icon: const Icon(Icons.close, size: 16),
-                  label: const Text('취소하기'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFC62828),
-                    side: const BorderSide(color: Color(0xFFC62828)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              )
-            else
-              const SizedBox.shrink(),
+            // // 하단 액션
+            // if (isSuccess)
+            //   SizedBox(
+            //     width: double.infinity,
+            //     child: OutlinedButton.icon(
+            //       onPressed: onCancelTap,
+            //       icon: const Icon(Icons.close, size: 16),
+            //       label: const Text('취소하기'),
+            //       style: OutlinedButton.styleFrom(
+            //         foregroundColor: const Color(0xFFC62828),
+            //         side: const BorderSide(color: Color(0xFFC62828)),
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //       ),
+            //     ),
+            //   )
+            // else
+            //   const SizedBox.shrink(),
           ],
         ),
       ),

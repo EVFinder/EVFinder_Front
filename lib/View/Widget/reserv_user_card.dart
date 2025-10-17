@@ -13,10 +13,9 @@ class ReservUserCard extends StatelessWidget {
     required this.dateText,        // 예: 2025. 09. 26.
     required this.timeText,        // 예: 19시 31분 - 23시 31분
     this.onCancel, //예약 취소
-    this.onUpdate, //예약 수정
+    // this.onUpdate, //예약 수정
     this.onWriteReview, //리뷰 작성
-    this.onPay,
-    this.onPayCancel,
+    // this.onPayCancel,
   });
 
   final String stationName;
@@ -26,10 +25,9 @@ class ReservUserCard extends StatelessWidget {
   final String dateText;
   final String timeText;
   final VoidCallback? onCancel;
-  final VoidCallback? onUpdate;
+  // final VoidCallback? onUpdate;
   final VoidCallback? onWriteReview;
-  final VoidCallback? onPay;
-  final VoidCallback? onPayCancel;
+  // final VoidCallback? onPayCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -130,26 +128,27 @@ class ReservUserCard extends StatelessWidget {
             const SizedBox(height: 16),
 
             //버튼들
-            onUpdate != null || onCancel != null
+            // onUpdate != null || onCancel != null
+            onCancel != null
                 ? Row(
                     children: [
                       // 예약 수정(그린 아웃라인)
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: onUpdate,
-                          icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
-                          label: const Text(
-                            '예약 수정',
-                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF10B981)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
+                      // Expanded(
+                      //   child: OutlinedButton.icon(
+                      //     onPressed: onUpdate,
+                      //     icon: const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF10B981)),
+                      //     label: const Text(
+                      //       '예약 수정',
+                      //       style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                      //     ),
+                      //     style: OutlinedButton.styleFrom(
+                      //       side: const BorderSide(color: Color(0xFF10B981)),
+                      //       padding: const EdgeInsets.symmetric(vertical: 14),
+                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      //     ),
+                      //   ),
+                      // ),
+                      // const SizedBox(width: 12),
                       // 취소(레드 아웃라인)
                       Expanded(
                         child: OutlinedButton.icon(
@@ -171,39 +170,23 @@ class ReservUserCard extends StatelessWidget {
                   )
                 : Row(
                 children: [
-                  (onPay != null)
-                  ? Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onPay,
-                      icon: const Icon(Icons.receipt_long_outlined, size: 20, color: Color(0xFF10B981)),
-                      label: const Text(
-                        '결제하기',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
-                    ),
-                  )
-              : Expanded( //이용 시간 지날 경우 숨겨야 함
-                    child: OutlinedButton.icon(
-                      onPressed: onPayCancel,
-                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
-                      label: const Text(
-                        '결제 취소',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFEF4444)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        foregroundColor: const Color(0xFFEF4444),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+                  // Expanded( //이용 시간 지날 경우 숨겨야 함
+                  //   child: OutlinedButton.icon(
+                  //     onPressed: onPayCancel,
+                  //     icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFEF4444)),
+                  //     label: const Text(
+                  //       '결제 취소',
+                  //       style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                  //     ),
+                  //     style: OutlinedButton.styleFrom(
+                  //       side: const BorderSide(color: Color(0xFFEF4444)),
+                  //       padding: const EdgeInsets.symmetric(vertical: 14),
+                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  //       foregroundColor: const Color(0xFFEF4444),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 12),
                   (onWriteReview != null)
                   ?  Expanded(
                             child: OutlinedButton.icon(

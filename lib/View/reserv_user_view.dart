@@ -101,17 +101,15 @@ class ReservUserView extends GetView<ReservUserController> {
 
             final onCancel = (isExpired || isLockEdit)
                 ? null
-                : () {
-                    controller.confirmDeleteReverse(reserveId);
-                  };
+                : () => controller.confirmDeleteReverse(reserveId, tid: tid);
 
-            final onUpdate = (isExpired || isLockEdit)
-                ? null
-                : () {
-                    Get.toNamed("/reserv", arguments: {'reservation': reservation});
-                    ReservController recontroller = Get.find<ReservController>();
-                    recontroller.selectMode();
-                  };
+            // final onUpdate = (isExpired || isLockEdit)
+            //     ? null
+            //     : () {
+            //         Get.toNamed("/reserv", arguments: {'reservation': reservation});
+            //         ReservController recontroller = Get.find<ReservController>();
+            //         recontroller.selectMode();
+            //       };
             final onWriteReview = MyReview
                 ? null
                 : () async {
@@ -127,11 +125,6 @@ class ReservUserView extends GetView<ReservUserController> {
                     }
                   };
 
-            final onPay = isPaid
-                ? null
-                : () {
-              controller.kakaopay(reservation: reservation);
-            };
             return ReservUserCard(
               stationName: reservation['stationName'],
               address: reservation['address'],
@@ -140,11 +133,9 @@ class ReservUserView extends GetView<ReservUserController> {
               dateText: dateText,
               timeText: timeText,
               onCancel: onCancel,
-              onUpdate: onUpdate,
-              onPay: onPay,
-                  // () => controller.kakaopay(reservation: reservation),
+              // onUpdate: onUpdate,
               onWriteReview: onWriteReview,
-              onPayCancel: (tid == null) ? null : () => controller.cancelPayment(tid: tid),
+              // onPayCancel: (tid == null) ? null : () => controller.cancelPayment(tid: tid),
                   // () => controller.cancelPayment(tid: tid),
               //     () {
               //   Get.toNamed("/reviewWrite", arguments: {'reservation': reservation});
