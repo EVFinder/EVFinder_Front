@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:evfinder_front/Constants/api_constants.dart';
 import 'package:evfinder_front/Controller/bnb_station_controller.dart';
 import 'package:get/get.dart';
@@ -13,7 +13,11 @@ class ChargeDetailController extends GetxController {
   final uid = ''.obs;
   String? stationId;
   BnbStationController bnbStationController = Get.find<BnbStationController>();
+
   Rx<Map<String, dynamic>?> reserveAvailableDate = Rx<Map<String, dynamic>?>(null);
+  Rx<DateTime?> selectedStartDate = Rx<DateTime?>(null);
+  Rx<DateTime?> selectedEndDate = Rx<DateTime?>(null);
+  Rx<DateTime> focusedDay = DateTime.now().obs;
 
   @override
   void dispose() {
@@ -157,29 +161,136 @@ class ChargeDetailController extends GetxController {
     }
   }
 
+  Future<bool> addDisabledDates(String uid, String shareId, List<String> dates) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/disabledDates');
+      // JSON 배열로 인코딩해서 전송
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(dates), // 이게 핵심!
+      );
+
+      if (response.statusCode == 200) {
+        print("addDisabledDates success");
+        return true;
+      }
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      return false;
+    } catch (e) {
+      print("addDisabledDates error: $e");
+      return false;
+    }
+  }
+
+  Future<bool> deleteDisabledDates(String uid, String shareId, List<String> dates) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/disabledDates');
+      // JSON 배열로 인코딩해서 전송
+      final response = await http.delete(
+        url,
+        headers: headers,
+        body: jsonEncode(dates), // 이게 핵심!
+      );
+
+      if (response.statusCode == 200) {
+        print("addDisabledDates success");
+        return true;
+      }
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      return false;
+    } catch (e) {
+      print("addDisabledDates error: $e");
+      return false;
+    }
+  }
+
   Future<void> loadReservedAvailableDates(String? ownerUid, String? shareId) async {
     print("_loadReservedAvailableDates 실행");
-    ChargeDetailController cController = Get.find<ChargeDetailController>();
     if (ownerUid != null && shareId != null) {
-      reserveAvailableDate.value = await cController.fetchReserveDate(ownerUid, shareId); //예약된 날짜 가져오기
+      isLoading.value = true;
+      try {
+        reserveAvailableDate.value = await fetchReserveDate(ownerUid, shareId);
+      } finally {
+        isLoading.value = false;
+      }
     } else {
       reserveAvailableDate.value = null;
     }
+    print("예약 불가능 날짜 데이터: ${reserveAvailableDate.value}");
   }
 
   // 날짜가 비활성화되어야 하는지 확인하는 함수
   bool isDayDisabled(DateTime day) {
     if (reserveAvailableDate.value?["disabledDates"] == null) return false;
-    // disabledDates 체크
+
     final dayString = "${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}";
-    return reserveAvailableDate.value?["disabledDates"].contains(dayString);
+    final disabledDates = reserveAvailableDate.value?["disabledDates"] as List<dynamic>?;
+
+    return disabledDates?.contains(dayString) ?? false;
   }
 
-  DateTime? selectedStartDate;
-  DateTime? selectedEndDate;
-
+  // 날짜 선택 함수들을 reactive하게 수정
   void selectStartDate(DateTime date) {
-    selectedStartDate = date;
-    update(); // GetX 상태 업데이트
+    selectedStartDate.value = date;
+    print('선택된 시작 날짜: $date');
+  }
+
+  void selectEndDate(DateTime date) {
+    selectedEndDate.value = date;
+    print('선택된 시작 날짜: $date');
+  }
+
+  // 선택된 날짜들 초기화
+  void clearSelectedDates() {
+    selectedStartDate.value = null;
+  }
+
+  // 범위 선택
+  void selectDateRange(DateTime start, DateTime end) {
+    selectedStartDate.value = start;
+    selectedEndDate.value = end;
+
+    // 선택된 범위 출력 (디버깅용)
+    print('선택된 범위: ${start.toString().split(' ')[0]} ~ ${end.toString().split(' ')[0]}');
+
+    // 범위 내 날짜 수 계산
+    int dayCount = end.difference(start).inDays + 1;
+    print('선택된 일수: $dayCount일');
+  }
+
+  // 선택된 범위 내 모든 날짜 가져오기
+
+  List<String> getSelectedDateRange() {
+    if (selectedStartDate.value == null) {
+      return [];
+    }
+
+    List<String> dates = [];
+    DateTime current = selectedStartDate.value!;
+    DateTime endDate = selectedEndDate.value ?? selectedStartDate.value!; // 종료일이 없으면 시작일과 같게
+
+    // 날짜만 비교 (시간 무시)
+    while (current.isBefore(endDate.add(const Duration(days: 1)))) {
+      // Firebase에 저장하기 좋은 형식 (yyyy-MM-dd)
+      String dateString =
+          '${current.year.toString().padLeft(4, '0')}-'
+          '${current.month.toString().padLeft(2, '0')}-'
+          '${current.day.toString().padLeft(2, '0')}';
+      dates.add(dateString);
+      current = current.add(const Duration(days: 1));
+    }
+
+    return dates;
+  }
+
+  // 범위 초기화
+  void clearDateRange() {
+    selectedStartDate.value = null;
+    selectedEndDate.value = null;
   }
 }
