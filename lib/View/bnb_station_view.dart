@@ -71,6 +71,7 @@ class BnbStationView extends GetView<BnbStationController> {
                         onTap: () {
                           Get.toNamed('/detail', arguments: {'station': station});
                           Get.find<ChargeDetailController>().loadDisabledDates(station['ownerUid'], station['id']);
+                          Get.find<ChargeDetailController>().fetchReservedTimeSlots(station['id']);
                         },
                       );
                     },

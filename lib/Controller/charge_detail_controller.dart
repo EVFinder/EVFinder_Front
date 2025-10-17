@@ -19,6 +19,9 @@ class ChargeDetailController extends GetxController {
   Rx<DateTime?> selectedEndDate = Rx<DateTime?>(null);
   Rx<DateTime> focusedDay = DateTime.now().obs;
 
+  // 예약된 시간대 관련 추가
+  RxList<String> reservedTimeSlots = <String>[].obs;
+
   @override
   void dispose() {
     super.dispose();
@@ -29,7 +32,6 @@ class ChargeDetailController extends GetxController {
     super.onInit();
     _loadUid();
 
-    // loadReview();
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
       final stationData = arguments['station'] as Map<String, dynamic>?;
@@ -44,6 +46,7 @@ class ChargeDetailController extends GetxController {
     }
   }
 
+  // 기존 코드들...
   Future<void> _loadUid() async {
     final prefs = await SharedPreferences.getInstance();
     uid.value = prefs.getString('uid') ?? '';
@@ -73,6 +76,150 @@ class ChargeDetailController extends GetxController {
     }
   }
 
+  // 기존 fetchReservedDates 메서드를 수정하여 시간대 저장 기능 추가
+  Future<void> fetchReservedTimeSlots(String shareId) async {
+    final headers = {'Content-Type': 'application/json'};
+    try {
+      http.Response response;
+      final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/share/$shareId');
+      response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print("fetchReservedTimeSlots success");
+        final List<dynamic> data = json.decode(response.body);
+
+        List<String> allReservedSlots = [];
+
+        for (var reservation in data) {
+          DateTime startDateTime = DateTime.parse(reservation['startTime']);
+          DateTime endDateTime = DateTime.parse(reservation['endTime']);
+
+          // 시작 시간부터 종료 시간까지 1시간 단위로 생성
+          DateTime currentTime = startDateTime;
+          while (currentTime.isBefore(endDateTime)) {
+            // "yyyy-MM-dd HH:mm" 형식으로 저장 (시간 비교용)
+            String timeSlot = DateFormat('yyyy-MM-dd HH:mm').format(currentTime.toLocal());
+            allReservedSlots.add(timeSlot);
+            currentTime = currentTime.add(Duration(hours: 1));
+          }
+        }
+
+        // 중복 제거 및 정렬
+        allReservedSlots = allReservedSlots.toSet().toList();
+        allReservedSlots.sort();
+
+        reservedTimeSlots.value = allReservedSlots;
+        print("예약된 시간대들: $reservedTimeSlots");
+      } else {
+        print('fetchReservedTimeSlots Status Code: ${response.statusCode}');
+        print('fetchReservedTimeSlots Response Body: ${response.body}');
+        reservedTimeSlots.clear();
+      }
+    } catch (e) {
+      print("fetchReservedTimeSlots error: $e");
+      reservedTimeSlots.clear();
+    }
+  }
+
+  // 기존 fetchReservedDates는 그대로 유지 (다른 곳에서 사용할 수 있으므로)
+  // Future<List<String>> fetchReservedDates(String shareId) async {
+  //   final headers = {'Content-Type': 'application/json'};
+  //   try {
+  //     http.Response response;
+  //     final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/share/$shareId');
+  //     response = await http.get(url, headers: headers);
+  //
+  //     if (response.statusCode == 200) {
+  //       print("fetchReservedDates success");
+  //       final List<dynamic> data = json.decode(response.body);
+  //
+  //       List<String> allReservedSlots = [];
+  //
+  //       for (var reservation in data) {
+  //         DateTime startDateTime = DateTime.parse(reservation['startTime']);
+  //         DateTime endDateTime = DateTime.parse(reservation['endTime']);
+  //
+  //         // 시작 시간부터 종료 시간까지 1시간 단위로 생성
+  //         DateTime currentTime = startDateTime;
+  //         while (currentTime.isBefore(endDateTime)) {
+  //           String timeSlot = DateFormat('M월 d일 H시').format(currentTime.toLocal());
+  //           allReservedSlots.add(timeSlot);
+  //           currentTime = currentTime.add(Duration(hours: 1));
+  //         }
+  //       }
+  //
+  //       // 중복 제거 및 정렬
+  //       allReservedSlots = allReservedSlots.toSet().toList();
+  //       allReservedSlots.sort();
+  //
+  //       print("예약된 시간대들: $allReservedSlots");
+  //       return allReservedSlots;
+  //     }
+  //
+  //     print('fetchReservedDates Status Code: ${response.statusCode}');
+  //     print('fetchReservedDates Response Body: ${response.body}');
+  //     return [];
+  //   } catch (e) {
+  //     print("fetchReservedDates error: $e");
+  //     return [];
+  //   }
+  // }
+
+  // 특정 날짜의 특정 시간이 예약되어 있는지 확인
+  bool isTimeSlotReserved(DateTime date, String period, String time) {
+    String dateStr = DateFormat('yyyy-MM-dd').format(date);
+
+    // 시간 형식 변환 (12시간 -> 24시간)
+    int hour = int.parse(time.split(':')[0]);
+    if (period == '오후' && hour != 12) {
+      hour += 12;
+    } else if (period == '오전' && hour == 12) {
+      hour = 0;
+    }
+
+    String timeSlot = '$dateStr ${hour.toString().padLeft(2, '0')}:00';
+    return reservedTimeSlots.contains(timeSlot);
+  }
+
+  // 특정 날짜에 예약된 시간이 있는지 확인
+  bool hasReservationsOnDate(DateTime date) {
+    String dateStr = DateFormat('yyyy-MM-dd').format(date);
+    return reservedTimeSlots.any((slot) => slot.startsWith(dateStr));
+  }
+
+  // 특정 날짜가 완전히 예약되어 있는지 확인 (모든 시간대가 예약된 경우)
+  bool isDayFullyBooked(DateTime date) {
+    String dateStr = DateFormat('yyyy-MM-dd').format(date);
+    int reservedCount = reservedTimeSlots.where((slot) => slot.startsWith(dateStr)).length;
+    return reservedCount >= 24; // 24시간 모두 예약된 경우
+  }
+
+  // 오전/오후 시간을 24시간 형식으로 변환
+  int _convertTo24Hour(String period, String time) {
+    List<String> timeParts = time.split(':');
+    int hour = int.parse(timeParts[0]);
+
+    if (period == '오전') {
+      if (hour == 12) return 0; // 오전 12시 = 0시
+      return hour;
+    } else {
+      // 오후
+      if (hour == 12) return 12; // 오후 12시 = 12시
+      return hour + 12;
+    }
+  }
+
+  // 예약된 시간대 데이터 로드 (shareId를 매개변수로 받음)
+  Future<void> loadReservedTimeSlots(String shareId) async {
+    isLoading.value = true;
+    try {
+      await fetchReservedTimeSlots(shareId);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // 기존 코드들 계속...
   Future<void> loadReview() async {
     isLoading.value = true;
     try {
@@ -97,6 +244,7 @@ class ChargeDetailController extends GetxController {
     }
   }
 
+  // 나머지 기존 메서드들은 그대로 유지...
   Future<List<Map<String, dynamic>>> fetchReview() async {
     var urlString = '${ApiConstants.reviewBaseUrl}/list/station/$stationId?orderBy=createdAt&limit=3';
 
@@ -146,9 +294,7 @@ class ChargeDetailController extends GetxController {
 
       if (response.statusCode == 200) {
         print("fetchReserveDate success");
-        // JSON 문자열을 Map으로 파싱
         final Map<String, dynamic> data = json.decode(response.body);
-        // print(data);
         reserveAvailableDate.value = data;
         return data;
       }
@@ -165,12 +311,7 @@ class ChargeDetailController extends GetxController {
     final headers = {'Content-Type': 'application/json'};
     try {
       final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/disabledDates');
-      // JSON 배열로 인코딩해서 전송
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: jsonEncode(dates), // 이게 핵심!
-      );
+      final response = await http.post(url, headers: headers, body: jsonEncode(dates));
 
       if (response.statusCode == 200) {
         print("addDisabledDates success");
@@ -189,12 +330,7 @@ class ChargeDetailController extends GetxController {
     final headers = {'Content-Type': 'application/json'};
     try {
       final url = Uri.parse('${ApiConstants.chargerbnbApiUrl}/$uid/$shareId/disabledDates');
-      // JSON 배열로 인코딩해서 전송
-      final response = await http.delete(
-        url,
-        headers: headers,
-        body: jsonEncode(dates), // 이게 핵심!
-      );
+      final response = await http.delete(url, headers: headers, body: jsonEncode(dates));
 
       if (response.statusCode == 200) {
         print("deleteDisabledDates success");
@@ -215,11 +351,14 @@ class ChargeDetailController extends GetxController {
       isLoading.value = true;
       try {
         reserveAvailableDate.value = await fetchDisableDates(ownerUid, shareId);
+        // 예약된 시간대도 함께 로드
+        await fetchReservedTimeSlots(shareId);
       } finally {
         isLoading.value = false;
       }
     } else {
       reserveAvailableDate.value = null;
+      reservedTimeSlots.clear();
     }
     print("예약 불가능 날짜 데이터: ${reserveAvailableDate.value}");
   }
@@ -234,7 +373,7 @@ class ChargeDetailController extends GetxController {
     return disabledDates?.contains(dayString) ?? false;
   }
 
-  // 날짜 선택 함수들을 reactive하게 수정
+  // 기존 날짜 선택 관련 메서드들...
   void selectStartDate(DateTime date) {
     selectedStartDate.value = date;
     print('선택된 시작 날짜: $date');
@@ -245,25 +384,19 @@ class ChargeDetailController extends GetxController {
     print('선택된 시작 날짜: $date');
   }
 
-  // 선택된 날짜들 초기화
   void clearSelectedDates() {
     selectedStartDate.value = null;
   }
 
-  // 범위 선택
   void selectDateRange(DateTime start, DateTime end) {
     selectedStartDate.value = start;
     selectedEndDate.value = end;
 
-    // 선택된 범위 출력 (디버깅용)
     print('선택된 범위: ${start.toString().split(' ')[0]} ~ ${end.toString().split(' ')[0]}');
 
-    // 범위 내 날짜 수 계산
     int dayCount = end.difference(start).inDays + 1;
     print('선택된 일수: $dayCount일');
   }
-
-  // 선택된 범위 내 모든 날짜 가져오기
 
   List<String> getSelectedDateRange() {
     if (selectedStartDate.value == null) {
@@ -272,11 +405,9 @@ class ChargeDetailController extends GetxController {
 
     List<String> dates = [];
     DateTime current = selectedStartDate.value!;
-    DateTime endDate = selectedEndDate.value ?? selectedStartDate.value!; // 종료일이 없으면 시작일과 같게
+    DateTime endDate = selectedEndDate.value ?? selectedStartDate.value!;
 
-    // 날짜만 비교 (시간 무시)
     while (current.isBefore(endDate.add(const Duration(days: 1)))) {
-      // Firebase에 저장하기 좋은 형식 (yyyy-MM-dd)
       String dateString =
           '${current.year.toString().padLeft(4, '0')}-'
           '${current.month.toString().padLeft(2, '0')}-'
@@ -288,7 +419,6 @@ class ChargeDetailController extends GetxController {
     return dates;
   }
 
-  // 범위 초기화
   void clearDateRange() {
     selectedStartDate.value = null;
     selectedEndDate.value = null;
