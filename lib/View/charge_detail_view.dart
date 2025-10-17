@@ -179,7 +179,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                                   Get.back();
                                                   Get.back();
                                                   controller.clearDateRange();
-                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  controller.fetchDisableDates(ownerUid, shareId);
                                                   Get.snackbar('성공', '활성화 되었습니다.');
                                                 } else {
                                                   Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
@@ -348,7 +348,49 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                         child: TextButton(
                                           onPressed: () async {
                                             if (controller.selectedStartDate.value != null) {
-                                              // 선택된 날짜로 다음 단계 진행
+                                              // 선택된 날짜 범위에 예약이 있는지 확인
+                                              List<String> selectedDates = controller.getSelectedDateRange();
+                                              bool hasReservations = false;
+
+                                              for (String dateStr in selectedDates) {
+                                                DateTime date = DateTime.parse(dateStr);
+                                                if (controller.hasReservationsOnDate(date)) {
+                                                  hasReservations = true;
+                                                  break;
+                                                }
+                                              }
+
+                                              if (hasReservations) {
+                                                // 예약이 있는 경우 경고 다이얼로그 표시
+                                                Get.dialog(
+                                                  AlertDialog(
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                    title: Row(
+                                                      children: [
+                                                        const Icon(Icons.warning, color: Colors.orange, size: 24),
+                                                        const SizedBox(width: 8),
+                                                        const Text('비활성화 불가', style: TextStyle(fontWeight: FontWeight.w700)),
+                                                      ],
+                                                    ),
+                                                    content: const Text('선택된 날짜에 예약이 있어 비활성화할 수 없습니다.\n예약을 먼저 취소해주세요.', style: TextStyle(color: Color(0xFF6B7280))),
+                                                    actions: [
+                                                      Container(
+                                                        decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(8)),
+                                                        child: TextButton(
+                                                          onPressed: () => Get.back(),
+                                                          child: const Text(
+                                                            '확인',
+                                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                                return; // 비활성화 실행하지 않고 종료
+                                              }
+
+                                              // 예약이 없는 경우에만 비활성화 실행
                                               if (ownerUid != null && shareId != null) {
                                                 print(controller.getSelectedDateRange());
                                                 bool success = await controller.addDisabledDates(ownerUid, shareId, controller.getSelectedDateRange());
@@ -356,13 +398,12 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                                   Get.back();
                                                   Get.back();
                                                   controller.clearDateRange();
-                                                  controller.fetchReserveDate(ownerUid, shareId);
+                                                  controller.fetchDisableDates(ownerUid, shareId);
                                                   Get.snackbar('성공', '해당 날짜가 비활성화 되었습니다.');
                                                 } else {
                                                   Get.snackbar('오류', '날짜 설정에 실패했습니다. 다시 시도해주세요.');
                                                 }
                                               }
-                                              // _proceedWithReservation(controller.selectedStartDate.value!);
                                             } else {
                                               Get.snackbar('알림', '날짜를 선택해주세요.');
                                             }
@@ -373,6 +414,7 @@ class ChargeDetailView extends GetView<ChargeDetailController> {
                                           ),
                                         ),
                                       ),
+
                                       TextButton(
                                         onPressed: () {
                                           Get.back();
