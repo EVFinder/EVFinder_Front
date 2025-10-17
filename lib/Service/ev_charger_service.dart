@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../Model/ev_charger.dart';
 import '../Model/ev_charger_detail.dart';
-import '../constants/api_constants.dart';
+import '../Constants/api_constants.dart';
 
 class EvChargerService {
   static Future<List<EvCharger>> fetchNearbyChargers(double lat, double lon) async {
