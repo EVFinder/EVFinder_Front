@@ -30,7 +30,7 @@ class SlidingupPanelWidget extends StatelessWidget {
       collapsed: true,
       minHeight: 30,
       body: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.53,
+        height: Get.size.height * 0.48,
         child: ListView.separated(
           itemCount: chargers.length,
           itemBuilder: (context, int index) {
