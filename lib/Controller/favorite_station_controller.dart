@@ -68,20 +68,22 @@ class FavoriteStationController extends GetxController {
   Future<void> refreshFavoriteStations() async {
     isLoading.value = true;
     try {
-      final rawFavorites = await FavoriteService.fetchFavoriteStatus(uid.value);
-      favoriteStations.assignAll(
-        rawFavorites.map(
-          (e) => {
-            "name": e['name']?.toString() ?? '알 수 없음',
-            "address": e['address']?.toString() ?? '주소 없음',
-            "id": e['id']?.toString() ?? '',
-            "lat": e['lat'] ?? 0.0,
-            "lon": e['lon'] ?? 0.0,
-            "chargers": e['chargers'] ?? [],
-            "isFavorite": true,
-          },
-        ),
-      );
+      final rawFavorites = await FavoriteService.updateFavorite(uid.value);
+      if (rawFavorites.isEmpty) {
+        // 빈 리스트 처리
+        favoriteStations.clear();
+        Get.snackbar('알림', '즐겨찾기한 충전소가 없습니다.');
+      } else {
+        favoriteStations.assignAll(
+          rawFavorites.map(
+            (e) => {"name": e.name.toString(), "address": e.addr.toString(), "id": e.id.toString(), "lat": e.lat, "lon": e.lon, "chargers": e.evchargerDetail, "isFavorite": true},
+          ),
+        );
+        Get.snackbar('성공', '즐겨찾기 목록이 업데이트되었습니다.');
+      }
+    } catch (e) {
+      Get.snackbar('오류', '즐겨찾기 업데이트에 실패했습니다.');
+      print('Error refreshing favorites: $e');
     } finally {
       isLoading.value = false;
     }

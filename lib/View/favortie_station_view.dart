@@ -13,7 +13,7 @@ class FavoriteStationView extends GetView<FavoriteStationController> {
     controller.loadFavoriteStations();
     return Scaffold(
       backgroundColor: Color(0xFFF7F9FC),
-      appBar: AppBar(title: const Text('즐겨찾기 충전소'), backgroundColor: Colors.white,),
+      appBar: AppBar(title: const Text('즐겨찾기 충전소'), backgroundColor: Colors.white),
       body: Obx(() {
         if (controller.isLoading.value) {
           //controller.isLoading.value 상태가 true일 경우 로딩

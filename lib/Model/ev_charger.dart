@@ -13,8 +13,8 @@ class EvCharger {
   factory EvCharger.fromJson(Map<String, dynamic> json) {
     return EvCharger(
       id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      addr: json['address'] ?? '',
+      name: json['name'] ?? '알 수 없음',
+      addr: json['address'] ?? '주소 없음',
       lat: json['lat'] ?? 0.0,
       lon: json['lon'] ?? 0.0,
       evchargerDetail: (json['evChargers'] as List<dynamic>?)?.map((item) => EvChargerDetail.fromJson(item as Map<String, dynamic>)).toList() ?? [],

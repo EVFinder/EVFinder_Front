@@ -66,13 +66,23 @@ class FavoriteService {
     }
   }
 
+  /// 즐겨찾기 목록 조회
+  static Future<List<EvCharger>> updateFavorite(String uid) async {
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/updateStatus/$uid');
+    final response = await http.put(url);
 
-
+    if (response.statusCode == 200) {
+      // final decoded = json.decode(response.body);
+      final List chargers = json.decode(response.body);
+      return chargers.map((e) => EvCharger.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to update favorites stats');
+    }
+  }
 
   // 임시값 (서울)
   static double userLat = 37.5665;
   static double userLng = 126.9780;
-
 
   // static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({required String uid}) async {
   //   if (await Permission.location.isGranted) {
