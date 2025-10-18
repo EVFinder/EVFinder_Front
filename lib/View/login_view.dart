@@ -11,7 +11,8 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB), // 부드러운 배경색
+      backgroundColor: const Color(0xFFF9FAFB),
+      // 부드러운 배경색
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -84,16 +85,19 @@ class LoginView extends GetView<LoginController> {
                 ),
               ),
               const SizedBox(height: 15),
-
               Row(
-                // mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SizedBox(width: Get.size.width * 0.02),
+                  Text("자동 로그인"),
+                  SizedBox(width: Get.size.width * 0.05),
                   SizedBox(
                     width: 20,
                     height: 20,
                     child: Obx(
-                      () => Checkbox(
+                      () => Switch(
+                        inactiveTrackColor: Colors.grey.shade300,
+                        inactiveThumbColor: Colors.grey.shade600,
+                        trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
                         value: controller.isChecked.value,
                         onChanged: (bool? value) async {
                           controller.isChecked.value = value ?? false;
@@ -104,18 +108,15 @@ class LoginView extends GetView<LoginController> {
                             prefs.setBool('isAutoLogin', false);
                           }
                         },
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                        activeColor: const Color(0xFF10B981),
+                        activeColor: Colors.green,
                       ),
                     ),
                   ),
-                  SizedBox(width: Get.size.width * 0.02),
-                  Text("자동 로그인"),
+                  SizedBox(width: Get.size.width * 0.05),
+                  // Text("자동 로그인"),
                 ],
               ),
-
-              const SizedBox(height: 15),
-
+              SizedBox(height: Get.size.height * 0.02),
               // 로그인 버튼
               ElevatedButton(
                 onPressed: () {
