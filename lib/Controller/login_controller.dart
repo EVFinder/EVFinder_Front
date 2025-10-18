@@ -16,6 +16,8 @@ class LoginController extends GetxController {
 
   final uid = ''.obs;
 
+  RxBool isChecked = false.obs;
+
   // final UserModel _model = UserModel();
 
   Future<void> success(BuildContext context, String jwt) async {

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Controller/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -82,7 +83,38 @@ class LoginView extends GetView<LoginController> {
                   fillColor: Colors.white,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
+
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(width: Get.size.width * 0.02),
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Obx(
+                      () => Checkbox(
+                        value: controller.isChecked.value,
+                        onChanged: (bool? value) async {
+                          controller.isChecked.value = value ?? false;
+                          final prefs = await SharedPreferences.getInstance();
+                          if (controller.isChecked.value) {
+                            prefs.setBool('isAutoLogin', true);
+                          } else {
+                            prefs.setBool('isAutoLogin', false);
+                          }
+                        },
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                        activeColor: const Color(0xFF10B981),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: Get.size.width * 0.02),
+                  Text("자동 로그인"),
+                ],
+              ),
+
+              const SizedBox(height: 15),
 
               // 로그인 버튼
               ElevatedButton(
