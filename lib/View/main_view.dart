@@ -13,25 +13,24 @@ class MainView extends GetView<MainController> {
     // , ProfileView()
     return Obx(
       () => Scaffold(
-        // appBar: controller.selectedIndex.value == 4
-        //     ? AppBar(
-        //         title: Text("EVFinder"),
-        //         actions: [
-        //           IconButton(
-        //             onPressed: () {
-        //               Get.toNamed(AppRoute.setting);
-        //             },
-        //             icon: Icon(Icons.settings),
-        //           ),
-        //         ],
-        //       )
-        //     :
-        // null,
+        appBar: controller.selectedIndex.value == 4
+            ? AppBar(
+          toolbarHeight: Get.size.height * 0.05,
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Get.toNamed(AppRoute.setting);
+                    },
+                    icon: Icon(Icons.settings),
+                  ),
+                ],
+              )
+            : null,
         //Navigation Bar
         bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           shape: CircularNotchedRectangle(),
-          child: Container(
+          child: SizedBox(
             height: 10,
             child: Padding(
               padding: const EdgeInsets.only(right: 20, left: 20),
