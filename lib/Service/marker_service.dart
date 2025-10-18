@@ -1,10 +1,10 @@
-import 'package:evfinder_front/Controller/camera_controller.dart';
+import 'package:evfinder_front/Controller/MainPage/camera_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/ev_charger.dart';
-import '../View/Widget/charger_detail_card.dart';
+import '../View/Widget/BnB/charger_detail_card.dart';
 import 'ev_charger_service.dart';
 import 'favorite_service.dart'; // 또는 상대경로 맞게 수정
 

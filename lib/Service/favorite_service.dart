@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:evfinder_front/Controller/permission_controller.dart';
+import 'package:evfinder_front/Controller/MainPage/permission_controller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;

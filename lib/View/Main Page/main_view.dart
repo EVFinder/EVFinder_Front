@@ -1,0 +1,102 @@
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import '../../Controller/MainPage/main_controller.dart';
+import '../../Util/Route/app_page.dart';
+
+class MainView extends GetView<MainController> {
+  const MainView({super.key});
+
+  static String route = '/main';
+
+  @override
+  Widget build(BuildContext context) {
+    // , ProfileView()
+    return Obx(
+      () => Scaffold(
+        appBar: controller.selectedIndex.value == 4
+            ? AppBar(
+          toolbarHeight: Get.size.height * 0.05,
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Get.toNamed(AppRoute.setting);
+                    },
+                    icon: Icon(Icons.settings),
+                  ),
+                ],
+              )
+            : null,
+        //Navigation Bar
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          shape: CircularNotchedRectangle(),
+          child: SizedBox(
+            height: 10,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20, left: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(0);
+                    },
+                    icon: Icon(Icons.forum, size: 25),
+                    color: controller.selectedIndex.value == 0 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(1);
+                    },
+                    icon: Icon(Icons.star, size: 25),
+                    color: controller.selectedIndex.value == 1 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(2);
+                    },
+                    icon: Icon(Icons.explore, size: 25),
+                    color: controller.selectedIndex.value == 2 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(3);
+                    },
+                    icon: Icon(Icons.ev_station, size: 25),
+                    color: controller.selectedIndex.value == 3 ? Colors.green : Colors.black12,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.setView(4);
+                    },
+                    icon: Icon(Icons.person, size: 25),
+                    color: controller.selectedIndex.value == 4 ? Colors.green : Colors.black12,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // 가운데 동그란 버튼
+        // floatingActionButton: SizedBox(
+        //   height: 80,
+        //   width: 80,
+        //   child: FloatingActionButton(
+        //     clipBehavior: Clip.none,
+        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+        //     onPressed: () {
+        //       setState(() {
+        //         selectedIndex = 1;
+        //       });
+        //     },
+        //     backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
+        //     child: Icon(Icons.map, size: 35),
+        //   ),
+        // ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        body: controller.pages[controller.selectedIndex.value],
+      ),
+    );
+  }
+}
