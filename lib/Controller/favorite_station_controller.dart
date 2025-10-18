@@ -91,6 +91,7 @@ class FavoriteStationController extends GetxController {
     final success = await FavoriteService.removeFavorite(uid.value, statId);
     if (success) {
       favoriteStations.removeWhere((station) => station['id'] == statId);
+      await loadFavoriteStations();
     }
   }
 
