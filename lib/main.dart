@@ -25,6 +25,7 @@ import 'package:evfinder_front/Controller/signup_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Controller/camera_controller.dart';
@@ -61,7 +62,9 @@ void _handleMessage(RemoteMessage message) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); // Firebase 초기화
+  FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   PushNotification.init();
   PushNotification.localNotiInit();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -75,7 +78,6 @@ void main() async {
   });
   setupInteractedMessage();
 
-  WidgetsFlutterBinding.ensureInitialized();
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
     onAuthFailed: (ex) => switch (ex) {
@@ -84,23 +86,31 @@ void main() async {
     },
   );
 
-  runApp(const MyApp());
+  // 자동 로그인 체크
+  String initialRoute = await checkAutoLogin();
+
+  // 모든 준비 완료 후 스플래시 제거
+  FlutterNativeSplash.remove();
+
+  runApp(MyApp(initialRoute: initialRoute)); // ← initialRoute 전달
+}
+
+Future<String> checkAutoLogin() async {
+  final prefs = await SharedPreferences.getInstance();
+  final jwt = prefs.getString('jwt');
+  final isAutoLogin = prefs.getBool('isAutoLogin') ?? false;
+
+  if (jwt != null && isAutoLogin) {
+    return AppRoute.main;
+  } else {
+    return AppRoute.login;
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute; // ← initialRoute 받기
 
-  Future<String> checkAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jwt = prefs.getString('jwt');
-    final isAutoLogin = prefs.getBool('isAutoLogin') ?? false;
-
-    if (jwt != null && isAutoLogin) {
-      return AppRoute.main;
-    } else {
-      return AppRoute.login;
-    }
-  }
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -112,65 +122,37 @@ class MyApp extends StatelessWidget {
       permissionController.permissionCheck();
     });
 
-    return FutureBuilder<String>(
-      future: checkAutoLogin(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // 로딩 중일 때 보여줄 화면
-          return MaterialApp(
-            home: Scaffold(
-              backgroundColor: const Color(0xFF10B981),
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'EVFinder',
-                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    SizedBox(height: 20),
-                    CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-
-        // 자동 로그인 체크 완료 후 실제 앱 실행
-        return GetMaterialApp(
-          locale: const Locale("ko", "KR"),
-          theme: ThemeData(fontFamily: 'neo'),
-          debugShowCheckedModeBanner: false,
-          initialBinding: BindingsBuilder(() {
-            Get.put(LoginController());
-            Get.lazyPut(() => FavoriteStationController(), fenix: true);
-            Get.lazyPut(() => SignupController(), fenix: true);
-            Get.lazyPut(() => MainController(), fenix: true);
-            Get.lazyPut(() => MapController(), fenix: true);
-            Get.lazyPut(() => ProfileController(), fenix: true);
-            Get.lazyPut(() => SettingController(), fenix: true);
-            Get.lazyPut(() => HostController(), fenix: true);
-            Get.lazyPut(() => AddChargeController(), fenix: true);
-            Get.lazyPut(() => ReservManagementController(), fenix: true);
-            Get.lazyPut(() => RegisterChargeController(), fenix: true);
-            Get.lazyPut(() => ReservController(), fenix: true);
-            Get.lazyPut(() => SearchChargerController(), fenix: true);
-            Get.lazyPut(() => BnbStationController(), fenix: true);
-            Get.lazyPut(() => CommunityController(), fenix: true);
-            Get.lazyPut(() => ChargeDetailController(), fenix: true);
-            Get.lazyPut(() => ReservUserController(), fenix: true);
-            Get.lazyPut(() => ReviewWriteController(), fenix: true);
-            Get.lazyPut(() => ReviewDetailController(), fenix: true);
-            Get.lazyPut(() => ChatbotController(), fenix: true);
-            Get.lazyPut(() => ChangePasswordController(), fenix: true);
-            Get.lazyPut(() => FindPasswordController(), fenix: true);
-            Get.lazyPut(() => PaymentHistoryController(), fenix: true);
-          }),
-          getPages: AppPages.pages,
-          initialRoute: snapshot.data ?? AppRoute.login,
-        );
-      },
+    return GetMaterialApp(
+      locale: const Locale("ko", "KR"),
+      theme: ThemeData(fontFamily: 'neo'),
+      debugShowCheckedModeBanner: false,
+      initialBinding: BindingsBuilder(() {
+        Get.put(LoginController());
+        Get.lazyPut(() => FavoriteStationController(), fenix: true);
+        Get.lazyPut(() => SignupController(), fenix: true);
+        Get.lazyPut(() => MainController(), fenix: true);
+        Get.lazyPut(() => MapController(), fenix: true);
+        Get.lazyPut(() => ProfileController(), fenix: true);
+        Get.lazyPut(() => SettingController(), fenix: true);
+        Get.lazyPut(() => HostController(), fenix: true);
+        Get.lazyPut(() => AddChargeController(), fenix: true);
+        Get.lazyPut(() => ReservManagementController(), fenix: true);
+        Get.lazyPut(() => RegisterChargeController(), fenix: true);
+        Get.lazyPut(() => ReservController(), fenix: true);
+        Get.lazyPut(() => SearchChargerController(), fenix: true);
+        Get.lazyPut(() => BnbStationController(), fenix: true);
+        Get.lazyPut(() => CommunityController(), fenix: true);
+        Get.lazyPut(() => ChargeDetailController(), fenix: true);
+        Get.lazyPut(() => ReservUserController(), fenix: true);
+        Get.lazyPut(() => ReviewWriteController(), fenix: true);
+        Get.lazyPut(() => ReviewDetailController(), fenix: true);
+        Get.lazyPut(() => ChatbotController(), fenix: true);
+        Get.lazyPut(() => ChangePasswordController(), fenix: true);
+        Get.lazyPut(() => FindPasswordController(), fenix: true);
+        Get.lazyPut(() => PaymentHistoryController(), fenix: true);
+      }),
+      getPages: AppPages.pages,
+      initialRoute: initialRoute, // ← 전달받은 initialRoute 사용
     );
   }
 }
