@@ -5,30 +5,38 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../Constants/api_constants.dart';
 import 'package:http/http.dart' as http;
-import '../Controller/login_controller.dart';
-import '../View/login_view.dart';
 
 class SignupController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final nameController = TextEditingController();
-  final loginController = LoginController();
+  final phoneNumController = TextEditingController();
   final RxBool isLoading = false.obs;
 
-  // final UserModel _userModel = UserModel();
-
-  void dispose() {
+  @override
+  void onClose() {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    nameController.dispose();
+    phoneNumController.dispose();
+    super.onClose();
   }
 
   Future<void> handleSignup(BuildContext context) async {
-    signup(context);
+    // 입력 검증
+    if (!_validateInput(context)) {
+      return;
+    }
+
     isLoading.value = true;
-    await Future.delayed(const Duration(seconds: 1)); // React 스타일 대기
-    isLoading.value = false;
+
+    try {
+      await signup(context);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   bool _isPasswordSecure(String password) {
@@ -44,83 +52,95 @@ class SignupController extends GetxController {
     final email = emailController.text.trim();
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
+    final name = nameController.text.trim();
+    final phoneNum = phoneNumController.text.trim();
 
     if (email.isEmpty) {
-      _showMessage(context, '이메일을 입력하세요.');
+      Get.snackbar('오류', '이메일을 입력하세요.');
       return false;
     }
 
     if (!isValidEmail(email)) {
-      _showMessage(context, '올바른 이메일 형식을 입력하세요.');
+      Get.snackbar('오류', '올바른 이메일 형식을 입력하세요.');
+      return false;
+    }
+
+    if (name.isEmpty) {
+      Get.snackbar('오류', '이름을 입력하세요.');
+      return false;
+    }
+
+    if (phoneNum.isEmpty) {
+      Get.snackbar('오류', '전화번호를 입력하세요.');
       return false;
     }
 
     if (password.length < 6) {
-      _showMessage(context, '비밀번호는 최소 6자 이상이어야 합니다.');
+      Get.snackbar('오류', '비밀번호는 최소 6자 이상이어야 합니다.');
       return false;
     }
 
     if (password != confirmPassword) {
-      _showMessage(context, '비밀번호가 일치하지 않습니다.');
+      Get.snackbar('오류', '비밀번호가 일치하지 않습니다.');
       return false;
     }
 
     if (!_isPasswordSecure(password)) {
-      _showMessage(context, '비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.');
+      Get.snackbar('오류', '비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.');
       return false;
     }
 
     return true;
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-
   Future<void> signup(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text;
-    final name = nameController.text;
+    final name = nameController.text.trim();
+    final phoneNum = phoneNumController.text.trim();
 
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.authApiBaseUrl}/signup'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password, 'userName': name}),
+        body: jsonEncode({'email': email, 'password': password, 'userName': name, 'phone': phoneNum}),
       );
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        // if (decoded['success'] == true) {
-        final String jwt = decoded['jwt'];
-        final String uid = decoded['uid'];
-        final String email = decoded['email'];
-        final String name = decoded['userName'];
-
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('회원가입 성공')));
-
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => LoginView()), // 직접 로그인 화면으로 이동
-        // );
         Get.dialog(
-          Dialog(
-            child: SizedBox(height: 200, child: Center(child: Text('회원가입이 완료되었습니다!'))),
+          AlertDialog(
+            title: const Text('성공'),
+            content: const Text('회원가입이 완료되었습니다!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Get.back(); // 다이얼로그 닫기
+                  Get.offAndToNamed(AppRoute.login);
+                },
+                child: const Text('확인'),
+              ),
+            ],
           ),
-        ).then((value) {
-          Get.offAndToNamed(AppRoute.login);
-        });
-        // } else {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(content: Text('회원가입 실패: ${decoded['message']}')),
-        //   );
-        // }
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('서버 오류가 발생했습니다. 회원가입에 실패하였습니다.')));
+        Get.dialog(
+          AlertDialog(
+            title: const Text('실패'),
+            content: const Text('회원가입에 실패하였습니다.'),
+            actions: [TextButton(onPressed: () => Get.back(), child: const Text('확인'))],
+          ),
+        );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('회원가입 실패: ${e.toString()}')));
+      Get.dialog(
+        AlertDialog(
+          title: const Text('오류'),
+          content: Text('회원가입 실패: ${e.toString()}'),
+          actions: [TextButton(onPressed: () => Get.back(), child: const Text('확인'))],
+        ),
+      );
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../Controller/map_controller.dart';
 import '../Model/search_chargers.dart';
+import '../Model/weather.dart';
 import 'Widget/search_appbar_widget.dart';
 import 'Widget/sliding_pannel_widget.dart';
 
@@ -101,14 +102,45 @@ class MapView extends GetView<MapController> {
           Positioned(
             bottom: Get.size.height * 0.05,
             right: Get.size.width * 0.05,
-            child: WeatherButton(
-              weather: controller.weather.value.main,
-              // weather: "Clear", // 수정해야함 (테스트용)
-              address: controller.address.value,
-              temperature: controller.weather.value.temperature,
-              humidity: controller.weather.value.humidity,
+            child: FutureBuilder<Weather>(
+              future: controller.fetchWeather(controller.currentCameraLat.value, controller.currentCameraLng.value),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: Offset(0, 2))],
+                    ),
+                    child: Center(child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.blue))),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: Offset(0, 2))],
+                    ),
+                    child: Icon(Icons.error_outline, color: Colors.red, size: 24),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  final weather = snapshot.data!;
+                  return WeatherButton(weather: weather.main, address: controller.address.value, temperature: weather.temperature, humidity: weather.humidity);
+                }
+
+                return SizedBox.shrink();
+              },
             ),
           ),
+
           controller.cameraMoved.value
               ? Positioned(
                   top: Get.size.height * 0.12,

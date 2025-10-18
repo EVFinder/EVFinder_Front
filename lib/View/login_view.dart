@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Controller/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
-  static String route = '/login';
 
+  static String route = '/login';
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +52,7 @@ class LoginView extends GetView<LoginController> {
               const Text(
                 '전기차 충전소를 쉽게 찾아보세요',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 40),
 
@@ -85,7 +83,38 @@ class LoginView extends GetView<LoginController> {
                   fillColor: Colors.white,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
+
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(width: Get.size.width * 0.02),
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Obx(
+                      () => Checkbox(
+                        value: controller.isChecked.value,
+                        onChanged: (bool? value) async {
+                          controller.isChecked.value = value ?? false;
+                          final prefs = await SharedPreferences.getInstance();
+                          if (controller.isChecked.value) {
+                            prefs.setBool('isAutoLogin', true);
+                          } else {
+                            prefs.setBool('isAutoLogin', false);
+                          }
+                        },
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                        activeColor: const Color(0xFF10B981),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: Get.size.width * 0.02),
+                  Text("자동 로그인"),
+                ],
+              ),
+
+              const SizedBox(height: 15),
 
               // 로그인 버튼
               ElevatedButton(
@@ -98,12 +127,7 @@ class LoginView extends GetView<LoginController> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                child: Obx(
-                  () => Text(
-                    controller.isLoading.value ? '로그인 중...' : '로그인',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+                child: Obx(() => Text(controller.isLoading.value ? '로그인 중...' : '로그인', style: const TextStyle(fontSize: 16, color: Colors.white))),
               ),
               const SizedBox(height: 15),
 
@@ -135,19 +159,13 @@ class LoginView extends GetView<LoginController> {
               Center(
                 child: TextButton(
                   onPressed: controller.handleSignup,
-                  child: const Text(
-                    '아직 계정이 없으신가요? 회원가입',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: const Text('아직 계정이 없으신가요? 회원가입', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
               ),
               Center(
                 child: TextButton(
                   onPressed: () => Get.toNamed("/find"),
-                  child: const Text(
-                    '비밀번호 찾기',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: const Text('비밀번호 찾기', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
               ),
 
@@ -155,10 +173,7 @@ class LoginView extends GetView<LoginController> {
 
               // 추가 정보
               const Center(
-                child: Text(
-                  '전국 전기차 충전소 정보를 한눈에',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                child: Text('전국 전기차 충전소 정보를 한눈에', style: TextStyle(fontSize: 12, color: Colors.grey)),
               ),
             ],
           ),

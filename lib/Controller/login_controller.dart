@@ -16,6 +16,8 @@ class LoginController extends GetxController {
 
   final uid = ''.obs;
 
+  RxBool isChecked = false.obs;
+
   // final UserModel _model = UserModel();
 
   Future<void> success(BuildContext context, String jwt) async {
@@ -25,7 +27,7 @@ class LoginController extends GetxController {
     uid.value = prefs.getString('uid') ?? '';
     print("fcmToken : $_fcmToken");
     print('token uinddd : $uid');
-    if(_fcmToken != null && _fcmToken.isNotEmpty) {
+    if (_fcmToken != null && _fcmToken.isNotEmpty) {
       final res = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/fcm/updateToken'),
         headers: {'Content-Type': 'application/json'},
@@ -33,7 +35,7 @@ class LoginController extends GetxController {
       );
       print("token 서버 응답 코드: ${res.statusCode}");
       print("token 서버 응답 내용: ${utf8.decode(res.bodyBytes)}");
-      if(res.statusCode == 200) {
+      if (res.statusCode == 200) {
         print('token 성고옹');
       }
     }
@@ -96,12 +98,14 @@ class LoginController extends GetxController {
         final String uid = decoded['uid'];
         final String email = decoded['email'];
         final String userName = decoded['userName'];
+        final String phoneNum = decoded['phone'];
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt', jwt);
         await prefs.setString('uid', uid); //uid 저장
         await prefs.setString('email', email);
         await prefs.setString('name', userName);
+        await prefs.setString('phone', formatPhoneNumber(phoneNum));
         // Get.snackbar('성공', '로그인 성공');
         // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 
@@ -119,6 +123,19 @@ class LoginController extends GetxController {
       Get.snackbar('실패', '로그인 실패: ${e.toString()}');
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패: ${e.toString()}')));
     }
+  }
+
+  String formatPhoneNumber(String phoneNumber) {
+    // 숫자만 추출
+    String numbers = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (numbers.length == 11 && numbers.startsWith('010')) {
+      return '${numbers.substring(0, 3)}-${numbers.substring(3, 7)}-${numbers.substring(7)}';
+    } else if (numbers.length == 10) {
+      return '${numbers.substring(0, 3)}-${numbers.substring(3, 6)}-${numbers.substring(6)}';
+    }
+
+    return phoneNumber; // 포맷팅할 수 없으면 원본 반환
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -175,34 +192,6 @@ class LoginController extends GetxController {
     }
   }
 
-  // Future<void> changePassword(BuildContext context, String newPassword) async {
-  //   try {
-  //     final user = FirebaseAuth.instance.currentUser;
-  //     final idToken = await user?.getIdToken();
-  //
-  //     if (idToken == null) {
-  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID 토큰을 가져올 수 없습니다.")));
-  //       return;
-  //     }
-  //
-  //     final response = await http.post(
-  //       Uri.parse('${ApiConstants.authApiBaseUrl}/changepw'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode({'idToken': idToken, 'newPassword': newPassword}),
-  //     );
-  //
-  //     final decoded = jsonDecode(response.body);
-  //     if (decoded['success']) {
-  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("비밀번호 변경 완료")));
-  //       Navigator.pop(context);
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("실패: ${decoded['message']}")));
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("에러 발생: $e")));
-  //   }
-  // }
-
   Future<void> deleteAccount(BuildContext context) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -233,16 +222,6 @@ class LoginController extends GetxController {
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("오류 발생: $e")));
     }
   }
-
-  // void handleGoogleLogin(BuildContext context) async {
-  //   isLoading.value = true; // 먼저 로딩 시작
-  //
-  //   try {
-  //     await signInWithGoogle(context); // await 추가
-  //   } finally {
-  //     isLoading.value = false; // 항상 로딩 종료
-  //   }
-  // }
 
   void handleLogin(BuildContext context) async {
     isLoading.value = true; // 먼저 로딩 시작
