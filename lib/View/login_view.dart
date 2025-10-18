@@ -4,8 +4,8 @@ import '../Controller/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
-  static String route = '/login';
 
+  static String route = '/login';
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +51,7 @@ class LoginView extends GetView<LoginController> {
               const Text(
                 '전기차 충전소를 쉽게 찾아보세요',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 40),
 
@@ -98,12 +95,7 @@ class LoginView extends GetView<LoginController> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                child: Obx(
-                  () => Text(
-                    controller.isLoading.value ? '로그인 중...' : '로그인',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+                child: Obx(() => Text(controller.isLoading.value ? '로그인 중...' : '로그인', style: const TextStyle(fontSize: 16, color: Colors.white))),
               ),
               const SizedBox(height: 15),
 
@@ -135,19 +127,13 @@ class LoginView extends GetView<LoginController> {
               Center(
                 child: TextButton(
                   onPressed: controller.handleSignup,
-                  child: const Text(
-                    '아직 계정이 없으신가요? 회원가입',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: const Text('아직 계정이 없으신가요? 회원가입', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
               ),
               Center(
                 child: TextButton(
                   onPressed: () => Get.toNamed("/find"),
-                  child: const Text(
-                    '비밀번호 찾기',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: const Text('비밀번호 찾기', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
               ),
 
@@ -155,10 +141,7 @@ class LoginView extends GetView<LoginController> {
 
               // 추가 정보
               const Center(
-                child: Text(
-                  '전국 전기차 충전소 정보를 한눈에',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                child: Text('전국 전기차 충전소 정보를 한눈에', style: TextStyle(fontSize: 12, color: Colors.grey)),
               ),
             ],
           ),
