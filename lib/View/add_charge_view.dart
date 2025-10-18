@@ -11,7 +11,6 @@ class AddChargeView extends GetView<AddChargeController> {
 
   @override
   Widget build(BuildContext context) {
-    controller.loadHostCharge();
     return Scaffold(
       backgroundColor: Color(0xFFF7F9FC),
       appBar: AppBar(
