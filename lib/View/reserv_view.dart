@@ -58,14 +58,7 @@ class ReservView extends GetView<ReservController> {
     );
   }
 
-  Widget _payMethodTile({
-    required String id,
-    required String title,
-    required bool selected,
-    required VoidCallback onTap,
-    String? subtitle,
-    bool tall = false,
-  }) {
+  Widget _payMethodTile({required String id, required String title, required bool selected, required VoidCallback onTap, String? subtitle, bool tall = false}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -76,9 +69,7 @@ class ReservView extends GetView<ReservController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: selected ? _accent : _border, width: selected ? 1.6 : 1),
-          boxShadow: selected
-              ? [BoxShadow(color: _accent.withOpacity(0.08), blurRadius: 8, offset: const Offset(0, 2))]
-              : null,
+          boxShadow: selected ? [BoxShadow(color: _accent.withOpacity(0.08), blurRadius: 8, offset: const Offset(0, 2))] : null,
         ),
         child: Row(
           children: [
@@ -87,11 +78,11 @@ class ReservView extends GetView<ReservController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _textDark)),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(fontSize: 12, color: _textSub)),
-                  ],
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _textDark),
+                  ),
+                  if (subtitle != null) ...[const SizedBox(height: 2), Text(subtitle, style: const TextStyle(fontSize: 12, color: _textSub))],
                 ],
               ),
             ),
@@ -119,202 +110,208 @@ class ReservView extends GetView<ReservController> {
     return Scaffold(
       backgroundColor: _panelBg,
       appBar: AppBar(title: const Text("충전소 예약"), elevation: 0, backgroundColor: Colors.white, foregroundColor: _textDark),
-      body: SingleChildScrollView(
-        // 전체를 감싸는 하나의 스크롤뷰
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Card(
-              color: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 헤더
-                    const Text(
-                      "기본 정보 입력",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: _textDark),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text("예약 정보를 입력해주세요.", style: TextStyle(fontSize: 13, color: _textSub)),
-                    const SizedBox(height: 18),
+      body: Obx(
+        () => controller.isFetched.value == true
+            ? SingleChildScrollView(
+                // 전체를 감싸는 하나의 스크롤뷰
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 헤더
+                            const Text(
+                              "기본 정보 입력",
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: _textDark),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text("예약 정보를 입력해주세요.", style: TextStyle(fontSize: 13, color: _textSub)),
+                            const SizedBox(height: 18),
 
-                    // 연락처
-                    _label(Icons.call_rounded, '연락처', required: true),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: controller.contactController,
-                      keyboardType: TextInputType.phone,
-                      decoration: _decoration("예: 010-1234-5678", prefix: const Icon(Icons.call_rounded, size: 18, color: _textSub)),
-                    ),
+                            Column(
+                              children: [
+                                // 연락처
+                                _label(Icons.call_rounded, '연락처', required: true),
+                                const SizedBox(height: 8),
+                                controller.phone == ''
+                                    ? TextFormField(
+                                        controller: controller.contactController,
+                                        keyboardType: TextInputType.phone,
+                                        decoration: _decoration("예: 010-1234-5678", prefix: const Icon(Icons.call_rounded, size: 18, color: _textSub)),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            // Icon(Icons.call_rounded, size: 18, color: _textSub),
+                                            SizedBox(width: Get.size.width * 0.02),
+                                            Text(controller.phone!, style: TextStyle(fontSize: 18)),
+                                          ],
+                                        ),
+                                      ),
+                              ],
+                            ),
 
-                    const SizedBox(height: 18),
+                            const SizedBox(height: 18),
 
-                    // 시작 시간
-                    _label(Icons.play_circle_fill_rounded, '시작 시간', required: true),
-                    const SizedBox(height: 8),
-                    Column(
-                      children: [
-                        TextFormField(
-                          controller: controller.startController,
-                          readOnly: true,
-                          decoration: _decoration(
-                            "시작 시간을 선택하세요",
-                            prefix: const Icon(Icons.access_time_rounded, size: 18, color: _textSub),
-                            suffix: Obx(
-                              () => AnimatedRotation(
-                                turns: isStartTimeVisible.value ? 0.5 : 0,
-                                duration: const Duration(milliseconds: 300),
-                                child: const Icon(Icons.keyboard_arrow_down_rounded),
+                            // 시작 시간
+                            _label(Icons.play_circle_fill_rounded, '시작 시간', required: true),
+                            const SizedBox(height: 8),
+                            Column(
+                              children: [
+                                TextFormField(
+                                  controller: controller.startController,
+                                  readOnly: true,
+                                  decoration: _decoration(
+                                    "시작 시간을 선택하세요",
+                                    prefix: const Icon(Icons.access_time_rounded, size: 18, color: _textSub),
+                                    suffix: Obx(
+                                      () => AnimatedRotation(
+                                        turns: isStartTimeVisible.value ? 0.5 : 0,
+                                        duration: const Duration(milliseconds: 300),
+                                        child: const Icon(Icons.keyboard_arrow_down_rounded),
+                                      ),
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    isStartTimeVisible.toggle();
+                                    if (isEndTimeVisible.value) {
+                                      isEndTimeVisible.value = false;
+                                    }
+                                  },
+                                ),
+
+                                GetBuilder<ReservController>(
+                                  builder: (controller) => ReservCalendarWidget(
+                                    isVisible: isStartTimeVisible,
+                                    controller: controller.startController,
+                                    selectedDate: controller.selectedStartDate,
+                                    borderColor: Colors.grey.shade300,
+                                    accentColor: _accent,
+                                    onDateSelected: (date) {
+                                      controller.selectStartDate(date);
+                                    },
+                                    onDateTimeSelected: () {
+                                      print('시작 시간이 선택되었습니다: ${controller.startController.text}');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // 종료 시간
+                            _label(Icons.stop_circle_rounded, '종료 시간', required: true),
+                            const SizedBox(height: 8),
+                            Column(
+                              children: [
+                                TextFormField(
+                                  controller: controller.endController,
+                                  readOnly: true,
+                                  decoration: _decoration(
+                                    "종료 시간을 선택하세요",
+                                    prefix: const Icon(Icons.access_time_filled_rounded, size: 18, color: _textSub),
+                                    suffix: Obx(
+                                      () => AnimatedRotation(
+                                        turns: isEndTimeVisible.value ? 0.5 : 0,
+                                        duration: const Duration(milliseconds: 300),
+                                        child: const Icon(Icons.keyboard_arrow_down_rounded),
+                                      ),
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    isEndTimeVisible.toggle();
+                                    if (isStartTimeVisible.value) {
+                                      isStartTimeVisible.value = false;
+                                    }
+                                  },
+                                ),
+
+                                GetBuilder<ReservController>(
+                                  builder: (controller) => ReservCalendarWidget(
+                                    isVisible: isEndTimeVisible,
+                                    controller: controller.endController,
+                                    selectedDate: controller.selectedEndDate,
+                                    borderColor: Colors.grey.shade300,
+                                    accentColor: _accent,
+                                    onDateSelected: (date) {
+                                      controller.selectEndDate(date);
+                                    },
+                                    onDateTimeSelected: () {
+                                      // Controller의 검증 메서드 사용
+                                      if (controller.validateEndTime()) {
+                                        print('종료 시간이 선택되었습니다: ${controller.endController.text}');
+                                      }
+                                    },
+                                    // disabledDates: ['2025-10-21'],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 22),
+                            const SizedBox(height: 16),
+                            _label(Icons.payments_rounded, '결제 수단 선택'),
+                            const SizedBox(height: 10),
+
+                            Obx(
+                              () => Column(
+                                children: [
+                                  _payMethodTile(id: 'kakao', title: '카카오페이', selected: payMethod.value == 'kakao', onTap: () => payMethod.value = 'kakao'),
+                                  const SizedBox(height: 10),
+                                  _payMethodTile(id: 'naver', title: '네이버페이', selected: payMethod.value == 'naver', onTap: () => payMethod.value = 'naver'),
+                                  const SizedBox(height: 10),
+                                  _payMethodTile(id: 'toss', title: '토스페이', selected: payMethod.value == 'toss', onTap: () => payMethod.value = 'toss'),
+
+                                  const SizedBox(height: 16),
+
+                                  _payMethodTile(
+                                    id: 'card',
+                                    title: '카드 추가',
+                                    subtitle: '신용카드 또는 체크카드를 등록해주세요',
+                                    selected: payMethod.value == 'card',
+                                    onTap: () => payMethod.value = 'card',
+                                    tall: true,
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                          onTap: () {
-                            isStartTimeVisible.toggle();
-                            if (isEndTimeVisible.value) {
-                              isEndTimeVisible.value = false;
-                            }
-                          },
-                        ),
 
-                        GetBuilder<ReservController>(
-                          builder: (controller) => ReservCalendarWidget(
-                            isVisible: isStartTimeVisible,
-                            controller: controller.startController,
-                            selectedDate: controller.selectedStartDate,
-                            borderColor: Colors.grey.shade300,
-                            accentColor: _accent,
-                            onDateSelected: (date) {
-                              controller.selectStartDate(date);
-                            },
-                            onDateTimeSelected: () {
-                              print('시작 시간이 선택되었습니다: ${controller.startController.text}');
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 종료 시간
-                    _label(Icons.stop_circle_rounded, '종료 시간', required: true),
-                    const SizedBox(height: 8),
-                    Column(
-                      children: [
-                        TextFormField(
-                          controller: controller.endController,
-                          readOnly: true,
-                          decoration: _decoration(
-                            "종료 시간을 선택하세요",
-                            prefix: const Icon(Icons.access_time_filled_rounded, size: 18, color: _textSub),
-                            suffix: Obx(
-                              () => AnimatedRotation(
-                                turns: isEndTimeVisible.value ? 0.5 : 0,
-                                duration: const Duration(milliseconds: 300),
-                                child: const Icon(Icons.keyboard_arrow_down_rounded),
+                            // 예약 버튼
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  controller.reserv(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _accent,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                                ),
+                                child: const Text("예약"),
                               ),
                             ),
-                          ),
-                          onTap: () {
-                            isEndTimeVisible.toggle();
-                            if (isStartTimeVisible.value) {
-                              isStartTimeVisible.value = false;
-                            }
-                          },
+                          ],
                         ),
-
-                        GetBuilder<ReservController>(
-                          builder: (controller) => ReservCalendarWidget(
-                            isVisible: isEndTimeVisible,
-                            controller: controller.endController,
-                            selectedDate: controller.selectedEndDate,
-                            borderColor: Colors.grey.shade300,
-                            accentColor: _accent,
-                            onDateSelected: (date) {
-                              controller.selectEndDate(date);
-                            },
-                            onDateTimeSelected: () {
-                              // Controller의 검증 메서드 사용
-                              if (controller.validateEndTime()) {
-                                print('종료 시간이 선택되었습니다: ${controller.endController.text}');
-                              }
-                            },
-                            // disabledDates: ['2025-10-21'],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 22),
-                    const SizedBox(height: 16),
-                    _label(Icons.payments_rounded, '결제 수단 선택'),
-                    const SizedBox(height: 10),
-
-                    Obx(() => Column(
-                      children: [
-                        _payMethodTile(
-                          id: 'kakao',
-                          title: '카카오페이',
-                          selected: payMethod.value == 'kakao',
-                          onTap: () => payMethod.value = 'kakao',
-                        ),
-                        const SizedBox(height: 10),
-                        _payMethodTile(
-                          id: 'naver',
-                          title: '네이버페이',
-                          selected: payMethod.value == 'naver',
-                          onTap: () => payMethod.value = 'naver',
-                        ),
-                        const SizedBox(height: 10),
-                        _payMethodTile(
-                          id: 'toss',
-                          title: '토스페이',
-                          selected: payMethod.value == 'toss',
-                          onTap: () => payMethod.value = 'toss',
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        _payMethodTile(
-                          id: 'card',
-                          title: '카드 추가',
-                          subtitle: '신용카드 또는 체크카드를 등록해주세요',
-                          selected: payMethod.value == 'card',
-                          onTap: () => payMethod.value = 'card',
-                          tall: true,
-                        ),
-                      ],
-                    )),
-
-                    // 예약 버튼
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          controller.reserv(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _accent,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-                        ),
-                        child: const Text("예약"),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ),
+              )
+            : const Center(child: CircularProgressIndicator()),
       ),
     );
   }

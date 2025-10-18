@@ -22,12 +22,14 @@ class ReservController extends GetxController {
   Map<String, dynamic>? reservdata;
 
   bool isUpdate = false;
+  RxBool isFetched = false.obs;
 
   String? uid;
   String? shareId;
   String? ownerUid;
   String? userName;
   String? reserveId;
+  String? phone;
 
   @override
   void onInit() {
@@ -144,19 +146,19 @@ class ReservController extends GetxController {
       }
     }
     // _resetState(); 입력 창 초기화
-
   }
 
-
-
   Future<void> _loadUidandUsername() async {
+    isFetched.value = false;
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
     userName = prefs.getString('name');
+    phone = prefs.getString('phone');
+    isFetched.value = true;
   }
 
   Future<void> reserv(BuildContext context) async {
-    final userPNumber = contactController.text;
+    final userPNumber = phone != '' ? phone! : contactController.text;
     final startTimeText = startController.text;
     final endTimeText = endController.text;
 
@@ -170,7 +172,6 @@ class ReservController extends GetxController {
     // parseDateTime으로 파싱 후 UTC ISO 형식으로 변환
     final startDateTime = parseDateTime(startTimeText);
     final endDateTime = parseDateTime(endTimeText);
-
 
     if (startDateTime == null || endDateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('시간 형식이 올바르지 않습니다.')));
@@ -211,18 +212,16 @@ class ReservController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.snackbar('', successMessage);
-        if(!isUpdate) {
+        if (!isUpdate) {
           Map<String, dynamic> respJson = {};
           try {
             respJson = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
           } catch (_) {}
-          final created = (respJson['data'] is Map)
-              ? (respJson['data'] as Map<String, dynamic>)
-              : respJson;
+          final created = (respJson['data'] is Map) ? (respJson['data'] as Map<String, dynamic>) : respJson;
 
           final createdReservationId = created['reserveId'].toString();
 
-          if(createdReservationId.isEmpty) {
+          if (createdReservationId.isEmpty) {
             Get.snackbar('', '예약 id를 찾을 수 없습니다.');
           }
           kakaopay(reserveId: createdReservationId, amount: total);
@@ -250,8 +249,7 @@ class ReservController extends GetxController {
 
     try {
       isLoading.value = true;
-      final url = Uri.parse(
-          '${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
+      final url = Uri.parse('${ApiConstants.reservApiBaseUrl}/${uid}/${reserveId}');
       final response = await http.delete(url);
 
       if (response.statusCode == 200) {
@@ -271,7 +269,7 @@ class ReservController extends GetxController {
 
   StreamSubscription<Uri>? linkSub;
 
-  Future <void> kakaopay({required String reserveId, required int amount}) async {
+  Future<void> kakaopay({required String reserveId, required int amount}) async {
     try {
       isLoading.value = true;
       paymentReserveId = reserveId;
@@ -282,7 +280,7 @@ class ReservController extends GetxController {
           "uid": uid,
           "itemName": reservdata?['stationName'],
           "amount": amount,
-          "reserveId": reserveId //id는 예약 응답
+          "reserveId": reserveId, //id는 예약 응답
         }),
       );
       print("kakao 서버 응답 코드: ${response.statusCode}");
@@ -300,26 +298,16 @@ class ReservController extends GetxController {
       lastOrderId = data['orderId'];
 
       final String webUrl = data['next_redirect_mobile_url'];
-      final String? scheme = Platform.isAndroid
-          ? data['android_app_scheme']
-          : data['ios_app_scheme'];
+      final String? scheme = Platform.isAndroid ? data['android_app_scheme'] : data['ios_app_scheme'];
 
       if (scheme != null && scheme.isNotEmpty) {
         final appUri = Uri.parse(scheme);
         if (await canLaunchUrl(appUri)) {
-          if (await launchUrl(appUri, mode: LaunchMode.externalApplication))
-            return;
+          if (await launchUrl(appUri, mode: LaunchMode.externalApplication)) return;
         }
       }
 
-      await launchUrl(
-        Uri.parse(webUrl),
-        mode: LaunchMode.inAppBrowserView,
-        webViewConfiguration: const WebViewConfiguration(
-          enableJavaScript: true,
-          enableDomStorage: true,
-        ),
-      );
+      await launchUrl(Uri.parse(webUrl), mode: LaunchMode.inAppBrowserView, webViewConfiguration: const WebViewConfiguration(enableJavaScript: true, enableDomStorage: true));
     } finally {
       isLoading.value = false;
       Future.delayed(const Duration(seconds: 60), () {
@@ -333,10 +321,7 @@ class ReservController extends GetxController {
 
   void startPayLinkListener() {
     linkSub?.cancel();
-    linkSub = appLinks.uriLinkStream.listen(
-          (uri) => handlePayUri(uri),
-      onError: (e) =>Get.snackbar('링크 오류', e.toString()),
-    );
+    linkSub = appLinks.uriLinkStream.listen((uri) => handlePayUri(uri), onError: (e) => Get.snackbar('링크 오류', e.toString()));
   }
 
   void stopPayLinkListener() {
@@ -375,20 +360,14 @@ class ReservController extends GetxController {
     // }
   }
 
-  Future<void> approvePayment(
-      {required String pgToken, required String orderId}) async {
+  Future<void> approvePayment({required String pgToken, required String orderId}) async {
     try {
       isLoading.value = true;
 
       final response = await http.post(
         Uri.parse('${ApiConstants.payApiBaseUrl}/approve'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "pg_token": pgToken,
-          "tid": lastTid,
-          "uid": uid,
-          "orderId": lastOrderId,
-        }),
+        body: jsonEncode({"pg_token": pgToken, "tid": lastTid, "uid": uid, "orderId": lastOrderId}),
       );
 
       if (response.statusCode == 200) {
@@ -401,15 +380,16 @@ class ReservController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
 
+  bool _isOverlapError(http.Response resp) {
+    try {
+      final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
+      final text = '${data['error'] ?? ''} ${data['status'] ?? ''} ';
+      return text.contains('이미 예약된 시간') || text.contains('겹칩니다');
+    } catch (_) {
+      final raw = utf8.decode(resp.bodyBytes);
+      return raw.contains('이미 예약된 시간') || raw.contains('겹칩니다');
+    }
   }
-bool _isOverlapError(http.Response resp) {
-  try {
-    final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
-    final text = '${data['error'] ?? ''} ${data['status'] ?? ''} ';
-    return text.contains('이미 예약된 시간') || text.contains('겹칩니다');
-  } catch (_) {
-    final raw = utf8.decode(resp.bodyBytes);
-    return raw.contains('이미 예약된 시간') || raw.contains('겹칩니다');
-  }
-}}
+}

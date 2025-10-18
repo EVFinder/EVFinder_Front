@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Constants/api_constants.dart';
 
-
 class RegisterChargeController extends GetxController {
   final addrController = TextEditingController();
   final detailaddrController = TextEditingController();
@@ -22,22 +21,27 @@ class RegisterChargeController extends GetxController {
   final Rx<double?> lon = Rx<double?>(null);
 
   final selectedStat = Rxn<String>();
-  final Map<String, String> statOptions = {
-    'available': '사용 가능',
-    'unavailable': '불가능',
-  };
+  final Map<String, String> statOptions = {'available': '사용 가능', 'unavailable': '불가능'};
 
   String? uid;
   String? userName;
+  String? phone;
+
+  RxBool isFetched = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     _loadUid();
   }
+
   Future<void> _loadUid() async {
+    isFetched.value = false;
     final prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid'); // 로그인 시 setString('uid', uid)로 저장했던 값
     userName = prefs.getString('name');
+    phone = prefs.getString('phone');
+    isFetched.value = true;
   }
 
   void resetForm() {
@@ -69,30 +73,27 @@ class RegisterChargeController extends GetxController {
   }
 
   Future<void> openPostcode() async {
-    await Get.to(() => KpostalView(
-      callback: (Kpostal result) {
-        addrController.text = result.roadAddress.isNotEmpty
-            ? result.roadAddress
-            : result.address;
-        lat.value = result.latitude;
-        lon.value = result.longitude;
-
-      },
-    ));
+    await Get.to(
+      () => KpostalView(
+        callback: (Kpostal result) {
+          addrController.text = result.roadAddress.isNotEmpty ? result.roadAddress : result.address;
+          lat.value = result.latitude;
+          lon.value = result.longitude;
+        },
+      ),
+    );
   }
 
-  Future <bool> register(BuildContext context) async {
+  Future<bool> register(BuildContext context) async {
     final address = '${addrController.text.trim()} ${detailaddrController.text.trim()}'.trim();
-    final hostContact = phoneController.text;
+    final hostContact = phone != '' ? phone! : phoneController.text;
     final stationName = chargeNameContrller.text;
     final chargerType = chargeTypeController.text;
     final power = powerController.text;
     final pricePerHour = priceContoller.text;
     final status = selectedStat.value;
-    if(address.isEmpty || hostContact.isEmpty || stationName.isEmpty|| chargerType.isEmpty || power.isEmpty || pricePerHour.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('모든 필드를 채워주세요.')),
-      );
+    if (address.isEmpty || hostContact.isEmpty || stationName.isEmpty || chargerType.isEmpty || power.isEmpty || pricePerHour.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('모든 필드를 채워주세요.')));
       return false;
     }
 
@@ -104,25 +105,22 @@ class RegisterChargeController extends GetxController {
           'address': address,
           'lat': lat.value,
           'lon': lon.value,
-          'hostName':userName,
-          'hostContact':hostContact,
-          'stationName':stationName,
+          'hostName': userName,
+          'hostContact': hostContact,
+          'stationName': stationName,
           'chargerType': chargerType,
           'power': power,
-          'pricePerHour':pricePerHour,
-          'status':status})
+          'pricePerHour': pricePerHour,
+          'status': status,
+        }),
       );
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('등록 완료!')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('등록 완료!')));
         resetForm();
         return true;
-      }else {
+      } else {
         final msg = response.body.isNotEmpty ? response.body : '요청 실패';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('등록 실패(${response.statusCode}) : $msg')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('등록 실패(${response.statusCode}) : $msg')));
         return false;
       }
     } catch (e) {

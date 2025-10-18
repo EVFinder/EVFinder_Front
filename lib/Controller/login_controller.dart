@@ -103,7 +103,7 @@ class LoginController extends GetxController {
         await prefs.setString('uid', uid); //uid 저장
         await prefs.setString('email', email);
         await prefs.setString('name', userName);
-        await prefs.setString('phone', phoneNum);
+        await prefs.setString('phone', formatPhoneNumber(phoneNum));
         // Get.snackbar('성공', '로그인 성공');
         // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('로그인 성공')));
 
@@ -121,6 +121,19 @@ class LoginController extends GetxController {
       Get.snackbar('실패', '로그인 실패: ${e.toString()}');
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패: ${e.toString()}')));
     }
+  }
+
+  String formatPhoneNumber(String phoneNumber) {
+    // 숫자만 추출
+    String numbers = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (numbers.length == 11 && numbers.startsWith('010')) {
+      return '${numbers.substring(0, 3)}-${numbers.substring(3, 7)}-${numbers.substring(7)}';
+    } else if (numbers.length == 10) {
+      return '${numbers.substring(0, 3)}-${numbers.substring(3, 6)}-${numbers.substring(6)}';
+    }
+
+    return phoneNumber; // 포맷팅할 수 없으면 원본 반환
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
