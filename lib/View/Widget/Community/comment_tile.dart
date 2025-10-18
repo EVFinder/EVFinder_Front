@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-import '../../../Controller/community_controller.dart';
+import '../../../Controller/MainPage/Community/community_controller.dart';
 import '../../../Model/community_comment.dart';
 import '../../../Util/Route/app_page.dart';
 import '../../../Util/convert_time.dart';

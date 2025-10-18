@@ -1,4 +1,4 @@
-import 'package:evfinder_front/Controller/community_controller.dart';
+import 'package:evfinder_front/Controller/MainPage/Community/community_controller.dart';
 import 'package:evfinder_front/Model/community_post.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
